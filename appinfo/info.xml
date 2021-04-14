@@ -14,7 +14,7 @@
     <category>office</category>
     <bugs>https://github.com/eideasy/nextcloud-electronic-signatures-plugin/issues</bugs>
     <dependencies>
-        <nextcloud min-version="15" max-version="15"/>
+        <nextcloud min-version="21" max-version="21"/>
     </dependencies>
     <navigations>
         <navigation>
