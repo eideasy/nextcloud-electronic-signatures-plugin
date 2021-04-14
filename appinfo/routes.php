@@ -8,8 +8,9 @@
  * it's instantiated in there
  */
 return [
-    'routes' => [
-	   ['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
-	   ['name' => 'page#do_echo', 'url' => '/echo', 'verb' => 'POST'],
-    ]
+	'routes' => [
+		// TODO remove index page route & Controller.
+		['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
+		['name' => 'sign#getSignLink', 'url' => '/get_sign_link', 'verb' => 'GET'],
+	]
 ];
