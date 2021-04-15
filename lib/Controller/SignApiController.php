@@ -55,7 +55,7 @@ class SignApiController extends Controller {
         // TODO de-validate these credentials in prod server, since they will be visible in git log.
         $clientId = 'TZJ0jMX0ukI49YgUrHrlIJEfo0R6jBGE';
 
-        $token = $this->generateRandomString(32);
+        $token = $this->generateRandomString(30);
 
         $responseBody = $this->startSigningSession($path, $base64, $token);
 
