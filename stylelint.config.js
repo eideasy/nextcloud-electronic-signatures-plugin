@@ -1,7 +1,7 @@
 module.exports = {
 	extends: 'stylelint-config-recommended-scss',
 	rules: {
-		indentation: 'tab',
+		indentation: 2,
 		'selector-type-no-unknown': null,
 		'number-leading-zero': null,
 		'rule-empty-line-before': [

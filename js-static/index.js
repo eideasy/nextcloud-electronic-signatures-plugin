@@ -1,6 +1,3 @@
-alert('test');
-
-
 var fileActionsPlugin = {
   attach: function (fileList) {
     console.log('fileActionsPlugin');
