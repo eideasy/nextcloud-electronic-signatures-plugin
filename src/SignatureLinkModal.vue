@@ -27,6 +27,7 @@ export default {
           return;
         }
         // TODO: make this url dynamic
+        // TODO: add CSRF token https://docs.nextcloud.com/server/latest/developer_manual/basics/front-end/js.html#sending-the-csrf-token
         axios.get('/nextcloud/index.php/apps/electronicsignatures/get_sign_link?path=' + this.filename, {
           responseType: 'json',
         })
