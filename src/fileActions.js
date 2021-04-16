@@ -20,7 +20,7 @@ function addCustomFileActions() {
     attach(fileList) {
       console.log('fileActionsPlugin');
       fileList.fileActions.registerAction({
-        mime: 'all',
+        mime: 'file',
         name: 'Sign',
         displayName: 'Get signing url',
         order: -100,
