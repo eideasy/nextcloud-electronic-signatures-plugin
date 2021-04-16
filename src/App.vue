@@ -1,6 +1,5 @@
 <template>
-	<Content :class="{'icon-loading': loading}" app-name="vueexample">
-	</Content>
+	<Content :class="{'icon-loading': loading}" app-name="vueexample" />
 </template>
 
 <script>

@@ -16,8 +16,6 @@ function addCustomFileActions() {
     },
   });
 
-  console.log(vm.$refs);
-
   const fileActionsPlugin = {
     attach(fileList) {
       console.log('fileActionsPlugin');
