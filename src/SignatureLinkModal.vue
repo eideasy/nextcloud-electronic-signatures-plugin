@@ -1,4 +1,5 @@
 <script>
+import copy from 'copy-to-clipboard';
 import axios from 'axios';
 import Modal from '@nextcloud/vue/dist/Components/Modal';
 import EventBus from './EventBus';
@@ -18,7 +19,7 @@ export default {
   data() {
     return {
       modal: false,
-      signingLink: '',
+      signingUrl: '',
     };
   },
   mounted() {
@@ -44,8 +45,8 @@ export default {
     });
   },
   methods: {
-    setSigningLink(signingLink) {
-      this.signingLink = signingLink;
+    setSigningLink(signingUrl) {
+      this.signingUrl = signingUrl;
     },
     showModal() {
       this.modal = true;
@@ -53,6 +54,15 @@ export default {
     closeModal() {
       this.modal = false;
     },
+    clearSelection(event) {
+      event.target.setSelectionRange(0);
+    },
+    selectAll(event) {
+      event.target.setSelectionRange(0, event.target.value.length);
+    },
+    copyToClipboard() {
+      copy(this.signingUrl);
+    }
   },
 };
 </script>
@@ -65,9 +75,18 @@ export default {
       <div
         class="modal__content">
         <div
-            v-if="signingLink"
-            class="signingLinkHolder">
-          {{ signingLink }}
+            v-if="signingUrl"
+            class="signingUrlHolder">
+          <div class="copyField">
+            <input
+                type="text"
+                aria-label="Signing link URL"
+                readonly="readonly"
+                class="staticInput"
+                @click="selectAll"
+                :value="signingUrl">
+            <button @click="copyToClipboard">Copy</button>
+          </div>
         </div>
         <div v-else
           class="loader">
@@ -80,10 +99,9 @@ export default {
 
 <style scoped>
   .modal__content {
-    width: 100%;
-    max-width: 700px;
-    min-width: 200px;
-    padding: 2rem;
+    width: 68vw;
+    max-width: 600px;
+    padding: 2rem 1rem;
     box-sizing: border-box;
   }
 
@@ -95,8 +113,22 @@ export default {
     margin: 0 auto;
   }
 
-  .signingLinkHolder {
+  .copyField {
+    display: flex;
+  }
+
+  .staticInput {
+    width: 100%;
+  }
+
+  .signingUrlHolder {
     user-select: text;
     cursor: text;
+  }
+
+  @media (min-width: 600px) {
+    .modal__content {
+      padding: 2rem;
+    }
   }
 </style>
