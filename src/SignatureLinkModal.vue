@@ -1,6 +1,7 @@
 <script>
 import axios from 'axios';
 import Modal from '@nextcloud/vue/dist/Components/Modal';
+import EventBus from './EventBus';
 
 export default {
   name: 'SignatureLinkModal',
@@ -15,38 +16,32 @@ export default {
   },
   data() {
     return {
-      modal: true,
+      modal: false,
       signingLink: '',
     };
   },
-  watch: {
-    modal: {
-      handler(newValue, oldValue) {
-        const _self = this;
-        if (!newValue) {
-          return;
-        }
-        // TODO: make this url dynamic
-        // TODO: add CSRF token https://docs.nextcloud.com/server/latest/developer_manual/basics/front-end/js.html#sending-the-csrf-token
-        axios.get('/nextcloud/index.php/apps/electronicsignatures/get_sign_link?path=' + this.filename, {
-          responseType: 'json',
-        })
-            .then(function(response) {
-              _self.setSigningLink(response.data.sign_link);
-            })
-            .catch(function(error) {
-              console.log(error);
-            })
-            .then(function() {
-              // always executed
-            });
-      },
-      immediate: true,
-    },
+  mounted() {
+    const _self = this;
+    EventBus.$on('GET_SIGNING_LINK_CLICK', function(payload) {
+      _self.setSigningLink('');
+      _self.showModal();
+      console.log(payload);
+      axios.get('/nextcloud/index.php/apps/electronicsignatures/get_sign_link?path=' + payload.filename, {
+        responseType: 'json',
+      })
+          .then(function(response) {
+            _self.setSigningLink(response.data.sign_link);
+          })
+          .catch(function(error) {
+            console.log(error);
+          })
+          .then(function() {
+            // always executed
+          });
+    });
   },
   methods: {
     setSigningLink(signingLink) {
-      console.log(signingLink);
       this.signingLink = signingLink;
     },
     showModal() {
@@ -61,7 +56,10 @@ export default {
 
 <template>
   <div>
-    <modal v-if="modal" @close="closeModal">
+    <modal
+        ref="modal"
+        v-if="modal"
+        @close="closeModal">
       <div
           class="modal__content">
         <div
