@@ -37,9 +37,11 @@ export default {
             _self.setSigningLink(response.data.sign_link);
           })
           .catch(function(error) {
+            // TODO: handle errors
             console.log(error);
           })
           .then(function() {
+            // TODO: hide loader
             // always executed
           });
     });
@@ -85,7 +87,7 @@ export default {
                 class="staticInput"
                 @click="selectAll"
                 :value="signingUrl">
-            <button @click="copyToClipboard">Copy</button>
+            <button @click="copyToClipboard">{{ $t($globalConfig.appId, 'Copy') }}</button>
           </div>
         </div>
         <div v-else

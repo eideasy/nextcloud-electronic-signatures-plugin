@@ -1,8 +1,15 @@
+import config from './config';
 import Vue from 'vue';
 import SignatureLinkModal from './SignatureLinkModal';
 import EventBus from './EventBus';
+import { translate, translatePlural } from '@nextcloud/l10n';
+
+Vue.prototype.$t = translate;
+Vue.prototype.$n = translatePlural;
+Vue.prototype.$globalConfig = config;
 
 function addCustomFileActions() {
+  const { t } = window;
 
   const modalHolderId = 'esigModalHolder';
   const modalHolder = document.createElement('div');
@@ -22,7 +29,7 @@ function addCustomFileActions() {
       fileList.fileActions.registerAction({
         mime: 'file',
         name: 'Sign',
-        displayName: 'Get signing url',
+        displayName: t(config.appId, 'Get signing URL'),
         order: -100,
         permissions: 0,
         iconClass: 'icon-shared',
