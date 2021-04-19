@@ -16,7 +16,7 @@ class Config {
 
     public function getClientId(): string
     {
-        if (!$this->clientId) {
+        if (!isset($this->clientId)) {
             $this->clientId = $this->config->getAppValue('electronicsignatures', 'client_id');
         }
 
@@ -25,7 +25,7 @@ class Config {
 
     public function getSecret(): string
     {
-        if (!$this->clientId) {
+        if (!isset($this->secret)) {
             $this->secret = $this->config->getAppValue('electronicsignatures', 'secret');
         }
 
@@ -36,7 +36,7 @@ class Config {
     {
         $path = ltrim($path, '/');
 
-        if (!$this->baseUrl) {
+        if (!isset($this->baseUrl)) {
             $url = $this->config->getAppValue('electronicsignatures', 'base_url', 'https://id.eideasy.com/api');
             $this->baseUrl = rtrim($url, '/');
         }
