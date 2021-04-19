@@ -2,6 +2,7 @@
 
 namespace OCA\ElectronicSignatures\Controller;
 
+use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Db\Session;
 use OCA\ElectronicSignatures\Db\SessionMapper;
 use OCA\ElectronicSignatures\Exceptions\EidEasyException;
@@ -26,12 +27,16 @@ class SignApiController extends Controller {
     /** @var SessionMapper */
     private $mapper;
 
-	public function __construct($AppName, IRequest $request, IRootFolder $storage, IClientService $clientService, SessionMapper $mapper, $UserId) {
+    /** @var Config */
+    private $config;
+
+	public function __construct($AppName, IRequest $request, IRootFolder $storage, IClientService $clientService, SessionMapper $mapper, Config $config, $UserId) {
 		parent::__construct($AppName, $request);
 		$this->userId = $UserId;
 		$this->storage = $storage;
 		$this->mapper = $mapper;
 		$this->httpClientService = $clientService;
+		$this->config = $config;
 	}
 
 	/**
@@ -51,10 +56,6 @@ class SignApiController extends Controller {
 		// TODO mark base64 ext as dependency in composer.json.
 		$base64 = base64_encode($this->getFileContents($path));
 
-        // TODO get credentials from config.
-        // TODO de-validate these credentials in prod server, since they will be visible in git log.
-        $clientId = 'TZJ0jMX0ukI49YgUrHrlIJEfo0R6jBGE';
-
         $token = $this->generateRandomString(30);
 
         $responseBody = $this->startSigningSession($path, $base64, $token);
@@ -69,8 +70,7 @@ class SignApiController extends Controller {
 
         $this->saveSession($token, $docId, $path);
 
-        // TODO get base URL from config.
-        $link = "https://id.eideasy.com/sign_contract_external?client_id=$clientId&doc_id=$docId";
+        $link = $this->config->getUrl("/sign_contract_external?client_id={$this->config->getClientId()}&doc_id=$docId");
 
 		return new JSONResponse(['sign_link' => $link]);
 	}
@@ -103,11 +103,6 @@ class SignApiController extends Controller {
     }
 
     private function startSigningSession(string $path, string $fileContentBase64, string $token): array {
-        // TODO get credentials from config.
-        // TODO de-validate these credentials in prod server, since they will be visible in git log.
-        $clientId = 'TZJ0jMX0ukI49YgUrHrlIJEfo0R6jBGE';
-        $secret = 'DxeBB3Ep1k9fyAd2jH55BAW4FXYQRfwS';
-
         // Send file to eID Easy server.
         $body = [
             'files' => [
@@ -120,13 +115,12 @@ class SignApiController extends Controller {
             'container_type' => self::CONTAINER_TYPE,
             // TODO get dynamic route.
             'signature_redirect' => "http://localhost:8080/index.php/apps/electronicsignatures/callback?token=$token",
-            'client_id' => $clientId,
-            'secret' => $secret
+            'client_id' => $this->config->getClientId(),
+            'secret' => $this->config->getSecret(),
         ];
 
-        // TODO get base URL from config.
         $client = $this->httpClientService->newClient();
-        $response = $client->post('https://id.eideasy.com/api/signatures/prepare-files-for-signing', [
+        $response = $client->post($this->config->getUrl('api/signatures/prepare-files-for-signing'), [
             'body' => json_encode($body),
             'headers' => [
                 // TODO dynamically get the plugin version and inject to User-Agent.

@@ -1,6 +1,7 @@
 <?php
 namespace OCA\ElectronicSignatures\Controller;
 
+use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Db\Session;
 use OCA\ElectronicSignatures\Db\SessionMapper;
 use OCA\ElectronicSignatures\Exceptions\EidEasyException;
@@ -23,12 +24,24 @@ class PageController extends Controller {
     /** @var SessionMapper */
     private $mapper;
 
-	public function __construct($AppName, IRequest $request, IRootFolder $storage, IClientService $clientService, SessionMapper $mapper, $UserId){
+    /** @var Config */
+    private $config;
+
+	public function __construct(
+	    $AppName,
+        IRequest $request,
+        IRootFolder $storage,
+        IClientService $clientService,
+        SessionMapper $mapper,
+        Config $config,
+        $UserId
+    ){
 		parent::__construct($AppName, $request);
 		$this->userId = $UserId;
         $this->storage = $storage;
         $this->httpClientService = $clientService;
         $this->mapper = $mapper;
+        $this->config = $config;
 	}
 
 	/**
@@ -74,19 +87,14 @@ class PageController extends Controller {
     private function getContainerResponse(Session $session): array {
         // Download signed doc.
         // Send file to eID Easy server.
-        // TODO get credentials from config.
-        // TODO de-validate these credentials in prod server, since they will be visible in git log.
-        $clientId = 'TZJ0jMX0ukI49YgUrHrlIJEfo0R6jBGE';
-        $secret = 'DxeBB3Ep1k9fyAd2jH55BAW4FXYQRfwS';
         $body = [
             'doc_id' => $session->getDocId(),
-            'client_id' => $clientId,
-            'secret' => $secret
+            'client_id' => $this->config->getClientId(),
+            'secret' => $this->config->getSecret(),
         ];
 
-        // TODO get base URL from config.
         $client = $this->httpClientService->newClient();
-        $response = $client->post('https://id.eideasy.com/api/signatures/download-signed-asice', [
+        $response = $client->post($this->config->getUrl('api/signatures/download-signed-asice'), [
             'body' => json_encode($body),
             'headers' => [
                 // TODO dynamically get the plugin version and inject to User-Agent.

@@ -13,5 +13,6 @@ return [
 		['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
 		['name' => 'page#signingCallback', 'url' => '/callback', 'verb' => 'GET'],
 		['name' => 'signApi#getSignLink', 'url' => '/get_sign_link', 'verb' => 'GET'],
+		['name' => 'settingsApi#updateCredentials', 'url' => '/update_credentials', 'verb' => 'POST'],
 	]
 ];
