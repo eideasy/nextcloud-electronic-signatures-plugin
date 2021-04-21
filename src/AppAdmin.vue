@@ -64,6 +64,15 @@ export default {
   <div>
     <div class="section">
       <h2>{{ $t('electronicsignatures', 'Electronic signatures settings') }}</h2>
+      <p class="settings-hint settingsHint">
+        {{ $t('electronicsignatures', 'You can find the credentials on your dashboard at: ') }}
+        <a
+            class="link"
+            target="_blank"
+            href="https://id.eideasy.com/">
+          id.eideasy.com
+        </a>
+      </p>
 
       <div class="statusWrap">
         <SettingsStatus
@@ -119,5 +128,13 @@ export default {
 
   .statusWrap {
     margin: 10px;
+  }
+
+  .link {
+    color: #0082c9;
+  }
+
+  .settingsHint {
+    opacity: 0.9;
   }
 </style>
