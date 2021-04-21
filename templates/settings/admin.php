@@ -6,5 +6,9 @@
 var_dump($_);
 ?>
 
-HELLO THERE
+<div
+  id="electronic-signatures-admin-root"
+  data-client-id="<?php echo $_['client_id_placeholder'] ?>"
+  data-secret="<?php echo $_['secret_placeholder'] ?>"
+></div>
 
