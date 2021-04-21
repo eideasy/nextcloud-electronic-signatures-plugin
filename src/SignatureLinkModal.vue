@@ -1,6 +1,9 @@
 <script>
+import copy from 'copy-to-clipboard';
 import axios from 'axios';
 import Modal from '@nextcloud/vue/dist/Components/Modal';
+import EventBus from './EventBus';
+const { OC } = window;
 
 export default {
   name: 'SignatureLinkModal',
@@ -15,38 +18,37 @@ export default {
   },
   data() {
     return {
-      modal: true,
-      signingLink: '',
+      modal: false,
+      signingUrl: '',
     };
   },
-  watch: {
-    modal: {
-      handler(newValue, oldValue) {
-        const _self = this;
-        if (!newValue) {
-          return;
-        }
-        // TODO: make this url dynamic
-        axios.get('/nextcloud/index.php/apps/electronicsignatures/get_sign_link?path=' + this.filename, {
-          responseType: 'json',
-        })
-            .then(function(response) {
-              _self.setSigningLink(response.data.sign_link);
-            })
-            .catch(function(error) {
-              console.log(error);
-            })
-            .then(function() {
-              // always executed
-            });
-      },
-      immediate: true,
-    },
+  mounted() {
+    const _self = this;
+    EventBus.$on('GET_SIGNING_LINK_CLICK', function(payload) {
+      _self.setSigningLink('');
+      _self.showModal();
+      axios.get(OC.generateUrl('/apps/electronicsignatures/get_sign_link?path=' + payload.filename), {
+        responseType: 'json',
+        headers: {
+          requesttoken: OC.requestToken,
+        },
+      })
+          .then(function(response) {
+            _self.setSigningLink(response.data.sign_link);
+          })
+          .catch(function(error) {
+            // TODO: handle errors
+            console.log(error);
+          })
+          .then(function() {
+            // TODO: hide loader
+            // always executed
+          });
+    });
   },
   methods: {
-    setSigningLink(signingLink) {
-      console.log(signingLink);
-      this.signingLink = signingLink;
+    setSigningLink(signingUrl) {
+      this.signingUrl = signingUrl;
     },
     showModal() {
       this.modal = true;
@@ -54,21 +56,44 @@ export default {
     closeModal() {
       this.modal = false;
     },
+    clearSelection(event) {
+      event.target.setSelectionRange(0);
+    },
+    selectAll(event) {
+      event.target.setSelectionRange(0, event.target.value.length);
+    },
+    copyToClipboard() {
+      copy(this.signingUrl);
+    }
   },
 };
 </script>
 
 <template>
   <div>
-    <modal v-if="modal" @close="closeModal">
+    <modal
+        v-if="modal"
+        @close="closeModal">
       <div
-          class="modal__content">
+        class="modal__content">
         <div
-            v-if="signingLink"
-            class="signingLinkHolder">
-          {{ signingLink }}
+            v-if="signingUrl"
+            class="signingUrlHolder">
+          <div class="copyField">
+            <input
+                type="text"
+                aria-label="Signing link URL"
+                readonly="readonly"
+                class="staticInput"
+                @click="selectAll"
+                :value="signingUrl">
+            <button @click="copyToClipboard">{{ $t($globalConfig.appId, 'Copy') }}</button>
+          </div>
         </div>
-        <div v-else>Loading...</div>
+        <div v-else
+          class="loader">
+          <div class="icon-loading" />
+        </div>
       </div>
     </modal>
   </div>
@@ -76,13 +101,36 @@ export default {
 
 <style scoped>
   .modal__content {
-    width: 100%;
-    max-width: 700px;
-    padding: 2rem;
+    width: 68vw;
+    max-width: 600px;
+    padding: 2rem 1rem;
+    box-sizing: border-box;
   }
 
-  .signingLinkHolder {
+  .modal__content * {
+    box-sizing: border-box;
+  }
+
+  .loader {
+    margin: 0 auto;
+  }
+
+  .copyField {
+    display: flex;
+  }
+
+  .staticInput {
+    width: 100%;
+  }
+
+  .signingUrlHolder {
     user-select: text;
     cursor: text;
+  }
+
+  @media (min-width: 600px) {
+    .modal__content {
+      padding: 2rem;
+    }
   }
 </style>

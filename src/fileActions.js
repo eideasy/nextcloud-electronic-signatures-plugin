@@ -1,34 +1,40 @@
+import config from './config';
 import Vue from 'vue';
 import SignatureLinkModal from './SignatureLinkModal';
+import EventBus from './EventBus';
+import { translate, translatePlural } from '@nextcloud/l10n';
+
+Vue.prototype.$t = translate;
+Vue.prototype.$n = translatePlural;
+Vue.prototype.$globalConfig = config;
 
 function addCustomFileActions() {
+  const { t } = window;
 
   const modalHolderId = 'esigModalHolder';
   const modalHolder = document.createElement('div');
   modalHolder.id = modalHolderId;
+  document.body.append(modalHolder);
+
+  const vm = new Vue({
+    el: modalHolder,
+    render: h => {
+      return h(SignatureLinkModal);
+    },
+  });
 
   const fileActionsPlugin = {
     attach(fileList) {
       console.log('fileActionsPlugin');
       fileList.fileActions.registerAction({
-        mime: 'all',
+        mime: 'file',
         name: 'Sign',
-        displayName: 'Get signing url',
+        displayName: t(config.appId, 'Get signing URL'),
         order: -100,
         permissions: 0,
         iconClass: 'icon-shared',
         actionHandler(filename, context) {
-          document.body.append(modalHolder);
-          // TODO: try to use a single vue instance
-          const modalInstance = new Vue({
-            el: modalHolder,
-            render: h => {
-              context = {
-                props: { filename },
-              };
-              return h(SignatureLinkModal, context);
-            },
-          });
+          EventBus.$emit('GET_SIGNING_LINK_CLICK', { filename });
         },
       });
       console.log(fileList);
