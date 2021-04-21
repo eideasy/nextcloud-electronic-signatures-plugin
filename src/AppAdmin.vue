@@ -7,9 +7,6 @@ export default {
       secret: this.$parent.secret,
     };
   },
-  mounted() {
-    console.log(this);
-  },
 };
 </script>
 
@@ -18,6 +15,12 @@ export default {
     <div class="section">
 
       <h2>{{ t('electronicsignatures', 'Electronic signatures settings') }}</h2>
+
+      <div>
+        <div class="icon-loading-small" />
+        <span class="msg success">Saved</span>
+        <span class="msg error">The given legal notice address is not a valid URL</span>
+      </div>
 
       <div>
         <label>
@@ -53,5 +56,9 @@ export default {
   .input {
     width: 100%;
     max-width: 270px;
+  }
+
+  .msg.error {
+    border-radius: var(--border-radius);
   }
 </style>
