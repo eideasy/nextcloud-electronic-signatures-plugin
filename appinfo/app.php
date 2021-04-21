@@ -12,5 +12,6 @@ class Application extends App {
     public function __construct() {
         parent::__construct('electronicsignatures');
         Util::addScript('electronicsignatures', '../js/electronic-signatures-main');
+        Util::addStyle('electronicsignatures', '../css/icons');
     }
 }

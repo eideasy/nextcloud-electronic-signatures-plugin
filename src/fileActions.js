@@ -32,7 +32,7 @@ function addCustomFileActions() {
         displayName: t(config.appId, 'Get signing URL'),
         order: -100,
         permissions: 0,
-        iconClass: 'icon-shared',
+        iconClass: 'custom-icon-signature',
         actionHandler(filename, context) {
           EventBus.$emit('GET_SIGNING_LINK_CLICK', { filename });
         },
