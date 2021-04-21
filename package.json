@@ -20,9 +20,11 @@
 	},
 	"dependencies": {
 		"@nextcloud/l10n": "^1.4.1",
+		"@nextcloud/router": "^2.0.0",
 		"@nextcloud/vue": "^3.7.0",
 		"axios": "^0.21.1",
 		"copy-to-clipboard": "^3.3.1",
+		"lodash.debounce": "^4.0.8",
 		"vue": "^2.6.12"
 	},
 	"browserslist": [

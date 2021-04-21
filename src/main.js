@@ -3,9 +3,11 @@ import { translate, translatePlural } from '@nextcloud/l10n';
 import App from './App';
 import AppAdmin from './AppAdmin';
 import './fileActions';
+import config from './config';
 
-Vue.prototype.t = translate;
-Vue.prototype.n = translatePlural;
+Vue.prototype.$t = translate;
+Vue.prototype.$n = translatePlural;
+Vue.prototype.$globalConfig = config;
 
 let vueInstance;
 if (document.getElementById('electronic-signatures-root')) {
@@ -19,8 +21,8 @@ const adminRootElement = document.getElementById('electronic-signatures-admin-ro
 if (adminRootElement) {
   vueInstance = new Vue({
     el: adminRootElement,
-    render: h => h(AppAdmin),
     data: () => Object.assign({}, adminRootElement.dataset),
+    render: h => h(AppAdmin),
   });
 }
 
