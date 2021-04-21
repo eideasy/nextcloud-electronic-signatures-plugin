@@ -19,18 +19,6 @@ export default {
       errorMessage: null,
     };
   },
-  watch: {
-    clientId(newValue) {
-      this.debouncedSaveSetting({
-        clientId: newValue,
-      });
-    },
-    secret(newValue) {
-      this.debouncedSaveSetting({
-        secret: newValue,
-      });
-    },
-  },
   created() {
     this.debouncedSaveSetting = debounce(this.saveSetting, 300);
   },
@@ -91,15 +79,25 @@ export default {
               v-model="clientId"
               class="input"
               type="text">
+          <button
+              class="button"
+              @click="debouncedSaveSetting({clientId})">
+            {{ $t('electronicsignatures', 'Save') }}
+          </button>
         </label>
       </div>
       <div>
         <label>
-          <span class="settingsLabel">{{ $t('electronicsignatures', 'Secret') }}</span>
+          <span class="settingsLabel">{{ $t('electronicsignatures', 'Save') }}</span>
           <input
               v-model="secret"
               class="input"
               type="text">
+          <button
+              class="button"
+              @click="debouncedSaveSetting({secret})">
+            {{ $t('electronicsignatures', 'Save') }}
+          </button>
         </label>
       </div>
     </div>
