@@ -97,7 +97,7 @@ export default {
       </div>
       <div>
         <label>
-          <span class="settingsLabel">{{ $t('electronicsignatures', 'Save') }}</span>
+          <span class="settingsLabel">{{ $t('electronicsignatures', 'Secret') }}</span>
           <input
               v-model="secret"
               class="input"
