@@ -1,14 +1,22 @@
 <script>
 import debounce from 'lodash.debounce';
 import axios from 'axios';
+import { generateUrl } from '@nextcloud/router';
+import SettingsStatus from './SettingsStatus';
 const { OC } = window;
 
 export default {
   name: 'AppAdmin',
+  components: {
+    SettingsStatus,
+  },
   data() {
     return {
       clientId: this.$parent.clientId,
       secret: this.$parent.secret,
+      isLoading: false,
+      successMessage: null,
+      errorMessage: null,
     };
   },
   watch: {
@@ -21,17 +29,29 @@ export default {
       this.debouncedSaveSetting({
         secret: newValue,
       });
-    }
+    },
   },
   created() {
     this.debouncedSaveSetting = debounce(this.saveSetting, 300);
   },
   methods: {
+    setIsLoading(isLoading) {
+      this.isLoading = isLoading;
+    },
+    setSuccessMessage(message) {
+      this.successMessage = message;
+    },
+    setErrorMessage(message) {
+      this.errorMessage = message;
+    },
     saveSetting(setting) {
       const _self = this;
+      _self.setIsLoading(true);
+      _self.setSuccessMessage(null);
+      _self.setErrorMessage(null);
       axios({
         method: 'post',
-        url: OC.generateUrl('/apps/electronicsignatures/update_credentials'),
+        url: generateUrl('/apps/electronicsignatures/update_credentials'),
         responseType: 'json',
         headers: {
           requesttoken: OC.requestToken,
@@ -39,26 +59,29 @@ export default {
         data: setting,
       })
           .then(function(response) {
-            console.log('------------------saved-------------------');
+            _self.setSuccessMessage(_self.$t('electronicsignatures', 'Saved'));
           })
           .catch(function() {
-            console.log('------------------failed-------------------');
+            _self.setErrorMessage(_self.$t('electronicsignatures', 'Something went wrong, settings were not saved.'));
+          })
+          .then(function() {
+            _self.setIsLoading(false);
           });
     },
-  }
+  },
 };
 </script>
 
 <template>
   <div>
     <div class="section">
-
       <h2>{{ $t('electronicsignatures', 'Electronic signatures settings') }}</h2>
 
-      <div>
-        <div class="icon-loading-small" />
-        <span class="msg success">Saved</span>
-        <span class="msg error">The given legal notice address is not a valid URL</span>
+      <div class="statusWrap">
+        <SettingsStatus
+          :is-loading="isLoading"
+          :error-message="errorMessage"
+          :success-message="successMessage" />
       </div>
 
       <div>
@@ -74,12 +97,11 @@ export default {
         <label>
           <span class="settingsLabel">{{ $t('electronicsignatures', 'Secret') }}</span>
           <input
+              v-model="secret"
               class="input"
-              type="text"
-              v-model="secret">
+              type="text">
         </label>
       </div>
-
     </div>
   </div>
 </template>
@@ -97,7 +119,7 @@ export default {
     max-width: 270px;
   }
 
-  .msg.error {
-    border-radius: var(--border-radius);
+  .statusWrap {
+    margin: 10px;
   }
 </style>

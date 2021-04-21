@@ -3,7 +3,6 @@
 //style('activity', 'settings');
 /** @var array $_ */
 /** @var \OCP\IL10N $l */
-var_dump($_);
 ?>
 
 <div
