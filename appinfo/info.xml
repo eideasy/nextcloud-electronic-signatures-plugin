@@ -16,12 +16,6 @@
     <dependencies>
         <nextcloud min-version="21" max-version="21"/>
     </dependencies>
-    <navigations>
-        <navigation>
-            <name>Electronic Signatures</name>
-            <route>electronicsignatures.page.index</route>
-        </navigation>
-    </navigations>
     <settings>
         <admin-section>OCA\ElectronicSignatures\Settings\AdminSection</admin-section>
         <admin>OCA\ElectronicSignatures\Settings\Admin</admin>
