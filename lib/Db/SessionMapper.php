@@ -10,13 +10,13 @@ class SessionMapper extends QBMapper {
         parent::__construct($db, 'esignature_sessions', Session::class);
     }
 
-    public function findByToken(string $token) {
+    public function findByDocId(string $docId) {
         $qb = $this->db->getQueryBuilder();
 
         $qb->select('*')
             ->from($this->getTableName())
             ->where(
-                $qb->expr()->eq('token', $qb->createNamedParameter($token))
+                $qb->expr()->eq('doc_id', $qb->createNamedParameter($docId))
             );
 
         return $this->findEntity($qb);

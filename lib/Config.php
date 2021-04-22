@@ -5,6 +5,8 @@ namespace OCA\ElectronicSignatures;
 use OCP\IConfig;
 
 class Config {
+    public const CONTAINER_TYPE = 'asice';
+
     private IConfig $config;
     private string $clientId;
     private string $secret;

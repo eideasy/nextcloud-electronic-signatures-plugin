@@ -1,20 +1,16 @@
 <?php
-namespace OCA\ElectronicSignatures\Controller;
+
+namespace OCA\ElectronicSignatures\Commands;
 
 use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Db\Session;
 use OCA\ElectronicSignatures\Db\SessionMapper;
 use OCA\ElectronicSignatures\Exceptions\EidEasyException;
-use OCP\AppFramework\Http\JSONResponse;
 use OCP\Files\IRootFolder;
 use OCP\Http\Client\IClientService;
-use OCP\IRequest;
-use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Controller;
 
-class PageController extends Controller {
-    private $userId;
-
+class FetchSignedFile extends Controller {
     /** @var  IClientService */
     private $httpClientService;
 
@@ -27,34 +23,20 @@ class PageController extends Controller {
     /** @var Config */
     private $config;
 
-	public function __construct(
-	    $AppName,
-        IRequest $request,
+    public function __construct(
         IRootFolder $storage,
         IClientService $clientService,
         SessionMapper $mapper,
-        Config $config,
-        $UserId
+        Config $config
     ){
-		parent::__construct($AppName, $request);
-		$this->userId = $UserId;
         $this->storage = $storage;
         $this->httpClientService = $clientService;
         $this->mapper = $mapper;
         $this->config = $config;
-	}
+    }
 
-    /**
-     * User will be redirected here from eID Easy, after they have successfully signed their document
-     *
-     * @NoAdminRequired
-     * @NoCSRFRequired
-     * @PublicPage
-     */
-    public function signingCallback() {
-        $token = $path = $this->request->getParam('token');
-
-        $session = $this->mapper->findByToken($token);
+    public function fetch(string $docId): void {
+        $session = $this->mapper->findByDocId($docId);
 
         $responseBody = $this->getContainerResponse($session);
 
@@ -64,9 +46,6 @@ class PageController extends Controller {
         }
 
         $this->saveContainer($responseBody['signed_file_contents'], $session);
-
-        // TODO redirect to success page.
-        return new JSONResponse(['message' => 'SIGNED SUCCESSFULLY!']);
     }
 
     private function getContainerResponse(Session $session): array {
@@ -108,7 +87,7 @@ class PageController extends Controller {
         array_pop($parts);
 
         $beginning = implode('.', $parts);
-        $extension = SignApiController::CONTAINER_TYPE;
+        $extension = Config::CONTAINER_TYPE;
         return "$beginning-{$session->getToken()}.$extension";
     }
 }

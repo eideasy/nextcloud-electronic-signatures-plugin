@@ -9,8 +9,8 @@
  */
 return [
 	'routes' => [
-		['name' => 'page#signingCallback', 'url' => '/callback', 'verb' => 'GET'],
 		['name' => 'signApi#getSignLink', 'url' => '/get_sign_link', 'verb' => 'GET'],
+		['name' => 'signApi#fetchSignedFile', 'url' => '/fetch_signed_file', 'verb' => 'POST'],
 		['name' => 'settingsApi#updateCredentials', 'url' => '/update_credentials', 'verb' => 'POST'],
 	]
 ];

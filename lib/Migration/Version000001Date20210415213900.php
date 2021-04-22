@@ -49,7 +49,7 @@ class Version000001Date20210415213900 extends SimpleMigrationStep {
             ]);
 
             $table->setPrimaryKey(['id']);
-            $table->addIndex(['token'], 'electronic_signatures_token');
+            $table->addIndex(['doc_id'], 'electronic_signatures_doc_id');
         }
         return $schema;
     }
