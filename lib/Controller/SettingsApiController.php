@@ -19,16 +19,6 @@ class SettingsApiController extends Controller {
 		$this->config = $config;
 	}
 
-	/**
-	 * CAUTION: the @Stuff turns off security checks; for this page no admin is
-	 *          required and no CSRF check. If you don't know what CSRF is, read
-	 *          it up in the docs or you might create a security hole. This is
-	 *          basically the only required method to add this exemption, don't
-	 *          add it to any other method if you don't exactly know what it does
-	 *
-	 * @NoCSRFRequired
-	 * TODO re-enable CSRF check?
-	 */
 	public function updateCredentials() {
 	    // TODO get app name from some constant, here and elsewhere.
         $clientId = $this->request->getParam('clientId', null);
