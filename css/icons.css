@@ -31,9 +31,9 @@
 }
 
 #filestable .action [class^="custom-icon-"],
-#filestable .action [class*=" custom-icon-"] ,
-#filestable .rightClickMenu [class^="custom-icon-"],
-#filestable .rightClickMenu [class*=" custom-icon-"] {
+#filestable .action [class*=" custom-icon-"],
+.rightClickMenu [class^="custom-icon-"],
+.rightClickMenu [class*=" custom-icon-"] {
     font-size: 20px;
     padding: 12px;
     color: black;
