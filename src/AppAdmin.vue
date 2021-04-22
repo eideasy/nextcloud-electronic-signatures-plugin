@@ -65,13 +65,21 @@ export default {
     <div class="section">
       <h2>{{ $t('electronicsignatures', 'Electronic signatures settings') }}</h2>
       <p class="settings-hint settingsHint">
-        {{ $t('electronicsignatures', 'You can find the credentials on your dashboard at: ') }}
+        {{ $t('electronicsignatures', 'You can find your credentials under the "My Webpages" section on your dashboard at: ') }}
         <a
             class="link"
             target="_blank"
             href="https://id.eideasy.com/">
           id.eideasy.com
         </a>
+      </p>
+
+      <p class="settings-hint settingsHint">
+        {{ $t('electronicsignatures', 'Ensure that in your eID Easy panel under "My Websites", you have added the following notification hook to your website: [your-nextcloud-url]/index.php/apps/electronicsignatures/fetch_signed_file') }}
+      </p>
+
+      <p class="settings-hint settingsHint">
+        {{ $t('electronicsignatures', 'NB! Please note that whenever you are generating a signature link, the contents of your document are securely sent to the eID Easy server for signing.') }}
       </p>
 
       <div class="statusWrap">
