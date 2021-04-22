@@ -26,7 +26,6 @@ class SettingsApiController extends Controller {
 	 *          basically the only required method to add this exemption, don't
 	 *          add it to any other method if you don't exactly know what it does
 	 *
-	 * @NoAdminRequired
 	 * @NoCSRFRequired
 	 * TODO re-enable CSRF check?
 	 */
