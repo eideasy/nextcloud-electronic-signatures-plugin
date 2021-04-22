@@ -55,6 +55,7 @@ class FetchSignedFile extends Controller {
             'doc_id' => $session->getDocId(),
             'client_id' => $this->config->getClientId(),
             'secret' => $this->config->getSecret(),
+            'lang' => 'en',
         ];
 
         $client = $this->httpClientService->newClient();

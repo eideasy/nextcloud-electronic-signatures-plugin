@@ -52,7 +52,7 @@ class GetSignLink extends Controller {
 
         $this->saveSession($token, $docId, $path, $userId);
 
-        return $this->config->getUrl("/sign_contract_external?client_id={$this->config->getClientId()}&doc_id=$docId");
+        return $this->config->getUrl("/sign_contract_external?client_id={$this->config->getClientId()}&doc_id=$docId&lang=en");
     }
 
     private function getFileContents(string $path, $userId): string {
@@ -95,6 +95,7 @@ class GetSignLink extends Controller {
             'container_type' => Config::CONTAINER_TYPE,
             'client_id' => $this->config->getClientId(),
             'secret' => $this->config->getSecret(),
+            'lang' => 'en',
         ];
 
         $client = $this->httpClientService->newClient();
