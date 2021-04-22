@@ -98,7 +98,7 @@ class GetSignLink extends Controller {
         ];
 
         $client = $this->httpClientService->newClient();
-        $response = $client->post($this->config->getUrl('api/signatures/prepare-files-for-signing'), [
+        $config = [
             'body' => json_encode($body),
             'headers' => [
                 // TODO dynamically get the plugin version and inject to User-Agent.
@@ -106,10 +106,18 @@ class GetSignLink extends Controller {
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
             ],
-        ]);
+            'http_errors' => false,
+        ];
+        $response = $client->post($this->config->getUrl('api/signatures/prepare-files-for-signing'), $config);
+        $responseBody = json_decode($response->getBody(), true);
+
+        if ($response->getStatusCode() !== 200) {
+            $message = $responseBody['message'] ? "eID Easy error: {$responseBody['message']}" : 'eID Easy error';
+            throw new EidEasyException($message);
+        }
 
         // TODO mark json ext as dependency in composer.json.
-        return json_decode($response->getBody(), true);
+        return $responseBody;
     }
 
     private function saveSession(string $token, string $docId, string $path, string $userId): void {

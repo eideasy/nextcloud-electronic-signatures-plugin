@@ -2,6 +2,7 @@
 
 namespace OCA\ElectronicSignatures\Controller;
 
+use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IConfig;
 use OCP\IRequest;
@@ -20,19 +21,24 @@ class SettingsApiController extends Controller {
 	}
 
 	public function updateCredentials() {
-	    // TODO get app name from some constant, here and elsewhere.
-        $clientId = $this->request->getParam('clientId', null);
-        $secret = $this->request->getParam('secret', null);
+        try {
+            // TODO get app name from some constant, here and elsewhere.
+            $clientId = $this->request->getParam('clientId', null);
+            $secret = $this->request->getParam('secret', null);
 
-        // TODO actually check the inputs - attempt to get client config from eID Easy server.
-        if ($clientId !== null) {
-            $this->config->setAppValue('electronicsignatures', 'client_id', $clientId);
+            // TODO actually check the inputs - attempt to get client config from eID Easy server.
+            if ($clientId !== null) {
+                $this->config->setAppValue('electronicsignatures', 'client_id', $clientId);
+            }
+
+            if ($secret !== null) {
+                $this->config->setAppValue('electronicsignatures', 'secret', $secret);
+            }
+
+            return new JSONResponse(['message' => 'eID Easy credentials updated!']);
+        } catch (\Throwable $e) {
+            // TODO log the exception into file.
+            return new JSONResponse(['message' => "Failed to get link: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);
         }
-
-        if ($secret !== null) {
-            $this->config->setAppValue('electronicsignatures', 'secret', $secret);
-        }
-
-		return new JSONResponse(['hi' => 'done']);
 	}
 }
