@@ -37,7 +37,7 @@ class Config {
         $path = ltrim($path, '/');
 
         if (!isset($this->baseUrl)) {
-            $url = $this->config->getAppValue('electronicsignatures', 'base_url', 'https://id.eideasy.com/api');
+            $url = $this->config->getAppValue('electronicsignatures', 'base_url', 'https://id.eideasy.com');
             $this->baseUrl = rtrim($url, '/');
         }
 
