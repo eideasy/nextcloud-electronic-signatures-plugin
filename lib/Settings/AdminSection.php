@@ -31,7 +31,7 @@ class AdminSection implements IIconSection {
      * @since 12
      */
     public function getIcon() {
-        return $this->url->imagePath('electronicsignatures', 'replace-me.svg');
+        return $this->url->imagePath('electronicsignatures', 'signature.svg');
     }
 
     /**
