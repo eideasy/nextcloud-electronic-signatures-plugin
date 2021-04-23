@@ -22,6 +22,11 @@ export default {
   created() {
     this.debouncedSaveSetting = debounce(this.saveSetting, 300);
   },
+  computed: {
+    fetchSignedFileUrl() {
+      return window.location.origin + this.generateNextcloudUrl('/index.php/apps/electronicsignatures/fetch_signed_file');
+    },
+  },
   methods: {
     setIsLoading(isLoading) {
       this.isLoading = isLoading;
@@ -32,6 +37,9 @@ export default {
     setErrorMessage(message) {
       this.errorMessage = message;
     },
+    generateNextcloudUrl(url) {
+      return generateUrl(url);
+    },
     saveSetting(setting) {
       const _self = this;
       _self.setIsLoading(true);
@@ -39,7 +47,7 @@ export default {
       _self.setErrorMessage(null);
       axios({
         method: 'post',
-        url: generateUrl('/apps/electronicsignatures/update_credentials'),
+        url: this.generateNextcloudUrl('/apps/electronicsignatures/update_credentials'),
         responseType: 'json',
         headers: {
           requesttoken: OC.requestToken,
@@ -75,7 +83,7 @@ export default {
       </p>
 
       <p class="settings-hint settingsHint">
-        {{ $t('electronicsignatures', 'Ensure that in your eID Easy panel under "My Websites", you have added the following notification hook to your website: [your-nextcloud-url]/index.php/apps/electronicsignatures/fetch_signed_file') }}
+        {{ $t('electronicsignatures', 'Ensure that in your eID Easy panel under "My Websites", you have added the following notification hook to your website: ') + fetchSignedFileUrl}}
       </p>
 
       <p class="settings-hint settingsHint">
