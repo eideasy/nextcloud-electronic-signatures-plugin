@@ -153,4 +153,8 @@ export default {
   .settingsHint {
     opacity: 0.9;
   }
+
+  .settingsHint + .settingsHint {
+    margin-top: 0;
+  }
 </style>
