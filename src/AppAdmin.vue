@@ -44,6 +44,10 @@ export default {
     },
     saveSetting(setting) {
       const _self = this;
+      // do not save empty values
+      if (!setting.clientId && !setting.secret) {
+        return;
+      }
       _self.setIsLoading(true);
       _self.setSuccessMessage(null);
       _self.setErrorMessage(null);
