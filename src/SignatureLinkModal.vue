@@ -39,11 +39,11 @@ export default {
             if (response.data.sign_link) {
               _self.setSigningLink(response.data.sign_link);
             } else {
-              _self.setErrorMessage(_self.$t(_self.$globalConfig.appId, 'Something went wrong. Make sure that the electronic signatures app settings are correct.'));
+              _self.setErrorMessage(response.data && response.data.message);
             }
           })
-          .catch(function() {
-            _self.setErrorMessage(_self.$t(_self.$globalConfig.appId, 'Something went wrong. Make sure that the electronic signatures app settings are correct.'));
+          .catch(function(error) {
+            _self.setErrorMessage(error.response && error.response.data && error.response.data.message);
           });
     });
   },
@@ -68,7 +68,11 @@ export default {
       copy(this.signingUrl);
     },
     setErrorMessage(message) {
-      this.errorMessage = message;
+      if (!message) {
+        this.$t(this.$globalConfig.appId, 'Something went wrong. Make sure that the electronic signatures app settings are correct.');
+      } else {
+        this.errorMessage = message;
+      }
     },
   },
 };
@@ -95,7 +99,6 @@ export default {
                 class="staticInput"
                 :value="signingUrl"
                 @click="selectAll">
-
             <button @click="copyToClipboard">
               {{ $t($globalConfig.appId, 'Copy') }}
             </button>
