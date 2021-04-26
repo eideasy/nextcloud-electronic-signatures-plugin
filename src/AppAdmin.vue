@@ -12,11 +12,13 @@ export default {
   },
   data() {
     return {
-      clientId: this.$parent.clientId,
-      secret: this.$parent.secret,
+      clientId: '',
+      secret: '',
       isLoading: false,
       successMessage: null,
       errorMessage: null,
+      clientIdPlaceholder: this.$parent.clientId,
+      secretPlaceholder: this.$parent.secret,
     };
   },
   created() {
@@ -42,6 +44,10 @@ export default {
     },
     saveSetting(setting) {
       const _self = this;
+      // do not save empty values
+      if (!setting.clientId && !setting.secret) {
+        return;
+      }
       _self.setIsLoading(true);
       _self.setSuccessMessage(null);
       _self.setErrorMessage(null);
@@ -102,6 +108,7 @@ export default {
           <span class="settingsLabel">{{ $t('electronicsignatures', 'Client ID') }}</span>
           <input
               v-model="clientId"
+              :placeholder="clientIdPlaceholder"
               class="input"
               type="text">
           <button
@@ -116,6 +123,7 @@ export default {
           <span class="settingsLabel">{{ $t('electronicsignatures', 'Secret') }}</span>
           <input
               v-model="secret"
+              :placeholder="secretPlaceholder"
               class="input"
               type="text">
           <button
