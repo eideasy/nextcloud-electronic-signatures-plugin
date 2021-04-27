@@ -74,6 +74,9 @@ export default {
         this.errorMessage = message;
       }
     },
+    onSubmit() {
+      console.log('handle submit');
+    }
   },
 };
 </script>
@@ -92,7 +95,29 @@ export default {
             v-else-if="signingUrl"
             class="signingUrlHolder">
           <div v-if="this.$globalConfig.features.signingLinkByEmail">
-              email field
+            <h3>
+              {{ $t($globalConfig.appId, 'Send the signing link by email') }}
+            </h3>
+            <form
+                v-on:submit.prevent="onSubmit"
+                action="">
+              <label
+                  class="label"
+                  for="signingLinkEmail">
+                {{ $t($globalConfig.appId, 'Enter the email address of the person who should sign this document.') }}
+              </label>
+              <div class="fieldRow">
+                <input
+                    type="email"
+                    class="input"
+                    placeholder="Email"
+                    id="signingLinkEmail"
+                    aria-label="email">
+                <button type="submit">
+                  {{ $t($globalConfig.appId, 'Send') }}
+                </button>
+              </div>
+            </form>
           </div>
           <div v-else>
             <div class="copyField">
@@ -149,6 +174,26 @@ export default {
 
   .error {
     color: #842029;
+  }
+
+  h3 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    font-weight: bold;
+  }
+
+  .fieldRow {
+    display: flex;
+  }
+
+  .label {
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .input {
+    width: 100%;
+    max-width: 300px;
   }
 
   @media (min-width: 600px) {
