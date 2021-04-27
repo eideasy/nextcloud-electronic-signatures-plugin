@@ -22,6 +22,7 @@ export default {
       modal: false,
       signingUrl: '',
       errorMessage: null,
+      simpleSignaturesOnly: false,
     };
   },
   mounted() {
@@ -74,6 +75,9 @@ export default {
         this.errorMessage = message;
       }
     },
+    onSubmit() {
+      console.log('handle submit');
+    },
   },
 };
 </script>
@@ -92,7 +96,43 @@ export default {
             v-else-if="signingUrl"
             class="signingUrlHolder">
           <div v-if="this.$globalConfig.features.signingLinkByEmail">
-              email field
+            <h3>
+              {{ $t($globalConfig.appId, 'Send the signing link by email') }}
+            </h3>
+            <form
+                action=""
+                @submit.prevent="onSubmit">
+              <label
+                  class="label"
+                  for="signingLinkEmail">
+                {{ $t($globalConfig.appId, 'Enter the email address of the person who should sign this document.') }}
+              </label>
+              <div class="fieldRow">
+                <input
+                    id="signingLinkEmail"
+                    type="email"
+                    class="input"
+                    placeholder="Email"
+                    aria-label="email">
+                <button type="submit">
+                  {{ $t($globalConfig.appId, 'Send') }}
+                </button>
+              </div>
+              <input
+                  type="checkbox"
+                  name="allowOnlyEmail"
+                  id="allowOnlyEmail"
+                  class="checkbox"
+                  value="1">
+              <label for="allowOnlyEmail">
+                {{ $t($globalConfig.appId, 'Allow only email based signatures') }}
+              </label>
+              <div class="note">
+                {{ $t($globalConfig.appId, `If checked, the signer will be forced to use their email and will not be able to choose any other signing method.
+                Email based signatures do not qualify as Advanced Electronic Signature (AdES) or Qualified Electronic Signature (QES).`) }}
+
+              </div>
+            </form>
           </div>
           <div v-else>
             <div class="copyField">
@@ -149,6 +189,33 @@ export default {
 
   .error {
     color: #842029;
+  }
+
+  h3 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    font-weight: bold;
+  }
+
+  .fieldRow {
+    display: flex;
+    margin-bottom: 1rem;
+  }
+
+  .label {
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .input {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .note {
+    margin-top: 10px;
+    font-size: 14px;
+    line-height: 1.5;
   }
 
   @media (min-width: 600px) {
