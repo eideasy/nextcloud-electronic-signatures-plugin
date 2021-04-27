@@ -114,9 +114,6 @@ export default {
                     class="input"
                     placeholder="Email"
                     aria-label="email">
-                <button type="submit">
-                  {{ $t($globalConfig.appId, 'Send') }}
-                </button>
               </div>
               <input
                   type="checkbox"
@@ -132,6 +129,11 @@ export default {
                 Email based signatures do not qualify as Advanced Electronic Signature (AdES) or Qualified Electronic Signature (QES).`) }}
 
               </div>
+              <button
+                  class="submitButton"
+                  type="submit">
+                {{ $t($globalConfig.appId, 'Send') }}
+              </button>
             </form>
           </div>
           <div v-else>
@@ -216,6 +218,10 @@ export default {
     margin-top: 10px;
     font-size: 14px;
     line-height: 1.5;
+  }
+
+  .submitButton {
+    margin-top: 30px;
   }
 
   @media (min-width: 600px) {
