@@ -4,7 +4,7 @@ import axios from 'axios';
 import Modal from '@nextcloud/vue/dist/Components/Modal';
 import EventBus from './EventBus';
 import { generateUrl } from '@nextcloud/router';
-const { OC } = window;
+import OC from './OC';
 
 export default {
   name: 'SignatureLinkModal',
