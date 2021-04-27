@@ -91,17 +91,22 @@ export default {
         <div
             v-else-if="signingUrl"
             class="signingUrlHolder">
-          <div class="copyField">
-            <input
-                type="text"
-                aria-label="Signing link URL"
-                readonly="readonly"
-                class="staticInput"
-                :value="signingUrl"
-                @click="selectAll">
-            <button @click="copyToClipboard">
-              {{ $t($globalConfig.appId, 'Copy') }}
-            </button>
+          <div v-if="this.$globalConfig.features.signingLinkByEmail">
+              email field
+          </div>
+          <div v-else>
+            <div class="copyField">
+              <input
+                  type="text"
+                  aria-label="Signing link URL"
+                  readonly="readonly"
+                  class="staticInput"
+                  :value="signingUrl"
+                  @click="selectAll">
+              <button @click="copyToClipboard">
+                {{ $t($globalConfig.appId, 'Copy') }}
+              </button>
+            </div>
           </div>
         </div>
         <div v-else
