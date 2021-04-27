@@ -29,7 +29,7 @@ function addCustomFileActions() {
       fileList.fileActions.registerAction({
         mime: 'file',
         name: 'Sign',
-        displayName: t(config.appId, 'Get signing URL'),
+        displayName: t(config.appId, 'Signing'),
         order: -100,
         permissions: 0,
         iconClass: 'custom-icon-signature',
