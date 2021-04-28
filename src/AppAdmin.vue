@@ -21,13 +21,13 @@ export default {
       secretPlaceholder: this.$parent.secret,
     };
   },
-  created() {
-    this.debouncedSaveSetting = debounce(this.saveSetting, 300);
-  },
   computed: {
     fetchSignedFileUrl() {
       return window.location.origin + this.generateNextcloudUrl('/index.php/apps/electronicsignatures/fetch_signed_file');
     },
+  },
+  created() {
+    this.debouncedSaveSetting = debounce(this.saveSetting, 300);
   },
   methods: {
     setIsLoading(isLoading) {
@@ -89,7 +89,7 @@ export default {
       </p>
 
       <p class="settings-hint settingsHint">
-        {{ $t('electronicsignatures', 'Ensure that in your eID Easy panel under "My Websites", you have added the following notification hook to your website: ') + fetchSignedFileUrl}}
+        {{ $t('electronicsignatures', 'Ensure that in your eID Easy panel under "My Websites", you have added the following notification hook to your website: ') + fetchSignedFileUrl }}
       </p>
 
       <p class="settings-hint settingsHint">
@@ -133,6 +133,21 @@ export default {
           </button>
         </label>
       </div>
+      <div v-if="$globalConfig.features.showEmailSignatureSetting">
+        <input
+            id="allowOnlyEmail"
+            type="checkbox"
+            name="allowOnlyEmail"
+            class="checkbox"
+            value="1">
+        <label for="allowOnlyEmail">
+          {{ $t($globalConfig.appId, 'Allow only email based signatures') }}
+        </label>
+        <div class="note">
+          {{ $t($globalConfig.appId, `If checked, the signer will be forced to use their email and will not be able to choose any other signing method.
+              Email based signatures do not qualify as Advanced Electronic Signature (AdES) or Qualified Electronic Signature (QES).`) }}
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -160,6 +175,12 @@ export default {
 
   .settingsHint {
     opacity: 0.9;
+  }
+
+  .note {
+    margin-top: 10px;
+    font-size: 14px;
+    line-height: 1.5;
   }
 
   .settingsHint + .settingsHint {

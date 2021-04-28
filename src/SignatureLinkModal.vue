@@ -130,25 +130,12 @@ export default {
                   placeholder="Email"
                   required
                   aria-label="email">
+              <button
+                  class="submitButton"
+                  type="submit">
+                {{ $t($globalConfig.appId, 'Send') }}
+              </button>
             </div>
-            <input
-                id="allowOnlyEmail"
-                type="checkbox"
-                name="allowOnlyEmail"
-                class="checkbox"
-                value="1">
-            <label for="allowOnlyEmail">
-              {{ $t($globalConfig.appId, 'Allow only email based signatures') }}
-            </label>
-            <div class="note">
-              {{ $t($globalConfig.appId, `If checked, the signer will be forced to use their email and will not be able to choose any other signing method.
-              Email based signatures do not qualify as Advanced Electronic Signature (AdES) or Qualified Electronic Signature (QES).`) }}
-            </div>
-            <button
-                class="submitButton"
-                type="submit">
-              {{ $t($globalConfig.appId, 'Send') }}
-            </button>
           </form>
         </div>
       </div>
@@ -207,16 +194,6 @@ export default {
   .input {
     width: 100%;
     max-width: 300px;
-  }
-
-  .note {
-    margin-top: 10px;
-    font-size: 14px;
-    line-height: 1.5;
-  }
-
-  .submitButton {
-    margin-top: 30px;
   }
 
   .spinner {
