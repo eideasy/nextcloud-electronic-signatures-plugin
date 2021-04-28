@@ -34,7 +34,7 @@ function addCustomFileActions() {
         permissions: 0,
         iconClass: 'custom-icon-signature',
         actionHandler(filename, context) {
-          EventBus.$emit('GET_SIGNING_LINK_CLICK', { filename });
+          EventBus.$emit('SIGNATURES_CLICK', { filename });
         },
       });
       console.log(fileList);
