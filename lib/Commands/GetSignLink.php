@@ -36,11 +36,12 @@ class GetSignLink extends Controller {
 
     public function getSignLink(string $userId, string $path): string {
         // TODO mark base64 ext as dependency in composer.json.
-        $base64 = base64_encode($this->getFileContents($path, $userId));
+        list($mimeType, $contents) = $this->getFile($path, $userId);
+        $base64 = base64_encode($contents);
 
         $token = $this->generateRandomString(30);
 
-        $responseBody = $this->startSigningSession($path, $base64, $token);
+        $responseBody = $this->startSigningSession($path, $base64, $mimeType);
 
         if (!isset($responseBody['doc_id'])) {
             $message = isset($responseBody['message']) ? $responseBody['message'] : 'eID Easy error!';
@@ -55,14 +56,14 @@ class GetSignLink extends Controller {
         return $this->config->getUrl("/sign_contract_external?client_id={$this->config->getClientId()}&doc_id=$docId&lang=en");
     }
 
-    private function getFileContents(string $path, $userId): string {
+    private function getFile(string $path, $userId): array {
         $userFolder = $this->storage->getUserFolder($userId);
 
         try {
             $file = $userFolder->get($path);
 
             if ($file instanceof \OCP\Files\File) {
-                return $file->getContent();
+                return [$file->getMimeType(), $file->getContent()];
             } else {
                 // TODO test that when Accepts header is application/json, a decent error structure is returned.
                 throw new NotFoundException('Can not read from folder');
@@ -82,14 +83,14 @@ class GetSignLink extends Controller {
         return $randomString;
     }
 
-    private function startSigningSession(string $path, string $fileContentBase64, string $token): array {
+    private function startSigningSession(string $path, string $fileContentBase64, string $mimeType): array {
         // Send file to eID Easy server.
         $body = [
             'files' => [
                 [
                     'fileName' => basename($path),
                     'fileContent' => $fileContentBase64,
-                    'mimeType' => 'text/plain',
+                    'mimeType' => $mimeType,
                 ],
             ],
             'container_type' => Config::CONTAINER_TYPE,
