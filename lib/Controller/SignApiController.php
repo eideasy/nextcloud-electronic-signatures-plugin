@@ -86,7 +86,7 @@ class SignApiController extends OCSController {
      */
     public function fetchSignedFile() {
         try {
-            $docId = $path = $this->request->getParam('doc_id');
+            $docId = $this->request->getParam('doc_id');
 
             $this->fetchFileCommand->fetch($docId);
 
