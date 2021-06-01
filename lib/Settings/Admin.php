@@ -36,6 +36,7 @@ class Admin implements ISettings {
         return new TemplateResponse('electronicsignatures', 'settings/admin', [
             'client_id_placeholder' => $this->anoymimize($this->currentConfig->getClientId()),
             'secret_placeholder' => $this->anoymimize($this->currentConfig->getSecret()),
+            'enable_otp' => $this->currentConfig->isOtpEnabled(),
         ], 'blank');
     }
 

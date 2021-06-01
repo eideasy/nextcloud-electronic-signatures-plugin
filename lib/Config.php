@@ -6,6 +6,7 @@ use OCP\IConfig;
 
 class Config {
     public const CONTAINER_TYPE = 'asice';
+    public const ENABLE_OTP_BY_DEFAULT = true;
 
     private IConfig $config;
     private string $clientId;
@@ -38,7 +39,8 @@ class Config {
     public function isOtpEnabled(): string
     {
         if (!isset($this->enableOtp)) {
-            $this->enableOtp = (bool) $this->config->getAppValue('electronicsignatures', 'enable_otp', false);
+            $storedValue = $this->config->getAppValue('electronicsignatures', 'enable_otp', null);
+            $this->enableOtp = $storedValue !== null ? (bool) $storedValue : self::ENABLE_OTP_BY_DEFAULT;
         }
 
         return $this->enableOtp;
