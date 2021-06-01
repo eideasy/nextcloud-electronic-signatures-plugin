@@ -34,14 +34,14 @@ class GetSignLink extends Controller {
         $this->config = $config;
     }
 
-    public function getSignLink(string $userId, string $path): string {
+    public function getSignLink(string $userId, string $path, string $email): string {
         // TODO mark base64 ext as dependency in composer.json.
         list($mimeType, $contents) = $this->getFile($path, $userId);
         $base64 = base64_encode($contents);
 
         $token = $this->generateRandomString(30);
 
-        $responseBody = $this->startSigningSession($path, $base64, $mimeType);
+        $responseBody = $this->startSigningSession($path, $base64, $mimeType, $email);
 
         if (!isset($responseBody['doc_id'])) {
             $message = isset($responseBody['message']) ? $responseBody['message'] : 'eID Easy error!';
@@ -82,7 +82,7 @@ class GetSignLink extends Controller {
         return $randomString;
     }
 
-    private function startSigningSession(string $path, string $fileContentBase64, string $mimeType): array {
+    private function startSigningSession(string $path, string $fileContentBase64, string $mimeType, string $email): array {
         // Send file to eID Easy server.
         $body = [
             'files' => [
@@ -97,6 +97,20 @@ class GetSignLink extends Controller {
             'secret' => $this->config->getSecret(),
             'lang' => 'en',
         ];
+
+
+        if ($this->config->isOtpEnabled()) {
+            $body['signer'] = [
+                'send_now' => true,
+                'contacts' => [
+                    [
+                        'type' => 'email',
+                        'value' => $email,
+                    ]
+                ],
+            ];
+        }
+
 
         $client = $this->httpClientService->newClient();
         $config = [

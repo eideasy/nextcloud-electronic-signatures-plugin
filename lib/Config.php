@@ -10,6 +10,7 @@ class Config {
     private IConfig $config;
     private string $clientId;
     private string $secret;
+    private bool $enableOtp;
     private string $baseUrl;
 
     public function __construct(IConfig $config) {
@@ -32,6 +33,15 @@ class Config {
         }
 
         return $this->secret;
+    }
+
+    public function isOtpEnabled(): string
+    {
+        if (!isset($this->enableOtp)) {
+            $this->enableOtp = (bool) $this->config->getAppValue('electronicsignatures', 'enable_otp', false);
+        }
+
+        return $this->enableOtp;
     }
 
     public function getUrl(string $path): string

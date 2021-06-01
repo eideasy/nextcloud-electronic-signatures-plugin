@@ -9,7 +9,6 @@
  */
 return [
 	'routes' => [
-		['name' => 'signApi#getSignLink', 'url' => '/get_sign_link', 'verb' => 'GET'],
 		['name' => 'signApi#sendSignLinkByEmail', 'url' => '/send_sign_link_by_email', 'verb' => 'POST'],
 		['name' => 'signApi#fetchSignedFile', 'url' => '/fetch_signed_file', 'verb' => 'POST'],
 		['name' => 'settingsApi#updateCredentials', 'url' => '/update_credentials', 'verb' => 'POST'],

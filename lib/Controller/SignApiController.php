@@ -35,22 +35,6 @@ class SignApiController extends OCSController {
 		$this->sendSigningLinkToEmail = $sendSigningLinkToEmail;
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
-	public function getSignLink() {
-        try {
-            $path = $this->request->getParam('path');
-
-            $link = $this->getSignLinkCommand->getSignLink($this->userId, $path);
-
-            return new JSONResponse(['sign_link' => $link]);
-        } catch (\Throwable $e) {
-            // TODO log the exception into file.
-            return new JSONResponse(['message' => "Failed to get link: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);
-        }
-	}
-
     /**
      * @NoAdminRequired
      */
@@ -65,9 +49,9 @@ class SignApiController extends OCSController {
                 ], Http::STATUS_BAD_REQUEST);
             }
 
-            $link = $this->getSignLinkCommand->getSignLink($this->userId, $path);
+            $link = $this->getSignLinkCommand->getSignLink($this->userId, $path, $email);
 
-            $this->sendSigningLinkToEmail->send($email, $link);
+            $this->sendSigningLinkToEmail->sendIfNecessary($email, $link);
 
             return new JSONResponse(['message' => 'E-mail sent!']);
         } catch (\Throwable $e) {
