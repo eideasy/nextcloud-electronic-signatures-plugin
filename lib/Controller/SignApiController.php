@@ -57,12 +57,11 @@ class SignApiController extends OCSController {
     public function sendSignLinkByEmail() {
         try {
             $path = $this->request->getParam('path');
-            // TODO Validate e-mail.
             $email = $this->request->getParam('email');
 
             if (!$this->mailer->validateMailAddress($email)) {
                 return new JSONResponse([
-                    'message' => 'Provided email-address is not valid',
+                    'message' => 'Provided email address is not valid',
                 ], Http::STATUS_BAD_REQUEST);
             }
 

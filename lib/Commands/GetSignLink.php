@@ -65,7 +65,6 @@ class GetSignLink extends Controller {
             if ($file instanceof \OCP\Files\File) {
                 return [$file->getMimeType(), $file->getContent()];
             } else {
-                // TODO test that when Accepts header is application/json, a decent error structure is returned.
                 throw new NotFoundException('Can not read from folder');
             }
         } catch (\OCP\Files\NotFoundException $e) {
