@@ -23,7 +23,7 @@ class SettingsApiController extends Controller {
 	public function updateSettings() {
 	    try {
             // TODO actually check the inputs - attempt to get client config from eID Easy server.
-            $clientId = $this->request->getParam('clientId', null);
+            $clientId = $this->request->getParam('client_id', null);
             if ($clientId !== null) {
                 // TODO get app name from some constant, here and elsewhere.
                 $this->config->setAppValue('electronicsignatures', 'client_id', $clientId);
