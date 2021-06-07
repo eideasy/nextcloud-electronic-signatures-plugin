@@ -136,7 +136,7 @@ export default {
 
           <div v-if="adminSettings && adminSettings.enable_otp && fileExtension !== 'pdf'">
             <span class="alert alert-warning">
-              You have enabled simple signatures, but this file is not a pdf. User cannot add a simple electronic signature to this file.
+              {{ $t($globalConfig.appId, 'You have enabled simple signatures, but this file is not a pdf. User cannot add a simple electronic signature to this file.') }}
             </span>
           </div>
 
