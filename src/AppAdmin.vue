@@ -19,7 +19,7 @@ export default {
       errorMessage: null,
       clientIdPlaceholder: this.$parent.clientId,
       secretPlaceholder: this.$parent.secret,
-      allowSimpleSignatures: '',
+      allowSimpleSignatures: this.$parent.enableOtp,
     };
   },
   computed: {
@@ -46,9 +46,16 @@ export default {
     saveSetting(setting) {
       const _self = this;
       // do not save empty values
-      if (Object.keys(setting).length === 0) {
+      let shouldSave = true;
+      Object.keys(setting).forEach(key => {
+        if (!setting[key]) {
+          shouldSave = false;
+        }
+      });
+      if (!shouldSave) {
         return;
       }
+
       _self.setIsLoading(true);
       _self.setSuccessMessage(null);
       _self.setErrorMessage(null);
@@ -114,7 +121,7 @@ export default {
               type="text">
           <button
               class="button"
-              @click="debouncedSaveSetting({clientId})">
+              @click="debouncedSaveSetting({client_id: clientId})">
             {{ $t('electronicsignatures', 'Save') }}
           </button>
         </label>
@@ -140,8 +147,8 @@ export default {
             id="allowOnlyEmail"
             type="checkbox"
             class="checkbox"
-            true-value="yes"
-            false-value=""
+            true-value="1"
+            false-value="0"
             @change="debouncedSaveSetting({enable_otp: !!allowSimpleSignatures})">
         <label for="allowOnlyEmail">
           {{ $t($globalConfig.appId, 'Allow simple signatures') }}
