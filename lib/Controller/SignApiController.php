@@ -35,40 +35,23 @@ class SignApiController extends OCSController {
 		$this->sendSigningLinkToEmail = $sendSigningLinkToEmail;
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
-	public function getSignLink() {
-        try {
-            $path = $this->request->getParam('path');
-
-            $link = $this->getSignLinkCommand->getSignLink($this->userId, $path);
-
-            return new JSONResponse(['sign_link' => $link]);
-        } catch (\Throwable $e) {
-            // TODO log the exception into file.
-            return new JSONResponse(['message' => "Failed to get link: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);
-        }
-	}
-
     /**
      * @NoAdminRequired
      */
     public function sendSignLinkByEmail() {
         try {
             $path = $this->request->getParam('path');
-            // TODO Validate e-mail.
             $email = $this->request->getParam('email');
 
             if (!$this->mailer->validateMailAddress($email)) {
                 return new JSONResponse([
-                    'message' => 'Provided email-address is not valid',
+                    'message' => 'Provided email address is not valid',
                 ], Http::STATUS_BAD_REQUEST);
             }
 
-            $link = $this->getSignLinkCommand->getSignLink($this->userId, $path);
+            $link = $this->getSignLinkCommand->getSignLink($this->userId, $path, $email);
 
-            $this->sendSigningLinkToEmail->send($email, $link);
+            $this->sendSigningLinkToEmail->sendIfNecessary($email, $link);
 
             return new JSONResponse(['message' => 'E-mail sent!']);
         } catch (\Throwable $e) {
@@ -86,7 +69,7 @@ class SignApiController extends OCSController {
      */
     public function fetchSignedFile() {
         try {
-            $docId = $path = $this->request->getParam('doc_id');
+            $docId = $this->request->getParam('doc_id');
 
             $this->fetchFileCommand->fetch($docId);
 

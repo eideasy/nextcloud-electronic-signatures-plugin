@@ -25,7 +25,6 @@ function addCustomFileActions() {
 
   const fileActionsPlugin = {
     attach(fileList) {
-      console.log('fileActionsPlugin');
       fileList.fileActions.registerAction({
         mime: 'file',
         name: 'Sign',
@@ -37,7 +36,6 @@ function addCustomFileActions() {
           EventBus.$emit('SIGNATURES_CLICK', { filename });
         },
       });
-      console.log(fileList);
     },
   };
   OC.Plugins.register('OCA.Files.FileList', fileActionsPlugin);

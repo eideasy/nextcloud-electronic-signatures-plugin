@@ -2,6 +2,7 @@
 
 namespace OCA\ElectronicSignatures\Controller;
 
+use OCA\ElectronicSignatures\Config;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IConfig;
@@ -12,33 +13,52 @@ class SettingsApiController extends Controller {
     private $userId;
 
     /** @var IConfig */
+    private $iConfig;
+
+    /** @var Config */
     private $config;
 
-	public function __construct($AppName, IRequest $request, IConfig $config, $UserId) {
+	public function __construct($AppName, IRequest $request, IConfig $iConfig, Config $config, $UserId) {
 		parent::__construct($AppName, $request);
 		$this->userId = $UserId;
+		$this->iConfig = $iConfig;
 		$this->config = $config;
 	}
 
-	public function updateCredentials() {
-        try {
-            // TODO get app name from some constant, here and elsewhere.
-            $clientId = $this->request->getParam('clientId', null);
-            $secret = $this->request->getParam('secret', null);
+	public function getSettings() {
+        return new JSONResponse([
+            'enable_otp' => $this->config->isOtpEnabled(),
+        ]);
+    }
 
+    // TODO remove (deprecated).
+    public function updateSettingsDepr() {
+	    return $this->updateSettings();
+    }
+
+	public function updateSettings() {
+	    try {
             // TODO actually check the inputs - attempt to get client config from eID Easy server.
+            $clientId = $this->request->getParam('client_id', null);
             if ($clientId !== null) {
-                $this->config->setAppValue('electronicsignatures', 'client_id', $clientId);
+                // TODO get app name from some constant, here and elsewhere.
+                $this->iConfig->setAppValue('electronicsignatures', 'client_id', $clientId);
             }
 
+            $secret = $this->request->getParam('secret', null);
             if ($secret !== null) {
-                $this->config->setAppValue('electronicsignatures', 'secret', $secret);
+                $this->iConfig->setAppValue('electronicsignatures', 'secret', $secret);
             }
 
-            return new JSONResponse(['message' => 'eID Easy credentials updated!']);
+            $enableOtp = $this->request->getParam('enable_otp', null);
+            if ($enableOtp !== null) {
+                $this->iConfig->setAppValue('electronicsignatures', 'enable_otp', (int) (bool) $enableOtp);
+            }
+
+            return new JSONResponse(['message' => 'Settings updated!']);
         } catch (\Throwable $e) {
             // TODO log the exception into file.
-            return new JSONResponse(['message' => "Failed to get link: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);
+            return new JSONResponse(['message' => "Failed to update credentials: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);
         }
 	}
 }

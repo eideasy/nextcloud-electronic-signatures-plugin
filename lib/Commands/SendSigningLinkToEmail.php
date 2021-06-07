@@ -2,6 +2,7 @@
 
 namespace OCA\ElectronicSignatures\Commands;
 
+use OCA\ElectronicSignatures\Config;
 use OCP\AppFramework\Controller;
 use OCP\IUserSession;
 use OCP\Mail\IEMailTemplate;
@@ -17,13 +18,23 @@ class SendSigningLinkToEmail extends Controller {
     /** @var IUserSession */
     private $session;
 
-    public function __construct(IMailer $mailer, IUserSession $userSession, $UserId) {
+    /** @var Config */
+    private $config;
+
+    public function __construct(IMailer $mailer, IUserSession $userSession, Config $config, $UserId) {
         $this->userId = $UserId;
         $this->mailer = $mailer;
         $this->session = $userSession;
+        $this->config = $config;
     }
 
-    public function send(string $email, $link): void {
+    public function sendIfNecessary(string $email, $link): void {
+        // We do not need to send the e-mail if OTP is enabled, because in
+        // this case, eID Easy will be sending the e-mail instead of us.
+        if ($this->config->isOtpEnabled()) {
+            return;
+        }
+
         $emailTemplate = $this->mailer->createEMailTemplate('calendar.PublicShareNotification', [
             'link' => $link,
         ]);

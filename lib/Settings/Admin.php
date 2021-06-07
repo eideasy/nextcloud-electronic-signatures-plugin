@@ -34,8 +34,9 @@ class Admin implements ISettings {
      */
     public function getForm() {
         return new TemplateResponse('electronicsignatures', 'settings/admin', [
-            'client_id_placeholder' => $this->anoymimize($this->currentConfig->getClientId()),
-            'secret_placeholder' => $this->anoymimize($this->currentConfig->getSecret()),
+            'client_id_placeholder' => $this->anonymize($this->currentConfig->getClientId()),
+            'secret_placeholder' => $this->anonymize($this->currentConfig->getSecret()),
+            'enable_otp' => $this->currentConfig->isOtpEnabled(),
         ], 'blank');
     }
 
@@ -57,7 +58,7 @@ class Admin implements ISettings {
         return 55;
     }
 
-    private function anoymimize(string $string): string {
+    private function anonymize(string $string): string {
         $letters = str_split($string);
         $lastFour = array_splice($letters, -4);
 
