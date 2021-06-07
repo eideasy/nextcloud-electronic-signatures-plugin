@@ -36,7 +36,7 @@ class Config {
         return $this->secret;
     }
 
-    public function isOtpEnabled(): string
+    public function isOtpEnabled(): bool
     {
         if (!isset($this->enableOtp)) {
             $storedValue = $this->config->getAppValue('electronicsignatures', 'enable_otp', null);
