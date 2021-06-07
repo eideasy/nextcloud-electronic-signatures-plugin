@@ -24,7 +24,7 @@ export default {
   },
   computed: {
     fetchSignedFileUrl() {
-      return window.location.origin + this.generateNextcloudUrl('/index.php/apps/electronicsignatures/fetch_signed_file');
+      return window.location.origin + this.generateNextcloudUrl('/apps/electronicsignatures/fetch_signed_file');
     },
   },
   created() {
