@@ -54,7 +54,7 @@ export default {
       _self.setErrorMessage(null);
       axios({
         method: 'post',
-        url: this.generateNextcloudUrl('/apps/electronicsignatures/update_credentials'),
+        url: this.generateNextcloudUrl('/apps/electronicsignatures/update_settings'),
         responseType: 'json',
         headers: {
           requesttoken: OC.requestToken,
