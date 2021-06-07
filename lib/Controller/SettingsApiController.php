@@ -20,8 +20,8 @@ class SettingsApiController extends Controller {
 		$this->config = $config;
 	}
 
-	public function updateCredentials() {
-        try {
+	public function updateSettings() {
+	    try {
             // TODO actually check the inputs - attempt to get client config from eID Easy server.
             $clientId = $this->request->getParam('clientId', null);
             if ($clientId !== null) {
@@ -36,13 +36,13 @@ class SettingsApiController extends Controller {
 
             $enableOtp = $this->request->getParam('enable_otp', null);
             if ($enableOtp !== null) {
-                $this->config->setAppValue('electronicsignatures', 'enable_otp', $enableOtp);
+                $this->config->setAppValue('electronicsignatures', 'enable_otp', (int) (bool) $enableOtp);
             }
 
             return new JSONResponse(['message' => 'Settings updated!']);
         } catch (\Throwable $e) {
             // TODO log the exception into file.
-            return new JSONResponse(['message' => "Failed to get link: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);
+            return new JSONResponse(['message' => "Failed to update credentials: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);
         }
 	}
 }
