@@ -17,6 +17,7 @@ export default {
       errorMessage: null,
       successMessage: null,
       isLoading: false,
+      adminSettings: null,
       email: '',
       filename: '',
     };
@@ -28,8 +29,19 @@ export default {
       _self.filename = payload.filename;
     });
   },
+  computed: {
+    fileExtension() {
+      return this.filename.split('.').pop();
+    }
+  },
   methods: {
+    generateNextcloudUrl(url) {
+      return generateUrl(url);
+    },
     showModal() {
+      if (!this.adminSettings) {
+        this.fetchAdminSettings();
+      }
       this.setErrorMessage(null);
       this.setSuccessMessage(null);
       this.modal = true;
@@ -56,6 +68,23 @@ export default {
       } else {
         return parsed.dir + '/' + this.filename;
       }
+    },
+    setAdminSettings(settings) {
+      this.adminSettings = settings;
+    },
+    fetchAdminSettings() {
+      const _self = this;
+      axios({
+        method: 'get',
+        url: this.generateNextcloudUrl('/apps/electronicsignatures/settings'),
+        responseType: 'json',
+        headers: {
+          requesttoken: OC.requestToken,
+        },
+      })
+          .then(function(response) {
+            _self.setAdminSettings(response.data);
+          });
     },
     onSubmit() {
       const _self = this;
@@ -104,6 +133,12 @@ export default {
           <h3>
             {{ $t($globalConfig.appId, 'Send the signing link by email') }}
           </h3>
+
+          <div v-if="adminSettings && adminSettings.enable_otp && fileExtension !== 'pdf'">
+            <span class="alert alert-warning">
+              You have enabled simple signatures, but this file is not a pdf. User cannot add a simple electronic signature to this file.
+            </span>
+          </div>
 
           <div v-if="errorMessage">
             <span class="alert alert-danger">{{ errorMessage }}</span>
@@ -219,6 +254,12 @@ export default {
     color: #721c24;
     background-color: #f8d7da;
     border-color: #f5c6cb;
+  }
+
+  .alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
   }
 
   @media (min-width: 600px) {
