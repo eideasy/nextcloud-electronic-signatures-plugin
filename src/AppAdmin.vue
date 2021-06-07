@@ -61,7 +61,7 @@ export default {
       _self.setErrorMessage(null);
       axios({
         method: 'post',
-        url: this.generateNextcloudUrl('/apps/electronicsignatures/update_settings'),
+        url: this.generateNextcloudUrl('/apps/electronicsignatures/settings'),
         responseType: 'json',
         headers: {
           requesttoken: OC.requestToken,
