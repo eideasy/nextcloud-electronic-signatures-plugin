@@ -19,6 +19,7 @@ export default {
       errorMessage: null,
       clientIdPlaceholder: this.$parent.clientId,
       secretPlaceholder: this.$parent.secret,
+      allowSimpleSignatures: '',
     };
   },
   computed: {
@@ -45,7 +46,7 @@ export default {
     saveSetting(setting) {
       const _self = this;
       // do not save empty values
-      if (!setting.clientId && !setting.secret) {
+      if (Object.keys(setting).length === 0) {
         return;
       }
       _self.setIsLoading(true);
@@ -133,20 +134,18 @@ export default {
           </button>
         </label>
       </div>
-      <div v-if="$globalConfig.features.showEmailSignatureSetting">
+      <div class="checkboxWrap">
         <input
+            v-model="allowSimpleSignatures"
             id="allowOnlyEmail"
             type="checkbox"
-            name="allowOnlyEmail"
             class="checkbox"
-            value="1">
+            true-value="yes"
+            false-value=""
+            @change="debouncedSaveSetting({enable_otp: !!allowSimpleSignatures})">
         <label for="allowOnlyEmail">
-          {{ $t($globalConfig.appId, 'Allow only email based signatures') }}
+          {{ $t($globalConfig.appId, 'Allow simple signatures') }}
         </label>
-        <div class="note">
-          {{ $t($globalConfig.appId, `If checked, the signer will be forced to use their email and will not be able to choose any other signing method.
-              Email based signatures do not qualify as Advanced Electronic Signature (AdES) or Qualified Electronic Signature (QES).`) }}
-        </div>
       </div>
     </div>
   </div>
@@ -177,10 +176,8 @@ export default {
     opacity: 0.9;
   }
 
-  .note {
-    margin-top: 10px;
-    font-size: 14px;
-    line-height: 1.5;
+  .checkboxWrap {
+    margin-top: 20px;
   }
 
   .settingsHint + .settingsHint {
