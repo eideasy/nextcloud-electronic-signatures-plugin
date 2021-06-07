@@ -31,6 +31,11 @@ class SettingsApiController extends Controller {
         ]);
     }
 
+    // TODO remove (deprecated).
+    public function updateSettingsDepr() {
+	    return $this->updateSettings();
+    }
+
 	public function updateSettings() {
 	    try {
             // TODO actually check the inputs - attempt to get client config from eID Easy server.
