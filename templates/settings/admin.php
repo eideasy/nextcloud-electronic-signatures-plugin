@@ -9,5 +9,6 @@
   id="electronic-signatures-admin-root"
   data-client-id="<?php echo $_['client_id_placeholder'] ?>"
   data-secret="<?php echo $_['secret_placeholder'] ?>"
+  data-enable-otp="<?php echo $_['enable_otp'] ?>"
 ></div>
 
