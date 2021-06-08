@@ -3,12 +3,14 @@ import debounce from 'lodash.debounce';
 import axios from 'axios';
 import { generateUrl } from '@nextcloud/router';
 import SettingsStatus from './SettingsStatus';
+import SigningView from './SigningView';
 const { OC } = window;
 
 export default {
   name: 'AppAdmin',
   components: {
     SettingsStatus,
+    SigningView,
   },
   data() {
     return {
@@ -84,6 +86,7 @@ export default {
 
 <template>
   <div>
+    <SigningView />
     <div class="section">
       <h2>{{ $t('electronicsignatures', 'Electronic signatures settings') }}</h2>
       <p class="settings-hint settingsHint">
@@ -143,8 +146,8 @@ export default {
       </div>
       <div class="checkboxWrap">
         <input
-            v-model="allowSimpleSignatures"
             id="allowOnlyEmail"
+            v-model="allowSimpleSignatures"
             type="checkbox"
             class="checkbox"
             true-value="1"
