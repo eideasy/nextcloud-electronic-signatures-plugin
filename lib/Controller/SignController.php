@@ -21,7 +21,7 @@ class SignController extends OCSController {
         $parameters = [];
 
         $response = new TemplateResponse(
-            'electronicsignatures', 'signfile', $parameters, 'blank'
+            'electronicsignatures', 'signfile', $parameters, 'base'
         );
 
         $csp = new ContentSecurityPolicy();
