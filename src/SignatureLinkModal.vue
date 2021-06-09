@@ -22,17 +22,17 @@ export default {
       filename: '',
     };
   },
+  computed: {
+    fileExtension() {
+      return this.filename.split('.').pop();
+    },
+  },
   mounted() {
     const _self = this;
     EventBus.$on('SIGNATURES_CLICK', function(payload) {
       _self.showModal();
       _self.filename = payload.filename;
     });
-  },
-  computed: {
-    fileExtension() {
-      return this.filename.split('.').pop();
-    }
   },
   methods: {
     generateNextcloudUrl(url) {
