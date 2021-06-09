@@ -40,12 +40,7 @@ class FetchSignedFile extends Controller {
 
         $responseBody = $this->getContainerResponse($session);
 
-        if (!isset($responseBody['signed_file_contents'])) {
-            $message = isset($responseBody['message']) ? $responseBody['message'] : 'eID Easy error!';
-            throw new EidEasyException($message);
-        }
-
-        $this->saveContainer($responseBody['signed_file_contents'], $session);
+        $this->saveContainerFromResponse($responseBody, $session);
     }
 
     private function getContainerResponse(Session $session): array {
@@ -72,23 +67,30 @@ class FetchSignedFile extends Controller {
         return json_decode($response->getBody(), true);
     }
 
-    private function saveContainer(string $base64Content, Session $session): void {
+    private function saveContainerFromResponse(array $responseBody, Session $session): void {
+        if (!isset($responseBody['signed_file_contents'])) {
+            $message = isset($responseBody['message']) ? $responseBody['message'] : 'eID Easy error!';
+            throw new EidEasyException($message);
+        }
+
         $userFolder = $this->storage->getUserFolder($session->getUserId());
 
-        $path = $this->getContainerPath($session);
+        $path = $this->getContainerPath($session, $responseBody['filename']);
         $userFolder->touch($path);
-        $userFolder->newFile($path, base64_decode($base64Content));
+        $userFolder->newFile($path, base64_decode($responseBody['signed_file_contents']));
     }
 
-    private function getContainerPath(Session $session): string {
+    private function getContainerPath(Session $session, string $containerFilename): string {
         $originalPath = $session->getPath();
-        $parts = explode('.', $originalPath);
+        $originalParts = explode('.', $originalPath);
 
         // Remove file extension.
-        array_pop($parts);
+        array_pop($originalParts);
 
-        $beginning = implode('.', $parts);
-        $extension = Config::CONTAINER_TYPE;
+        $containerParts = explode('.', $containerFilename);
+
+        $beginning = implode('.', $originalParts);
+        $extension = $containerParts[count($containerParts) - 1];
         return "$beginning-{$session->getToken()}.$extension";
     }
 }

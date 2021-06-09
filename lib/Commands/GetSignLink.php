@@ -34,14 +34,14 @@ class GetSignLink extends Controller {
         $this->config = $config;
     }
 
-    public function getSignLink(string $userId, string $path, string $email): string {
+    public function getSignLink(string $userId, string $path, string $email, string $containerType): string {
         // TODO mark base64 ext as dependency in composer.json.
         list($mimeType, $contents) = $this->getFile($path, $userId);
         $base64 = base64_encode($contents);
 
         $token = $this->generateRandomString(30);
 
-        $responseBody = $this->startSigningSession($path, $base64, $mimeType, $email);
+        $responseBody = $this->startSigningSession($path, $base64, $mimeType, $email, $containerType);
 
         if (!isset($responseBody['doc_id'])) {
             $message = isset($responseBody['message']) ? $responseBody['message'] : 'eID Easy error!';
@@ -82,7 +82,7 @@ class GetSignLink extends Controller {
         return $randomString;
     }
 
-    private function startSigningSession(string $path, string $fileContentBase64, string $mimeType, string $email): array {
+    private function startSigningSession(string $path, string $fileContentBase64, string $mimeType, string $email, string $containerType): array {
         // Send file to eID Easy server.
         $body = [
             'files' => [
@@ -92,7 +92,7 @@ class GetSignLink extends Controller {
                     'mimeType' => $mimeType,
                 ],
             ],
-            'container_type' => Config::CONTAINER_TYPE,
+            'container_type' => $containerType,
             'client_id' => $this->config->getClientId(),
             'secret' => $this->config->getSecret(),
             'lang' => 'en',

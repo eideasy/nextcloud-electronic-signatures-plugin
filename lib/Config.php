@@ -5,7 +5,9 @@ namespace OCA\ElectronicSignatures;
 use OCP\IConfig;
 
 class Config {
-    public const CONTAINER_TYPE = 'asice';
+    public const CONTAINER_TYPE = 'asice'; // TODO delete!
+    public const CONTAINER_TYPE_ASICE = 'asice';
+    public const CONTAINER_TYPE_PDF = 'pdf';
     public const ENABLE_OTP_BY_DEFAULT = true;
 
     private IConfig $config;
