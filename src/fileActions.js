@@ -15,13 +15,14 @@ function addCustomFileActions() {
   const modalHolder = document.createElement('div');
   modalHolder.id = modalHolderId;
   document.body.append(modalHolder);
-
+ /* eslint-disable no-unused-vars */
   const vm = new Vue({
     el: modalHolder,
     render: h => {
       return h(SignatureLinkModal);
     },
   });
+  /* eslint-enable */
 
   const fileActionsPlugin = {
     attach(fileList) {
