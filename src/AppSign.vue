@@ -41,11 +41,13 @@ export default {
       {{ $t($globalConfig.appId, 'You are signing the document below') }}<br>
       <small>{{ $t($globalConfig.appId, 'Please review its contents before signing.') }}</small>
     </h2>
-    <eideasy-signing-widget
-      id-host="https://id.eideasy.test"
-      country-code="EE"
-      language="et"
-      :sandbox="true" />
+    <div class="widgetHolder">
+      <eideasy-signing-widget
+        id-host="https://id.eideasy.com"
+        country-code="EE"
+        language="et"
+        :sandbox="true" />
+    </div>
     <div class="preview">
       <FilePreview />
     </div>
@@ -62,13 +64,7 @@ export default {
   max-width: 1170px;
 }
 
-.methodsGrid {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.methodsGridUnit {
-  width: 50%;
-  padding: 7px;
+.widgetHolder {
+  width: 400px;
 }
 </style>
