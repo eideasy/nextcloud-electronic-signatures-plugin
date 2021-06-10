@@ -2,9 +2,11 @@
 
 namespace OCA\ElectronicSignatures\Controller;
 
+use Exception;
 use OCA\ElectronicSignatures\Commands\FetchSignedFile;
 use OCA\ElectronicSignatures\Commands\GetSignLink;
 use OCA\ElectronicSignatures\Commands\SendSigningLinkToEmail;
+use OCA\ElectronicSignatures\Config;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\OCSController;
@@ -42,6 +44,7 @@ class SignApiController extends OCSController {
         try {
             $path = $this->request->getParam('path');
             $email = $this->request->getParam('email');
+            $containerType = $this->getContainerType($path);
 
             if (!$this->mailer->validateMailAddress($email)) {
                 return new JSONResponse([
@@ -49,7 +52,7 @@ class SignApiController extends OCSController {
                 ], Http::STATUS_BAD_REQUEST);
             }
 
-            $link = $this->getSignLinkCommand->getSignLink($this->userId, $path, $email);
+            $link = $this->getSignLinkCommand->getSignLink($this->userId, $path, $email, $containerType);
 
             $this->sendSigningLinkToEmail->sendIfNecessary($email, $link);
 
@@ -78,5 +81,25 @@ class SignApiController extends OCSController {
             // TODO log the exception into file.
             return new JSONResponse(['message' => "Failed to get link: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);
         }
+    }
+
+
+    private function getContainerType(string $path) {
+        $containerType = $this->request->getParam('container_type', Config::CONTAINER_TYPE_ASICE);
+
+        $parts = explode('.', $path);
+        $extension = strtolower($parts[count($parts) - 1]);
+
+        // If file is not pdf, but container type is, then throw exception.
+        if ($extension !== 'pdf' && $containerType === Config::CONTAINER_TYPE_PDF) {
+            throw new Exception('Container type is PDF, but file type is not.');
+        }
+
+        // If container type is not recognized, then throw exception.
+        if (!in_array($containerType, [Config::CONTAINER_TYPE_PDF, Config::CONTAINER_TYPE_ASICE])) {
+            throw new Exception('Unknown container type.');
+        }
+
+        return $containerType;
     }
 }
