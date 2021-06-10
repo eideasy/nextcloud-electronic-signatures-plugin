@@ -36,21 +36,29 @@ export default {
 </script>
 
 <template>
-  <div class="container">
-    <h2 class="signingTitle">
-      {{ $t($globalConfig.appId, 'You are signing the document below') }}<br>
-      <small>{{ $t($globalConfig.appId, 'Please review its contents before signing.') }}</small>
-    </h2>
-    <div class="widgetHolder">
-      <eideasy-signing-widget
-        id-host="https://id.eideasy.com"
-        country-code="EE"
-        language="et"
-        :on-success.prop="() => console.log('test')"
-        :sandbox="true" />
+  <div class="Layout">
+    <div class="Layout_main">
+      <div class="Layout_mainContainer">
+        <div class="Layout_section">
+          <h2 class="h2">
+            1. {{ $t($globalConfig.appId, 'Review the file contents before signing:') }}
+          </h2>
+          <FilePreview />
+        </div>
+      </div>
     </div>
-    <div class="preview">
-      <FilePreview />
+    <div class="Layout_actions">
+      <h2 class="h2">
+        2. {{ $t($globalConfig.appId, 'Sign:') }}
+      </h2>
+      <div class="widgetHolder">
+        <eideasy-signing-widget
+            id-host="https://id.eideasy.com"
+            country-code="EE"
+            language="en"
+            :on-success.prop="() => console.log('test')"
+            :sandbox="true" />
+      </div>
     </div>
   </div>
 </template>
@@ -66,6 +74,65 @@ export default {
 }
 
 .widgetHolder {
-  width: 400px;
+  width: 100%;
 }
+
+.Layout_actions {
+  margin-top: 40px;
+}
+
+.Layout_section + .Layout_section {
+  margin-top: 20px;
+}
+
+.Layout_mainContainer {
+  width: 100%;
+}
+
+.Layout {
+  width: 100%;
+  max-width: 480px;
+  margin: 50px auto 0 auto;
+  padding: 0 20px;
+}
+
+@media (min-width: 768px) {
+  .Layout {
+    display: flex;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+  }
+
+  .Layout_mainContainer {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .Layout_main {
+    flex-grow: 1;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    height: 100%;
+    overflow: auto;
+  }
+
+  .Layout_actions {
+    border-left: 1px solid var(--color-border);
+    width: 400px;
+    padding: 40px 20px;
+    margin-top: 0;
+    height: 100%;
+    overflow: auto;
+  }
+}
+
+@media (min-width: 992px) {
+  .Layout_actions {
+    width: 500px;
+  }
+}
+
 </style>
