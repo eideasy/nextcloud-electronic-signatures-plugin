@@ -1,14 +1,23 @@
 <script>
-import SmartCardButton from './methodButtons/SmartCardButton';
-import SmartIdButton from './methodButtons/SmartIdButton';
+import '@eid-easy/eideasy-signing-widget';
 import { imagePath } from '@nextcloud/router';
 import FilePreview from './FilePreview';
+
+const METHODS = {
+  smartCard: 'smartCard',
+  smartId: 'smartId',
+};
+
 export default {
   name: 'AppSign',
   components: {
     FilePreview,
-    SmartCardButton,
-    SmartIdButton,
+  },
+  data() {
+    return {
+      METHODS,
+      selectedMethod: null,
+    };
   },
   computed: {
     signingMethods() {
@@ -20,7 +29,7 @@ export default {
       return imagePath(this.$globalConfig.appId, 'methods/' + file);
     },
     selectMethod(method) {
-      console.log(method);
+      this.selectedMethod = method;
     },
   },
 };
@@ -29,23 +38,16 @@ export default {
 <template>
   <div class="container">
     <h2 class="signingTitle">
-        Sa allkirjastad allolevat dokumenti<br>
-      <small>Palun kontrolli enne selle dokumendi sisu üle</small>
+      {{ $t($globalConfig.appId, 'You are signing the document below') }}<br>
+      <small>{{ $t($globalConfig.appId, 'Please review its contents before signing.') }}</small>
     </h2>
-    <div class="methodsGrid">
-      <div class="methodsGridUnit">
-        <SmartCardButton
-            :on-click="() => selectMethod('smartCard')"
-            :generate-icon-path="generateIconPath" />
-      </div>
-      <div class="methodsGridUnit">
-        <SmartIdButton
-            :on-click="() => selectMethod('smartId')"
-            :generate-icon-path="generateIconPath" />
-      </div>
-      <div class="preview">
-        <FilePreview />
-      </div>
+    <eideasy-signing-widget
+      id-host="https://id.eideasy.test"
+      country-code="EE"
+      language="et"
+      :sandbox="true" />
+    <div class="preview">
+      <FilePreview />
     </div>
   </div>
 </template>
@@ -66,7 +68,7 @@ export default {
 }
 
 .methodsGridUnit {
-  width: 25%;
+  width: 50%;
   padding: 7px;
 }
 </style>
