@@ -46,6 +46,7 @@ export default {
         id-host="https://id.eideasy.com"
         country-code="EE"
         language="et"
+        :on-success.prop="() => console.log('test')"
         :sandbox="true" />
     </div>
     <div class="preview">
