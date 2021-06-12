@@ -52,7 +52,7 @@ class Config {
 
     public function isSigningLocal(): bool
     {
-        return true; // TODO implement.
+        return false; // TODO implement.
     }
 
     public function getUrl(string $path = ''): string

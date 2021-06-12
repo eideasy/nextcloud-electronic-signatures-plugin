@@ -16,7 +16,7 @@ trait GetsFile {
             } else {
                 throw new NotFoundException('Can not read from folder');
             }
-        } catch (\OCP\Files\NotFoundException $e) {
+        } catch (NotFoundException $e) {
             throw new NotFoundException('File does not exist');
         }
     }

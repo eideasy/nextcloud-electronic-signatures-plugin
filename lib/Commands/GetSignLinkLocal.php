@@ -13,7 +13,6 @@ use OCP\Files\IRootFolder;
 use OCP\Http\Client\IClientService;
 use OCP\AppFramework\Controller;
 use OCP\Security\ISecureRandom;
-use Psr\Log\LoggerInterface;
 
 class GetSignLinkLocal extends Controller
 {
@@ -40,7 +39,7 @@ class GetSignLinkLocal extends Controller
     /** @var EidEasyApi */
     private $eidEasyApi;
 
-    public function __construct(IRootFolder $storage, IClientService $clientService, ISecureRandom $secureRandom, SessionMapper $mapper, Config $config, LoggerInterface $logger, $UserId)
+    public function __construct(IRootFolder $storage, IClientService $clientService, ISecureRandom $secureRandom, SessionMapper $mapper, Config $config, $UserId)
     {
         $this->userId = $UserId;
         $this->storage = $storage;
@@ -49,8 +48,6 @@ class GetSignLinkLocal extends Controller
         $this->httpClientService = $clientService;
         $this->config = $config;
         $this->eidEasyApi = $config->getApi();
-        // TODO remove logger.
-        $this->logger = $logger;
 
     }
 
@@ -66,7 +63,6 @@ class GetSignLinkLocal extends Controller
         } elseif ($containerType === 'asice') {
             $signatureContainer = 'xades';
         }
-        $this->logger->alert('TESTx 1');
 
         $sourceFiles = [
             [
@@ -83,7 +79,6 @@ class GetSignLinkLocal extends Controller
                 'time' => (new DateTime())->format(DateTimeInterface::ISO8601),
             ],
         ];
-        $this->logger->alert('TESTx 2');
 
         $data = $this->eidEasyApi->prepareFiles($sourceFiles, $prepareParams);
 
@@ -93,12 +88,10 @@ class GetSignLinkLocal extends Controller
                 'eID Easy error';
             throw new EidEasyException($message);
         }
-        $this->logger->alert('TESTx 3');
 
         $docId = $data['doc_id'];
 
         $this->saveSession($docId, $path, $userId, $containerType, true);
-        $this->logger->alert('TESTx 4');
 
         // TODO return link.
         return 'https://example.com/';

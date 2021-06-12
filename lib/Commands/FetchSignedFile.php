@@ -10,7 +10,7 @@ use OCA\ElectronicSignatures\Db\SessionMapper;
 use OCP\Files\IRootFolder;
 use OCP\AppFramework\Controller;
 
-class FetchSignedDigest extends Controller
+class FetchSignedFile extends Controller
 {
     use GetsFile;
 

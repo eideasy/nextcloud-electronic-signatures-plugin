@@ -3,7 +3,7 @@
 namespace OCA\ElectronicSignatures\Controller;
 
 use Exception;
-use OCA\ElectronicSignatures\Commands\FetchSignedDigest;
+use OCA\ElectronicSignatures\Commands\FetchSignedFile;
 use OCA\ElectronicSignatures\Commands\GetSignLinkLocal;
 use OCA\ElectronicSignatures\Commands\GetSignLinkRemote;
 use OCA\ElectronicSignatures\Commands\SendSigningLinkToEmail;
@@ -28,7 +28,7 @@ class SignApiController extends OCSController
     /** @var GetSignLinkLocal */
     private $getSignLinkLocalCommand;
 
-    /** @var FetchSignedDigest */
+    /** @var FetchSignedFile */
     private $fetchFileCommand;
 
     /** @var SendSigningLinkToEmail */
@@ -44,7 +44,7 @@ class SignApiController extends OCSController
         GetSignLinkRemote $getSignLinkRemote,
         GetSignLinkLocal $getSignLinkLocal,
         SendSigningLinkToEmail $sendSigningLinkToEmail,
-        FetchSignedDigest $fetchSignedFile,
+        FetchSignedFile $fetchSignedFile,
         Config $config,
         LoggerInterface $logger,
         $UserId
