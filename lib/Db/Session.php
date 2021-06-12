@@ -9,6 +9,8 @@ class Session extends Entity {
     protected $userId;
     protected $path;
     protected $used;
+    protected $isHashBased;
+    protected $containerType;
 
     public function __construct() {
         $this->addType('id','integer');

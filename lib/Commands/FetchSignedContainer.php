@@ -10,7 +10,8 @@ use OCP\Files\IRootFolder;
 use OCP\Http\Client\IClientService;
 use OCP\AppFramework\Controller;
 
-class FetchSignedFile extends Controller {
+// TODO obsolete?
+class FetchSignedContainer extends Controller {
     /** @var  IClientService */
     private $httpClientService;
 

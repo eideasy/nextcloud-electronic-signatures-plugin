@@ -2,6 +2,7 @@
 
 namespace OCA\ElectronicSignatures;
 
+use EidEasy\Api\EidEasyApi;
 use OCP\IConfig;
 
 class Config {
@@ -14,9 +15,11 @@ class Config {
     private string $secret;
     private bool $enableOtp;
     private string $baseUrl;
+    private EidEasyApi $api;
 
-    public function __construct(IConfig $config) {
+    public function __construct(IConfig $config, EidEasyApi $api) {
         $this->config = $config;
+        $this->initApi($api);;
     }
 
     public function getClientId(): string
@@ -47,7 +50,12 @@ class Config {
         return $this->enableOtp;
     }
 
-    public function getUrl(string $path): string
+    public function isSigningLocal(): bool
+    {
+        return true; // TODO implement.
+    }
+
+    public function getUrl(string $path = ''): string
     {
         $path = ltrim($path, '/');
 
@@ -56,6 +64,23 @@ class Config {
             $this->baseUrl = rtrim($url, '/');
         }
 
+        if (!$path) {
+            return $this->baseUrl;
+        }
+
         return "$this->baseUrl/$path";
+    }
+
+    public function getApi(): EidEasyApi
+    {
+        return $this->api;
+    }
+
+    private function initApi(EidEasyApi $api): void
+    {
+        $this->api = $api;
+        $this->api->setApiUrl($this->getUrl());
+        $this->api->setClientId($this->getClientId());
+        $this->api->setSecret($this->getSecret());
     }
 }

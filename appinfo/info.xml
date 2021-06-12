@@ -5,7 +5,7 @@
     <name>Electronic Signatures</name>
     <summary>Accept electronic signatures on your documents.</summary>
     <description><![CDATA[Send out a link to accept electronic signatures on your documents.]]></description>
-    <version>0.0.1</version>
+    <version>1.1.0</version>
     <licence>agpl</licence>
     <author mail="tonis.palts@eideasy.com" homepage="https://eideasy.com">Tõnis Palts</author>
     <namespace>ElectronicSignatures</namespace>
