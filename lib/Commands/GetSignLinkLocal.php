@@ -53,7 +53,7 @@ class GetSignLinkLocal extends Controller
 
     public function getSignLink(string $userId, string $path, string $containerType)
     {
-        list($mimeType, $fileContent, $fileName) = $this->getFile($path, $userId);
+        list($mimeType, $fileContent) = $this->getFile($path, $userId);
 
         // Handle digest based signature starting.
         $signatureContainer = $containerType;
@@ -66,7 +66,7 @@ class GetSignLinkLocal extends Controller
 
         $sourceFiles = [
             [
-                'fileName' => $fileName,
+                'fileName' => 'anonymized.txt',
                 'mimeType' => $mimeType,
                 'fileContent' => base64_encode(hash('sha256', $fileContent, true)),
             ]
