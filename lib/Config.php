@@ -9,11 +9,13 @@ class Config {
     public const CONTAINER_TYPE_ASICE = 'asice';
     public const CONTAINER_TYPE_PDF = 'pdf';
     public const ENABLE_OTP_BY_DEFAULT = true;
+    public const ENABLE_LOCAL_SIGNING_BY_DEFAULT = true;
 
     private IConfig $config;
     private string $clientId;
     private string $secret;
     private bool $enableOtp;
+    private bool $enableLocalSigning;
     private string $baseUrl;
     private EidEasyApi $api;
 
@@ -43,8 +45,7 @@ class Config {
     public function isOtpEnabled(): bool
     {
         if (!isset($this->enableOtp)) {
-            $storedValue = $this->config->getAppValue('electronicsignatures', 'enable_otp', null);
-            $this->enableOtp = $storedValue !== null ? (bool) $storedValue : self::ENABLE_OTP_BY_DEFAULT;
+            $this->enableOtp = (bool) $this->config->getAppValue('electronicsignatures', 'enable_otp', self::ENABLE_OTP_BY_DEFAULT);
         }
 
         return $this->enableOtp;
@@ -52,7 +53,11 @@ class Config {
 
     public function isSigningLocal(): bool
     {
-        return false; // TODO implement.
+        if (!isset($this->enableLocalSigning)) {
+            $this->enableLocalSigning = (bool) $this->config->getAppValue('electronicsignatures', 'enable_local_signing', self::ENABLE_LOCAL_SIGNING_BY_DEFAULT);
+        }
+
+        return $this->enableLocalSigning;
     }
 
     public function getUrl(string $path = ''): string
