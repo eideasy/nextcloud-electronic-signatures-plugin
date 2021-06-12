@@ -37,6 +37,7 @@ class Admin implements ISettings {
             'client_id_placeholder' => $this->anonymize($this->currentConfig->getClientId()),
             'secret_placeholder' => $this->anonymize($this->currentConfig->getSecret()),
             'enable_otp' => $this->currentConfig->isOtpEnabled(),
+            'enable_local_signing' => $this->currentConfig->isSigningLocal(),
         ], 'blank');
     }
 
