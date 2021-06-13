@@ -92,7 +92,7 @@ class GetSignLinkRemote extends Controller {
 
 
         if ($this->config->isOtpEnabled()) {
-            $body['signer'] = [
+			$params['signer'] = [
                 'send_now' => true,
                 'contacts' => [
                     [
