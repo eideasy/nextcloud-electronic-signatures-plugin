@@ -78,8 +78,7 @@ class SignApiController extends OCSController
 
             $link = $this->getSignLink($path, $containerType, $email);
 
-            // TODO send e-mail if we did not provide send-now and email to OTP.
-            $this->sendSigningLinkToEmail->sendIfNecessary($email, $link);
+            $this->sendSigningLinkToEmail->sendIfNecessary($containerType, $email, $link);
 
             return new JSONResponse(['message' => 'E-mail sent!']);
         } catch (\Throwable $e) {
