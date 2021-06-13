@@ -57,22 +57,6 @@ class GetSignLinkRemote extends Controller {
         return $this->config->getUrl("/sign_contract_external?client_id={$this->config->getClientId()}&doc_id=$docId&lang=en");
     }
 
-    private function getFile(string $path, $userId): array {
-        $userFolder = $this->storage->getUserFolder($userId);
-
-        try {
-            $file = $userFolder->get($path);
-
-            if ($file instanceof \OCP\Files\File) {
-                return [$file->getMimeType(), $file->getContent()];
-            } else {
-                throw new NotFoundException('Can not read from folder');
-            }
-        } catch (\OCP\Files\NotFoundException $e) {
-            throw new NotFoundException('File does not exist');
-        }
-    }
-
     private function startSigningSession(string $path, string $fileContentBase64, string $mimeType, string $email, string $containerType): array {
         // Send file to eID Easy server.
         $files = [
