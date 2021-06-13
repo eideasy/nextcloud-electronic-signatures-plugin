@@ -15,6 +15,8 @@ return [
 		// TODO remove (deprecated)
         ['name' => 'settingsApi#updateSettingsDepr', 'url' => '/update_settings', 'verb' => 'POST'],
 		['name' => 'settingsApi#updateSettings', 'url' => '/settings', 'verb' => 'POST'],
-		['name' => 'sign#showSigningPage', 'url' => '/sign', 'verb' => 'GET'],
+		// TODO remove (deprecated)
+		['name' => 'sign#showSigningPageDepr', 'url' => '/sign', 'verb' => 'GET'],
+		['name' => 'sign#showSigningPage', 'url' => '/sign/{doc_id}', 'verb' => 'GET'],
 	]
 ];

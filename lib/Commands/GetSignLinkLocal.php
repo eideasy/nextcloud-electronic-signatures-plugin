@@ -12,6 +12,7 @@ use OCA\ElectronicSignatures\Exceptions\EidEasyException;
 use OCP\Files\IRootFolder;
 use OCP\Http\Client\IClientService;
 use OCP\AppFramework\Controller;
+use OCP\IURLGenerator;
 use OCP\Security\ISecureRandom;
 
 class GetSignLinkLocal extends Controller
@@ -30,6 +31,9 @@ class GetSignLinkLocal extends Controller
     /** @var ISecureRandom */
     private $secureRandom;
 
+	/** @var IURLGenerator */
+	private $urlGenerator;
+
     /** @var SessionMapper */
     private $mapper;
 
@@ -39,11 +43,12 @@ class GetSignLinkLocal extends Controller
     /** @var EidEasyApi */
     private $eidEasyApi;
 
-    public function __construct(IRootFolder $storage, IClientService $clientService, ISecureRandom $secureRandom, SessionMapper $mapper, Config $config, $UserId)
+    public function __construct(IRootFolder $storage, IClientService $clientService, ISecureRandom $secureRandom, IURLGenerator $urlGenerator, SessionMapper $mapper, Config $config, $UserId)
     {
         $this->userId = $UserId;
         $this->storage = $storage;
         $this->secureRandom = $secureRandom;
+        $this->urlGenerator = $urlGenerator;
         $this->mapper = $mapper;
         $this->httpClientService = $clientService;
         $this->config = $config;
@@ -93,7 +98,6 @@ class GetSignLinkLocal extends Controller
 
         $this->saveSession($docId, $path, $userId, $containerType, true);
 
-        // TODO return link.
-        return 'https://example.com/';
+        return $this->urlGenerator->linkToRouteAbsolute('electronicsignatures.sign.showSigningPage', ['doc_id' => $docId]);
     }
 }

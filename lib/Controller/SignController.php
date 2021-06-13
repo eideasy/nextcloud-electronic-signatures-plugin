@@ -16,18 +16,27 @@ class SignController extends OCSController {
     /**
      * @PublicPage
      * @NoCSRFRequired
+	 * @deprecated TODO remove.
      */
-    public function showSigningPage(): TemplateResponse {
-        $parameters = [];
-
-        $response = new TemplateResponse(
-            'electronicsignatures', 'signfile', $parameters, 'base'
-        );
-
-        $csp = new ContentSecurityPolicy();
-        $csp->addAllowedFrameDomain('https://id.eideasy.com');
-        $response->setContentSecurityPolicy($csp);
-
-        return $response;
+    public function showSigningPageDepr(): TemplateResponse {
+        return $this->showSigningPage();
     }
+
+	/**
+	 * @PublicPage
+	 * @NoCSRFRequired
+	 */
+	public function showSigningPage(): TemplateResponse {
+		$parameters = [];
+
+		$response = new TemplateResponse(
+			'electronicsignatures', 'signfile', $parameters, 'base'
+		);
+
+		$csp = new ContentSecurityPolicy();
+		$csp->addAllowedFrameDomain('https://id.eideasy.com');
+		$response->setContentSecurityPolicy($csp);
+
+		return $response;
+	}
 }
