@@ -1,6 +1,6 @@
 {
     "require": {
-        "eideasy/eideasy-php": "1.7"
+        "eideasy/eideasy-php": "1.8"
     },
     "require-dev": {
         "phpunit/phpunit": "^5.4"
