@@ -27,7 +27,7 @@ class SignController extends OCSController {
 	 * @NoCSRFRequired
 	 */
 	public function showSigningPage(): TemplateResponse {
-		$parameters = [];
+		$parameters = ['doc_id' => $this->request->getParam('doc_id')];
 
 		$response = new TemplateResponse(
 			'electronicsignatures', 'signfile', $parameters, 'base'
