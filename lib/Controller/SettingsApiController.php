@@ -56,7 +56,7 @@ class SettingsApiController extends Controller {
             }
 
             $enableLocalSigning = $this->request->getParam('enable_local_signing', null);
-            if ($enableOtp !== null) {
+            if ($enableLocalSigning !== null) {
                 $this->iConfig->setAppValue('electronicsignatures', 'enable_local_signing', (int) (bool) $enableLocalSigning);
             }
 
