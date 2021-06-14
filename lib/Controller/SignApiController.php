@@ -4,7 +4,8 @@ namespace OCA\ElectronicSignatures\Controller;
 
 use Exception;
 use OCA\ElectronicSignatures\Commands\FetchSignedFile;
-use OCA\ElectronicSignatures\Commands\GetSignLink;
+use OCA\ElectronicSignatures\Commands\GetSignLinkLocal;
+use OCA\ElectronicSignatures\Commands\GetSignLinkRemote;
 use OCA\ElectronicSignatures\Commands\SendSigningLinkToEmail;
 use OCA\ElectronicSignatures\Config;
 use OCP\AppFramework\Http;
@@ -12,15 +13,20 @@ use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\OCSController;
 use OCP\IRequest;
 use OCP\Mail\IMailer;
+use Psr\Log\LoggerInterface;
 
-class SignApiController extends OCSController {
+class SignApiController extends OCSController
+{
     private $userId;
 
     /** @var IMailer */
     private $mailer;
 
-    /** @var GetSignLink */
-    private $getSignLinkCommand;
+    /** @var GetSignLinkRemote */
+    private $getSignLinkRemoteCommand;
+
+    /** @var GetSignLinkLocal */
+    private $getSignLinkLocalCommand;
 
     /** @var FetchSignedFile */
     private $fetchFileCommand;
@@ -28,19 +34,37 @@ class SignApiController extends OCSController {
     /** @var SendSigningLinkToEmail */
     private $sendSigningLinkToEmail;
 
-	public function __construct($AppName, IRequest $request, Imailer $mailer, GetSignLink $getSignLink, SendSigningLinkToEmail $sendSigningLinkToEmail, FetchSignedFile $fetchSignedFile, $UserId) {
-		parent::__construct($AppName, $request);
-		$this->userId = $UserId;
-		$this->mailer = $mailer;
-		$this->getSignLinkCommand = $getSignLink;
-		$this->fetchFileCommand = $fetchSignedFile;
-		$this->sendSigningLinkToEmail = $sendSigningLinkToEmail;
-	}
+    /** @var Config */
+    private $config;
+
+    public function __construct(
+        $AppName,
+        IRequest $request,
+        Imailer $mailer,
+        GetSignLinkRemote $getSignLinkRemote,
+        GetSignLinkLocal $getSignLinkLocal,
+        SendSigningLinkToEmail $sendSigningLinkToEmail,
+        FetchSignedFile $fetchSignedFile,
+        Config $config,
+        LoggerInterface $logger,
+        $UserId
+    ) {
+        parent::__construct($AppName, $request);
+        $this->userId = $UserId;
+        $this->mailer = $mailer;
+        $this->getSignLinkRemoteCommand = $getSignLinkRemote;
+        $this->getSignLinkLocalCommand = $getSignLinkLocal;
+        $this->fetchFileCommand = $fetchSignedFile;
+        $this->sendSigningLinkToEmail = $sendSigningLinkToEmail;
+        $this->config = $config;
+        $this->logger = $logger;
+    }
 
     /**
      * @NoAdminRequired
      */
-    public function sendSignLinkByEmail() {
+    public function sendSignLinkByEmail()
+    {
         try {
             $path = $this->request->getParam('path');
             $email = $this->request->getParam('email');
@@ -52,9 +76,9 @@ class SignApiController extends OCSController {
                 ], Http::STATUS_BAD_REQUEST);
             }
 
-            $link = $this->getSignLinkCommand->getSignLink($this->userId, $path, $email, $containerType);
+            $link = $this->getSignLink($path, $containerType, $email);
 
-            $this->sendSigningLinkToEmail->sendIfNecessary($email, $link);
+            $this->sendSigningLinkToEmail->sendIfNecessary($containerType, $email, $link);
 
             return new JSONResponse(['message' => 'E-mail sent!']);
         } catch (\Throwable $e) {
@@ -70,8 +94,10 @@ class SignApiController extends OCSController {
      * @NoCSRFRequired
      * @PublicPage
      */
-    public function fetchSignedFile() {
+    public function fetchSignedFile()
+    {
         try {
+            $this->logger->alert('fetch ' . json_encode($this->request->getParams()));
             $docId = $this->request->getParam('doc_id');
 
             $this->fetchFileCommand->fetch($docId);
@@ -83,8 +109,8 @@ class SignApiController extends OCSController {
         }
     }
 
-
-    private function getContainerType(string $path) {
+    private function getContainerType(string $path)
+    {
         $containerType = $this->request->getParam('container_type', Config::CONTAINER_TYPE_ASICE);
 
         $parts = explode('.', $path);
@@ -101,5 +127,15 @@ class SignApiController extends OCSController {
         }
 
         return $containerType;
+    }
+
+    private function getSignLink(string $path, string $containerType, ?string $email = null): string
+    {
+        $this->logger->alert('get signing link ' . json_encode([$path, $containerType, $email]));
+        if ($this->config->isSigningLocal()) {
+            return $this->getSignLinkLocalCommand->getSignLink($this->userId, $path, $containerType);
+        } else {
+            return $this->getSignLinkRemoteCommand->getSignLink($this->userId, $path, $containerType, $email);
+        }
     }
 }

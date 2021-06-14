@@ -55,6 +55,11 @@ class SettingsApiController extends Controller {
                 $this->iConfig->setAppValue('electronicsignatures', 'enable_otp', (int) (bool) $enableOtp);
             }
 
+            $enableLocalSigning = $this->request->getParam('enable_local_signing', null);
+            if ($enableLocalSigning !== null) {
+                $this->iConfig->setAppValue('electronicsignatures', 'enable_local_signing', (int) (bool) $enableLocalSigning);
+            }
+
             return new JSONResponse(['message' => 'Settings updated!']);
         } catch (\Throwable $e) {
             // TODO log the exception into file.
