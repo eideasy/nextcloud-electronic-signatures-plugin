@@ -18,9 +18,11 @@ if (document.getElementById('electronic-signatures-root')) {
   });
 }
 
+const signingRootElement = document.getElementById('electronic-signatures-sign-root');
 if (document.getElementById('electronic-signatures-sign-root')) {
   vueInstance = new Vue({
-    el: '#electronic-signatures-sign-root',
+    el: signingRootElement,
+    data: () => Object.assign({}, signingRootElement.dataset),
     render: h => h(AppSign),
   });
 }
