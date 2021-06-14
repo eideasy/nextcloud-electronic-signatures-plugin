@@ -17,6 +17,10 @@ export default {
     return {
       METHODS,
       selectedMethod: null,
+      docId: this.$parent.docId,
+      mimeType: this.$parent.mimeType,
+      fileContent: this.$parent.fileContent,
+      fileName: this.$parent.fileName,
     };
   },
   computed: {
@@ -43,7 +47,11 @@ export default {
           <h2 class="h2">
             1. {{ $t($globalConfig.appId, 'Review the file contents before signing:') }}
           </h2>
-          <FilePreview />
+          <div> {{ docId }} </div>
+          <FilePreview
+              :file-content="fileContent"
+              :file-name="fileName"
+              :mime-type="mimeType" />
         </div>
       </div>
     </div>
