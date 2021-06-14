@@ -174,9 +174,9 @@ export default {
             {{ $t($globalConfig.appId, 'Send the signing link by email') }}
           </h3>
 
-          <div v-if="adminSettings && adminSettings.enable_otp && fileExtension !== 'pdf'">
+          <div v-if="adminSettings && adminSettings.enable_otp && containerTypeModel !== 'pdf'">
             <span class="alert alert-warning">
-              {{ $t($globalConfig.appId, 'You have enabled simple signatures, but this file is not a pdf. User cannot add a simple electronic signature to this file.') }}
+              {{ $t($globalConfig.appId, 'You have enabled simple signatures in the settings, however it is not possible to add simple signatures to .asice containers') }}
             </span>
           </div>
 
