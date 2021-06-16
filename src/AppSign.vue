@@ -39,7 +39,7 @@ export default {
     },
     handleSigningSuccess(result) {
       console.log(result);
-    }
+    },
   },
 };
 </script>
@@ -50,9 +50,9 @@ export default {
       <div class="Layout_mainContainer">
         <div class="Layout_section">
           <h2 class="h2">
-            1. {{ $t($globalConfig.appId, 'Review the file contents before signing:') }}
+            1. {{ $t($globalConfig.appId, 'You are signing the following documents:') }}
           </h2>
-          <div> {{ docId }} </div>
+
           <FilePreview
               :file-content="fileContent"
               :file-name="fileName"
@@ -110,6 +110,10 @@ export default {
   max-width: 480px;
   margin: 50px auto 0 auto;
   padding: 0 20px;
+}
+
+.h2 {
+  margin-bottom: 30px;
 }
 
 @media (min-width: 768px) {
