@@ -3,7 +3,6 @@
 namespace OCA\ElectronicSignatures\Controller;
 
 use OCA\ElectronicSignatures\Commands\GetFileForPreview;
-use OCA\ElectronicSignatures\Commands\PreviewOriginalFile;
 use OCP\AppFramework\Http\ContentSecurityPolicy;
 use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\TemplateResponse;
@@ -14,14 +13,10 @@ class SignController extends OCSController {
 	/** @var GetFileForPreview */
 	private $getFile;
 
-	/** @var PreviewOriginalFile */
-	private $previewOriginalFile;
-
-	public function __construct($AppName, IRequest $request, GetFileForPreview $getFile, PreviewOriginalFile $previewOriginalFile, $UserId) {
+	public function __construct($AppName, IRequest $request, GetFileForPreview $getFile, $UserId) {
 		parent::__construct($AppName, $request);
 		$this->userId = $UserId;
 		$this->getFile = $getFile;
-		$this->previewOriginalFile = $previewOriginalFile;
 	}
 
     /**
