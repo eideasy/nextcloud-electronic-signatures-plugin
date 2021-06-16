@@ -21,6 +21,7 @@ export default {
       mimeType: this.$parent.mimeType,
       fileContent: this.$parent.fileContent,
       fileName: this.$parent.fileName,
+      clientId: this.$parent.clientId,
     };
   },
   computed: {
@@ -62,8 +63,8 @@ export default {
       <div class="widgetHolder">
         <eideasy-signing-widget
             :doc-id="docId"
-            client-id="r1NXWSK6LZzEcTShjfLmu4kbqE3zi0oo"
-            id-host="https://id.eideasy.com"
+            client-id="2IaeiZXbcKzlP1KvjZH9ghty2IJKM8Lg"
+            id-host="https://test.eideasy.com"
             country-code="EE"
             language="en"
             :on-success.prop="() => console.log('test')"
