@@ -56,7 +56,7 @@ export default {
         target="_blank"
         class="filePreview_action">
         <span class="filePreview_actionIcon">
-          <span class="icon icon-download-white"></span>
+          <span class="icon icon-download-white" />
         </span>
         {{ fileName }}
       </a>

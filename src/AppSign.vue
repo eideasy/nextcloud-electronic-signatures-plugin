@@ -23,6 +23,7 @@ export default {
       fileName: this.$parent.fileName,
       clientId: this.$parent.clientId,
       fileUrl: this.$parent.fileUrl,
+      signedContainerUrl: null,
     };
   },
   computed: {
@@ -38,7 +39,7 @@ export default {
       this.selectedMethod = method;
     },
     handleSigningSuccess(result) {
-      console.log(result);
+      this.signedContainerUrl = result.data.containerUrl;
     },
   },
 };
@@ -65,7 +66,25 @@ export default {
       <h2 class="h2">
         2. {{ $t($globalConfig.appId, 'Sign:') }}
       </h2>
-      <div class="widgetHolder">
+      <div
+        v-if="signedContainerUrl">
+        <span class="alert alert-success">
+          {{ $t($globalConfig.appId, 'File successfully signed!') }}
+        </span>
+        <a
+            :href="signedContainerUrl"
+            :download="fileName"
+            target="_blank"
+            class="button">
+        <span class="filePreview_actionIcon">
+          <span class="icon icon-download-white" />
+        </span>
+          {{ $t($globalConfig.appId, 'Download signed document') }}
+        </a>
+      </div>
+      <div
+          v-else
+          class="widgetHolder">
         <eideasy-signing-widget
             :doc-id="docId"
             client-id="2IaeiZXbcKzlP1KvjZH9ghty2IJKM8Lg"
@@ -114,6 +133,21 @@ export default {
 
 .h2 {
   margin-bottom: 30px;
+}
+
+.alert {
+  display: block;
+  position: relative;
+  padding: .75rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: .25rem;
+}
+
+.alert-success {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
 }
 
 @media (min-width: 768px) {
