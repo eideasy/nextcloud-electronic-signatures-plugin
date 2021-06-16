@@ -3,6 +3,7 @@
 namespace OCA\ElectronicSignatures\Controller;
 
 use OCA\ElectronicSignatures\Commands\GetFileForPreview;
+use OCA\ElectronicSignatures\Config;
 use OCP\AppFramework\Http\ContentSecurityPolicy;
 use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\TemplateResponse;
@@ -17,11 +18,15 @@ class SignController extends OCSController {
 	/** @var IURLGenerator */
 	private $urlGenerator;
 
-	public function __construct($AppName, IRequest $request, GetFileForPreview $getFile, IURLGenerator $urlGenerator, $UserId) {
+	/** @var Config */
+	private $config;
+
+	public function __construct($AppName, IRequest $request, GetFileForPreview $getFile, IURLGenerator $urlGenerator, Config $config, $UserId) {
 		parent::__construct($AppName, $request);
 		$this->userId = $UserId;
 		$this->getFile = $getFile;
 		$this->urlGenerator = $urlGenerator;
+		$this->config = $config;
 	}
 
     /**
@@ -48,6 +53,7 @@ class SignController extends OCSController {
 			'file_content' => base64_encode($fileContent),
 			'file_url' => $this->urlGenerator->linkToRouteAbsolute('electronicsignatures.sign.downloadFilePreview', ['doc_id' => $docId]),
 			'file_name' => $fileName,
+			'client_id' => $this->config->getClientId(),
 		];
 
 		$response = new TemplateResponse(
