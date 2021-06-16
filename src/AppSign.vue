@@ -22,6 +22,7 @@ export default {
       fileContent: this.$parent.fileContent,
       fileName: this.$parent.fileName,
       clientId: this.$parent.clientId,
+      fileUrl: this.$parent.fileUrl,
     };
   },
   computed: {
@@ -36,6 +37,9 @@ export default {
     selectMethod(method) {
       this.selectedMethod = method;
     },
+    handleSigningSuccess(result) {
+      console.log(result);
+    }
   },
 };
 </script>
@@ -52,6 +56,7 @@ export default {
           <FilePreview
               :file-content="fileContent"
               :file-name="fileName"
+              :file-url="fileUrl"
               :mime-type="mimeType" />
         </div>
       </div>
@@ -67,7 +72,7 @@ export default {
             id-host="https://test.eideasy.com"
             country-code="EE"
             language="en"
-            :on-success.prop="() => console.log('test')"
+            :on-success.prop="handleSigningSuccess"
             :sandbox="true" />
       </div>
     </div>

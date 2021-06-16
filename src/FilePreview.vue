@@ -14,10 +14,14 @@ export default {
       type: String,
       default: '',
     },
+    fileUrl: {
+      type: String,
+      default: '',
+    },
   },
   computed: {
     filePreviewData() {
-      return `data:${this.mimeType};base64,${this.fileContent}`;
+      return this.fileUrl;
     },
   },
 };
