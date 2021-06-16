@@ -8,15 +8,20 @@ use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\OCSController;
 use OCP\IRequest;
+use OCP\IURLGenerator;
 
 class SignController extends OCSController {
 	/** @var GetFileForPreview */
 	private $getFile;
 
-	public function __construct($AppName, IRequest $request, GetFileForPreview $getFile, $UserId) {
+	/** @var IURLGenerator */
+	private $urlGenerator;
+
+	public function __construct($AppName, IRequest $request, GetFileForPreview $getFile, IURLGenerator $urlGenerator, $UserId) {
 		parent::__construct($AppName, $request);
 		$this->userId = $UserId;
 		$this->getFile = $getFile;
+		$this->urlGenerator = $urlGenerator;
 	}
 
     /**
@@ -33,12 +38,15 @@ class SignController extends OCSController {
 	 * @NoCSRFRequired
 	 */
 	public function showSigningPage(): TemplateResponse {
-		list($mimeType, $fileContent, $fileName) = $this->getFile->getFileData($this->request->getParam('doc_id'));
+		$docId = $this->request->getParam('doc_id');
+
+		list($mimeType, $fileContent, $fileName) = $this->getFile->getFileData($docId);
 
 		$parameters = [
 			'doc_id' => $this->request->getParam('doc_id'),
 			'file_mime_type' => $mimeType,
 			'file_content' => base64_encode($fileContent),
+			'file_url' => $this->urlGenerator->linkToRouteAbsolute('electronicsignatures.sign.downloadFilePreview', ['doc_id' => $docId]),
 			'file_name' => $fileName,
 		];
 
