@@ -3,7 +3,9 @@
 namespace OCA\ElectronicSignatures\Controller;
 
 use OCA\ElectronicSignatures\Commands\GetFileForPreview;
+use OCA\ElectronicSignatures\Commands\PreviewOriginalFile;
 use OCP\AppFramework\Http\ContentSecurityPolicy;
+use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\OCSController;
 use OCP\IRequest;
@@ -12,10 +14,14 @@ class SignController extends OCSController {
 	/** @var GetFileForPreview */
 	private $getFile;
 
-	public function __construct($AppName, IRequest $request, GetFileForPreview $getFile, $UserId) {
+	/** @var PreviewOriginalFile */
+	private $previewOriginalFile;
+
+	public function __construct($AppName, IRequest $request, GetFileForPreview $getFile, PreviewOriginalFile $previewOriginalFile, $UserId) {
 		parent::__construct($AppName, $request);
 		$this->userId = $UserId;
 		$this->getFile = $getFile;
+		$this->previewOriginalFile = $previewOriginalFile;
 	}
 
     /**
@@ -33,6 +39,7 @@ class SignController extends OCSController {
 	 */
 	public function showSigningPage(): TemplateResponse {
 		list($mimeType, $fileContent, $fileName) = $this->getFile->getFileData($this->request->getParam('doc_id'));
+
 		$parameters = [
 			'doc_id' => $this->request->getParam('doc_id'),
 			'file_mime_type' => $mimeType,
@@ -51,5 +58,16 @@ class SignController extends OCSController {
 		$response->addHeader('Referrer-Policy', 'origin');
 
 		return $response;
+	}
+
+	/**
+	 * @PublicPage
+	 * @NoCSRFRequired
+	 */
+	public function downloadFilePreview(): DataDownloadResponse
+	{
+		list($mimeType, $fileContent, $fileName) = $this->getFile->getFileData($this->request->getParam('doc_id'));
+
+		return new DataDownloadResponse($fileContent, $fileName, $mimeType);
 	}
 }
