@@ -61,6 +61,8 @@ export default {
       </h2>
       <div class="widgetHolder">
         <eideasy-signing-widget
+            :doc-id="docId"
+            client-id="r1NXWSK6LZzEcTShjfLmu4kbqE3zi0oo"
             id-host="https://id.eideasy.com"
             country-code="EE"
             language="en"
