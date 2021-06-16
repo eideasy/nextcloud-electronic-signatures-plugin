@@ -1,14 +1,27 @@
 <script>
-import SmartCardButton from './methodButtons/SmartCardButton';
-import SmartIdButton from './methodButtons/SmartIdButton';
+import '@eid-easy/eideasy-signing-widget';
 import { imagePath } from '@nextcloud/router';
 import FilePreview from './FilePreview';
+
+const METHODS = {
+  smartCard: 'smartCard',
+  smartId: 'smartId',
+};
+
 export default {
   name: 'AppSign',
   components: {
     FilePreview,
-    SmartCardButton,
-    SmartIdButton,
+  },
+  data() {
+    return {
+      METHODS,
+      selectedMethod: null,
+      docId: this.$parent.docId,
+      mimeType: this.$parent.mimeType,
+      fileContent: this.$parent.fileContent,
+      fileName: this.$parent.fileName,
+    };
   },
   computed: {
     signingMethods() {
@@ -20,31 +33,41 @@ export default {
       return imagePath(this.$globalConfig.appId, 'methods/' + file);
     },
     selectMethod(method) {
-      console.log(method);
+      this.selectedMethod = method;
     },
   },
 };
 </script>
 
 <template>
-  <div class="container">
-    <h2 class="signingTitle">
-        Sa allkirjastad allolevat dokumenti<br>
-      <small>Palun kontrolli enne selle dokumendi sisu üle</small>
-    </h2>
-    <div class="methodsGrid">
-      <div class="methodsGridUnit">
-        <SmartCardButton
-            :on-click="() => selectMethod('smartCard')"
-            :generate-icon-path="generateIconPath" />
+  <div class="Layout">
+    <div class="Layout_main">
+      <div class="Layout_mainContainer">
+        <div class="Layout_section">
+          <h2 class="h2">
+            1. {{ $t($globalConfig.appId, 'Review the file contents before signing:') }}
+          </h2>
+          <div> {{ docId }} </div>
+          <FilePreview
+              :file-content="fileContent"
+              :file-name="fileName"
+              :mime-type="mimeType" />
+        </div>
       </div>
-      <div class="methodsGridUnit">
-        <SmartIdButton
-            :on-click="() => selectMethod('smartId')"
-            :generate-icon-path="generateIconPath" />
-      </div>
-      <div class="preview">
-        <FilePreview />
+    </div>
+    <div class="Layout_actions">
+      <h2 class="h2">
+        2. {{ $t($globalConfig.appId, 'Sign:') }}
+      </h2>
+      <div class="widgetHolder">
+        <eideasy-signing-widget
+            :doc-id="docId"
+            client-id="r1NXWSK6LZzEcTShjfLmu4kbqE3zi0oo"
+            id-host="https://id.eideasy.com"
+            country-code="EE"
+            language="en"
+            :on-success.prop="() => console.log('test')"
+            :sandbox="true" />
       </div>
     </div>
   </div>
@@ -60,13 +83,66 @@ export default {
   max-width: 1170px;
 }
 
-.methodsGrid {
-  display: flex;
-  flex-wrap: wrap;
+.widgetHolder {
+  width: 100%;
 }
 
-.methodsGridUnit {
-  width: 25%;
-  padding: 7px;
+.Layout_actions {
+  margin-top: 40px;
 }
+
+.Layout_section + .Layout_section {
+  margin-top: 20px;
+}
+
+.Layout_mainContainer {
+  width: 100%;
+}
+
+.Layout {
+  width: 100%;
+  max-width: 480px;
+  margin: 50px auto 0 auto;
+  padding: 0 20px;
+}
+
+@media (min-width: 768px) {
+  .Layout {
+    display: flex;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+  }
+
+  .Layout_mainContainer {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .Layout_main {
+    flex-grow: 1;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    height: 100%;
+    overflow: auto;
+  }
+
+  .Layout_actions {
+    border-left: 1px solid var(--color-border);
+    width: 400px;
+    padding: 40px 20px;
+    margin-top: 0;
+    height: 100%;
+    overflow: auto;
+  }
+}
+
+@media (min-width: 992px) {
+  .Layout_actions {
+    width: 500px;
+  }
+}
+
 </style>

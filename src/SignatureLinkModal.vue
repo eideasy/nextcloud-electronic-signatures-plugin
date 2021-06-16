@@ -6,6 +6,15 @@ import { generateUrl } from '@nextcloud/router';
 import queryString from 'query-string';
 import OC from './OC';
 
+const CONTAINER_TYPE = {
+  asice: 'asice',
+  pdf: 'pdf',
+};
+
+const getFileExtension = function getFileExtension(filename) {
+  return filename.split('.').pop();
+};
+
 export default {
   name: 'SignatureLinkModal',
   components: {
@@ -18,13 +27,43 @@ export default {
       successMessage: null,
       isLoading: false,
       adminSettings: null,
+      containerType: '',
+      containerTypeOptions: [
+        {
+          value: CONTAINER_TYPE.asice,
+          text: '.asice',
+        },
+        {
+          value: CONTAINER_TYPE.pdf,
+          text: '.pdf',
+        },
+      ],
       email: '',
       filename: '',
     };
   },
   computed: {
     fileExtension() {
-      return this.filename.split('.').pop();
+      return getFileExtension(this.filename);
+    },
+    containerTypeModel: {
+      get() {
+        if (getFileExtension(this.filename) !== CONTAINER_TYPE.pdf) {
+          return CONTAINER_TYPE.asice;
+        }
+
+        if (this.containerType) {
+          return this.containerType;
+        } else {
+          return CONTAINER_TYPE.pdf;
+        }
+      },
+      set(val) {
+        this.containerType = val;
+      },
+    },
+    shouldShowContainerSelect() {
+      return this.fileExtension === CONTAINER_TYPE.pdf;
     },
   },
   mounted() {
@@ -36,7 +75,7 @@ export default {
   },
   methods: {
     generateNextcloudUrl(url) {
-      return generateUrl(url);
+	return generateUrl(url);
     },
     showModal() {
       if (!this.adminSettings) {
@@ -101,6 +140,7 @@ export default {
         data: {
           path: this.getFilePath(),
           email: this.email,
+          container_type: this.containerTypeModel,
         },
       })
         .then(function() {
@@ -134,9 +174,9 @@ export default {
             {{ $t($globalConfig.appId, 'Send the signing link by email') }}
           </h3>
 
-          <div v-if="adminSettings && adminSettings.enable_otp && fileExtension !== 'pdf'">
+          <div v-if="adminSettings && adminSettings.enable_otp && containerTypeModel !== 'pdf'">
             <span class="alert alert-warning">
-              {{ $t($globalConfig.appId, 'You have enabled simple signatures, but this file is not a pdf. User cannot add a simple electronic signature to this file.') }}
+              {{ $t($globalConfig.appId, 'You have enabled simple signatures in the settings, however it is not possible to add simple signatures to .asice containers') }}
             </span>
           </div>
 
@@ -151,6 +191,25 @@ export default {
           <form
               action=""
               @submit.prevent="onSubmit">
+            <div v-if="shouldShowContainerSelect">
+              <label
+                  class="label"
+                  for="containerType">
+                {{ $t($globalConfig.appId, 'Container type') }}
+              </label>
+              <div class="fieldRow">
+                <select
+                    id="containerType"
+                    v-model="containerTypeModel">
+                  <option
+                      v-for="option in containerTypeOptions"
+                      :key="option.value"
+                      :value="option.value">
+                    {{ option.text }}
+                  </option>
+                </select>
+              </div>
+            </div>
             <label
                 class="label"
                 for="signingLinkEmail">

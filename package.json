@@ -1,7 +1,7 @@
 {
 	"name": "electronic-signatures",
 	"description": "Accept electronic signatures on your documents.",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"author": "eID Easy",
 	"keywords": [
 		"nextcloud",
@@ -20,6 +20,7 @@
 		"stylelint:fix": "stylelint src --fix"
 	},
 	"dependencies": {
+		"@eid-easy/eideasy-signing-widget": "0.1.0-alpha.7",
 		"@nextcloud/l10n": "^1.4.1",
 		"@nextcloud/router": "^2.0.0",
 		"@nextcloud/vue": "^3.9.0",
