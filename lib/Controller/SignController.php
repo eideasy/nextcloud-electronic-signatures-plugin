@@ -48,6 +48,8 @@ class SignController extends OCSController {
 		$csp->addAllowedFrameDomain('https://id.eideasy.com');
 		$response->setContentSecurityPolicy($csp);
 
+		$response->addHeader('Referrer-Policy', 'origin');
+
 		return $response;
 	}
 }
