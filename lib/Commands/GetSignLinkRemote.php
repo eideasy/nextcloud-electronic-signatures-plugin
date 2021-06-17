@@ -54,7 +54,7 @@ class GetSignLinkRemote extends Controller {
 
         $this->saveSession($docId, $path, $userId, $containerType);
 
-        return $this->config->getUrl("/sign_contract_external?client_id={$this->config->getClientId()}&doc_id=$docId&lang=en");
+        return $this->config->getApiUrl("/sign_contract_external?client_id={$this->config->getClientId()}&doc_id=$docId&lang=en");
     }
 
     private function startSigningSession(string $path, string $fileContentBase64, string $mimeType, string $email, string $containerType): array {

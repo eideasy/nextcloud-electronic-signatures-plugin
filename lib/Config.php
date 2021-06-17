@@ -64,7 +64,7 @@ class Config {
         return $this->enableLocalSigning;
     }
 
-    public function getUrl(string $path = ''): string
+    public function getApiUrl(string $path = ''): string
     {
         $path = ltrim($path, '/');
 
@@ -80,7 +80,7 @@ class Config {
         return "$this->baseUrl/$path";
     }
 
-	public function getPadesUrl(string $path = ''): string
+	public function getPadesApiUrl(string $path = ''): string
 	{
 		$path = ltrim($path, '/');
 
@@ -114,7 +114,7 @@ class Config {
     private function initApi(EidEasyApi $api): void
     {
         $this->api = $api;
-        $this->api->setApiUrl($this->getUrl());
+        $this->api->setApiUrl($this->getApiUrl());
         $this->api->setClientId($this->getClientId());
         $this->api->setSecret($this->getSecret());
     }
@@ -122,6 +122,6 @@ class Config {
 	private function initPadesApi(Pades $padesApi): void
 	{
 		$this->padesApi = $padesApi;
-		$this->padesApi->setApiUrl($this->getPadesUrl());
+		$this->padesApi->setApiUrl($this->getPadesApiUrl());
 	}
 }
