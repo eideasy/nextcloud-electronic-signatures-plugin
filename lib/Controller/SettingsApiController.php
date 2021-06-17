@@ -60,6 +60,11 @@ class SettingsApiController extends Controller {
                 $this->iConfig->setAppValue('electronicsignatures', 'enable_local_signing', (int) (bool) $enableLocalSigning);
             }
 
+            $padesApiUrl = $this->request->getParam('pades_url', null);
+            if ($padesApiUrl !== null) {
+                $this->iConfig->setAppValue('electronicsignatures', 'pades_url', $padesApiUrl);
+            }
+
             return new JSONResponse(['message' => 'Settings updated!']);
         } catch (\Throwable $e) {
             // TODO log the exception into file.

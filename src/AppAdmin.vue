@@ -170,6 +170,16 @@ export default {
             {{ $t($globalConfig.appId, 'With local signing, the signer is directed to your Nextcloud instance for the signing process. They will not need an account in your Nextcloud instance. The files never leave your server.') }}
           </p>
           <p>
+            {{ $t($globalConfig.appId, 'To enable local signing for pdf containers, you must set up a PADES service on your server. To do this:') }}
+            <ol>
+                <li>Install docker</li>
+                <li>Pull the service container into the directory of your choice: docker pull eideasy/pades-external-digital-signatures</li>
+                <li>cd eideasy-external-pades-digital-signatures/</li>
+                <li v-pre>Start the container: sudo docker run -p 8080:8084 --name=eideasy_detached_pades --restart always --log-driver syslog --log-opt tag="{{.Name}}/{{.ID}}" eideasy/pades-external-digital-signatures</li>
+                <li>Enter the container's url into the box above. If you didn't change the above 'docker run' command, the url is 0.0.0.0:8080.</li>
+            </ol>
+          </p>
+          <p>
             {{ $t($globalConfig.appId, 'With remote signing, the files are sent to the eID Easy server. The signer will go to a signing page on the eID Easy site, where they will be guided through the signing process.') }}
           </p>
           <p>
