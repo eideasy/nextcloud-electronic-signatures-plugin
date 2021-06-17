@@ -4,6 +4,7 @@ namespace OCA\ElectronicSignatures\Commands;
 
 use EidEasy\Api\EidEasyApi;
 use EidEasy\Signatures\Asice;
+use EidEasy\Signatures\Pades;
 use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Db\Session;
 use OCA\ElectronicSignatures\Db\SessionMapper;
@@ -23,6 +24,9 @@ class FetchSignedFile extends Controller
     /** @var EidEasyApi */
     private $eidEasyApi;
 
+    /** @var Pades */
+    private $padesApi;
+
     public function __construct(
         IRootFolder $storage,
         SessionMapper $mapper,
@@ -31,11 +35,13 @@ class FetchSignedFile extends Controller
     {
         $this->storage = $storage;
         $this->mapper = $mapper;
+        $this->padesApi = $config->getPadesApi();
         $this->eidEasyApi = $config->getApi();
     }
 
     public function fetch(string $docId): void
     {
+        /** @var Session $session */
         $session = $this->mapper->findByDocId($docId);
 
         $isHashBased = (bool)$session->getIsHashBased();
@@ -46,14 +52,26 @@ class FetchSignedFile extends Controller
         $signedFileContents = $data['signed_file_contents'];
 
         // Assemble signed file and make sure its in binary form.
-        if ($isHashBased && $containerType === "pdf") {
-            throw new \Exception('PDF local signing is not implemented.');
-        } elseif ($isHashBased && $containerType === "asice") {
-            $asice = new Asice();
-            $unsignedFile = $this->createAsiceContainer($session);
-            $signedFileContents = $asice->addSignatureAsice($unsignedFile, base64_decode($signedFileContents));
-        } else {
+        if (!$isHashBased) {
             $signedFileContents = base64_decode($signedFileContents);
+        } elseif ($containerType === "pdf") {
+            list($mimeType, $fileContent) = $this->getFile($session->getPath(), $session->getUserId());
+
+            /** @var array $padesDssData */
+            $padesDssData = $data['pades_dss_data'] ?? null;
+
+            $padesResponse = $this->padesApi->addSignaturePades(
+                $fileContent,
+                $session->getSignatureTime(),
+                $signedFileContents,
+                $padesDssData
+            );
+
+            $signedFileContents = base64_decode($padesResponse['signedFile']);
+        } elseif ($containerType === "asice") {
+            $asice = new Asice();
+            $unsignedContainer = $this->createAsiceContainer($session);
+            $signedFileContents = $asice->addSignatureAsice($unsignedContainer, base64_decode($signedFileContents));
         }
 
         $this->saveContainer($session, $signedFileContents);

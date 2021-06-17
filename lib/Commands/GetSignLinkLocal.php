@@ -5,7 +5,9 @@ namespace OCA\ElectronicSignatures\Commands;
 use DateTime;
 use DateTimeInterface;
 use EidEasy\Api\EidEasyApi;
-use Exception;
+use EidEasy\Signatures\Pades;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Db\SessionMapper;
 use OCA\ElectronicSignatures\Exceptions\EidEasyException;
@@ -31,8 +33,8 @@ class GetSignLinkLocal extends Controller
     /** @var ISecureRandom */
     private $secureRandom;
 
-	/** @var IURLGenerator */
-	private $urlGenerator;
+    /** @var IURLGenerator */
+    private $urlGenerator;
 
     /** @var SessionMapper */
     private $mapper;
@@ -43,7 +45,18 @@ class GetSignLinkLocal extends Controller
     /** @var EidEasyApi */
     private $eidEasyApi;
 
-    public function __construct(IRootFolder $storage, IClientService $clientService, ISecureRandom $secureRandom, IURLGenerator $urlGenerator, SessionMapper $mapper, Config $config, $UserId)
+    /** @var Pades */
+    private $padesApi;
+
+    public function __construct(
+        IRootFolder $storage,
+        IClientService $clientService,
+        ISecureRandom $secureRandom,
+        IURLGenerator $urlGenerator,
+        SessionMapper $mapper,
+        Config $config,
+        $UserId
+    )
     {
         $this->userId = $UserId;
         $this->storage = $storage;
@@ -52,19 +65,28 @@ class GetSignLinkLocal extends Controller
         $this->mapper = $mapper;
         $this->httpClientService = $clientService;
         $this->config = $config;
+        $this->padesApi = $config->getPadesApi();
         $this->eidEasyApi = $config->getApi();
-
     }
 
     public function getSignLink(string $userId, string $path, string $containerType)
     {
         list($mimeType, $fileContent) = $this->getFile($path, $userId);
 
+        $signatureTime = null;
+
         // Handle digest based signature starting.
         $signatureContainer = $containerType;
         if ($containerType === "pdf") {
-            // TODO implement PDF digest signing.
-            throw new Exception('PDF local signing is not yet implemented');
+            $padesResponse = $this->padesApi->getPadesDigest($fileContent);
+            if (!isset($padesResponse['digest'])) {
+                throw new EidEasyException('Pades preparation failed.');
+            }
+            $fileContent = $padesResponse['digest']; // Modified PDF digest will be signed.
+
+            $signatureTime = $padesResponse['signatureTime'];
+
+            $signatureContainer = 'cades';
         } elseif ($containerType === 'asice') {
             $signatureContainer = 'xades';
         }
@@ -73,7 +95,7 @@ class GetSignLinkLocal extends Controller
             [
                 'fileName' => 'anonymized.txt',
                 'mimeType' => $mimeType,
-                'fileContent' => base64_encode(hash('sha256', $fileContent, true)),
+                'fileContent' => $fileContent,
             ]
         ];
 
@@ -96,7 +118,7 @@ class GetSignLinkLocal extends Controller
 
         $docId = $data['doc_id'];
 
-        $this->saveSession($docId, $path, $userId, $containerType, true);
+        $this->saveSession($docId, $path, $userId, $containerType, true, $signatureTime);
 
         return $this->urlGenerator->linkToRouteAbsolute('electronicsignatures.sign.showSigningPage', ['doc_id' => $docId]);
     }

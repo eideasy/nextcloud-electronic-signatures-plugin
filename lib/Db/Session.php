@@ -11,6 +11,7 @@ class Session extends Entity {
     protected $used;
     protected $isHashBased;
     protected $containerType;
+    protected $signatureTime;
 
     public function __construct() {
         $this->addType('id','integer');

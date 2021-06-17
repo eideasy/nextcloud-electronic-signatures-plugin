@@ -30,6 +30,11 @@ class Version010100Date20210610100900 extends SimpleMigrationStep {
             'notnull' => true,
             'default' => 'asice',
         ]);
+		$table->addColumn('signature_time', 'string', [
+			'length' => 30,
+			'notnull' => false,
+			'default' => null,
+		]);
         return $schema;
     }
 }

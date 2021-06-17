@@ -3,6 +3,8 @@
 namespace OCA\ElectronicSignatures;
 
 use EidEasy\Api\EidEasyApi;
+use EidEasy\Signatures\Pades;
+use OCA\ElectronicSignatures\Exceptions\EidEasyException;
 use OCP\IConfig;
 
 class Config {
@@ -18,10 +20,12 @@ class Config {
     private bool $enableLocalSigning;
     private string $baseUrl;
     private EidEasyApi $api;
+    private Pades $padesApi;
 
-    public function __construct(IConfig $config, EidEasyApi $api) {
+    public function __construct(IConfig $config, EidEasyApi $api, Pades $padesApi) {
         $this->config = $config;
-        $this->initApi($api);;
+        $this->initApi($api);
+        $this->initPadesApi($padesApi);
     }
 
     public function getClientId(): string
@@ -76,10 +80,36 @@ class Config {
         return "$this->baseUrl/$path";
     }
 
+	public function getPadesUrl(string $path = ''): string
+	{
+		$path = ltrim($path, '/');
+
+		if (!isset($this->padesBaseUrl)) {
+			$url = $this->config->getAppValue('electronicsignatures', 'pades_url');
+			$this->padesBaseUrl = rtrim($url, '/');
+		}
+
+        // TODO could we check here whether the app is up and running?
+        if (!$this->padesBaseUrl) {
+            throw new EidEasyException('Pades API url is not set.');
+        }
+
+		if (!$path) {
+			return $this->padesBaseUrl;
+		}
+
+		return "$this->padesBaseUrl/$path";
+	}
+
     public function getApi(): EidEasyApi
     {
         return $this->api;
     }
+
+	public function getPadesApi(): Pades
+	{
+		return $this->padesApi;
+	}
 
     private function initApi(EidEasyApi $api): void
     {
@@ -88,4 +118,10 @@ class Config {
         $this->api->setClientId($this->getClientId());
         $this->api->setSecret($this->getSecret());
     }
+
+	private function initPadesApi(Pades $padesApi): void
+	{
+		$this->padesApi = $padesApi;
+		$this->padesApi->setApiUrl($this->getPadesUrl());
+	}
 }

@@ -2,6 +2,7 @@
 
 namespace OCA\ElectronicSignatures\Controller;
 
+use EidEasy\Signatures\Pades;
 use Exception;
 use OCA\ElectronicSignatures\Commands\FetchSignedFile;
 use OCA\ElectronicSignatures\Commands\GetSignLinkLocal;
@@ -37,6 +38,9 @@ class SignApiController extends OCSController
     /** @var Config */
     private $config;
 
+    /** @var Pades */
+    private $pades;
+
     public function __construct(
         $AppName,
         IRequest $request,
@@ -47,8 +51,10 @@ class SignApiController extends OCSController
         FetchSignedFile $fetchSignedFile,
         Config $config,
         LoggerInterface $logger,
+        Pades $pades,
         $UserId
-    ) {
+    )
+    {
         parent::__construct($AppName, $request);
         $this->userId = $UserId;
         $this->mailer = $mailer;
@@ -58,6 +64,7 @@ class SignApiController extends OCSController
         $this->sendSigningLinkToEmail = $sendSigningLinkToEmail;
         $this->config = $config;
         $this->logger = $logger;
+        $this->pades = $pades;
     }
 
     /**

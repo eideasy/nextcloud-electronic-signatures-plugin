@@ -4,8 +4,17 @@ namespace OCA\ElectronicSignatures\Commands;
 
 use OCA\ElectronicSignatures\Db\Session;
 
-trait SavesSession {
-    private function saveSession(string $docId, string $path, string $userId, string $containerType, bool $isHashBased = false): void {
+trait SavesSession
+{
+    private function saveSession(
+        string $docId,
+        string $path,
+        string $userId,
+        string $containerType,
+        bool $isHashBased = false,
+        ?string $signatureTime = null
+    ): void
+    {
         $token = $this->generateRandomString(30);
 
         // TODO  |  We should actually be getting the file by ID, not by path. Otherwise,
@@ -17,12 +26,16 @@ trait SavesSession {
         $session->setUserId($userId);
         $session->setPath($path);
         $session->setUsed(0);
-        $session->setIsHashBased((int) $isHashBased);
+        $session->setIsHashBased((int)$isHashBased);
         $session->setContainerType($containerType);
+        if ($signatureTime) {
+            $session->setSignatureTime($signatureTime);
+        }
         $this->mapper->insert($session);
     }
 
-    private function generateRandomString($length = 10) {
+    private function generateRandomString($length = 10)
+    {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
         $randomString = '';
