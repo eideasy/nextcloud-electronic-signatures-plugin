@@ -14,7 +14,6 @@ use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\OCSController;
 use OCP\IRequest;
 use OCP\Mail\IMailer;
-use Psr\Log\LoggerInterface;
 
 class SignApiController extends OCSController
 {
@@ -50,7 +49,6 @@ class SignApiController extends OCSController
         SendSigningLinkToEmail $sendSigningLinkToEmail,
         FetchSignedFile $fetchSignedFile,
         Config $config,
-        LoggerInterface $logger,
         Pades $pades,
         $UserId
     )
@@ -63,7 +61,6 @@ class SignApiController extends OCSController
         $this->fetchFileCommand = $fetchSignedFile;
         $this->sendSigningLinkToEmail = $sendSigningLinkToEmail;
         $this->config = $config;
-        $this->logger = $logger;
         $this->pades = $pades;
     }
 
@@ -104,7 +101,6 @@ class SignApiController extends OCSController
     public function fetchSignedFile()
     {
         try {
-            $this->logger->alert('fetch ' . json_encode($this->request->getParams()));
             $docId = $this->request->getParam('doc_id');
 
             $this->fetchFileCommand->fetch($docId);
@@ -138,7 +134,6 @@ class SignApiController extends OCSController
 
     private function getSignLink(string $path, string $containerType, ?string $email = null): string
     {
-        $this->logger->alert('get signing link ' . json_encode([$path, $containerType, $email]));
         if ($this->config->isSigningLocal()) {
             return $this->getSignLinkLocalCommand->getSignLink($this->userId, $path, $containerType);
         } else {

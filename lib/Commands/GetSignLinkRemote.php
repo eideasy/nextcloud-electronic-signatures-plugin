@@ -7,9 +7,7 @@ use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Db\SessionMapper;
 use OCA\ElectronicSignatures\Exceptions\EidEasyException;
 use OCP\Files\IRootFolder;
-use OCP\Files\NotFoundException;
 use OCP\AppFramework\Controller;
-use Psr\Log\LoggerInterface;
 
 class GetSignLinkRemote extends Controller {
     use GetsFile;
@@ -29,12 +27,11 @@ class GetSignLinkRemote extends Controller {
     /** @var EidEasyApi */
     private $eidEasyApi;
 
-    public function __construct(IRootFolder $storage, SessionMapper $mapper, Config $config, LoggerInterface $logger, $UserId) {
+    public function __construct(IRootFolder $storage, SessionMapper $mapper, Config $config, $UserId) {
         $this->userId = $UserId;
         $this->storage = $storage;
         $this->mapper = $mapper;
         $this->config = $config;
-        $this->logger = $logger;
         $this->eidEasyApi = $config->getApi();
     }
 

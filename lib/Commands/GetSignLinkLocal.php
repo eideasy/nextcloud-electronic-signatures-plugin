@@ -14,7 +14,6 @@ use OCA\ElectronicSignatures\Exceptions\EidEasyException;
 use OCP\Files\IRootFolder;
 use OCP\AppFramework\Controller;
 use OCP\IURLGenerator;
-use OCP\Security\ISecureRandom;
 
 class GetSignLinkLocal extends Controller
 {
@@ -25,9 +24,6 @@ class GetSignLinkLocal extends Controller
 
     /** @var IRootFolder */
     private $storage;
-
-    /** @var ISecureRandom */
-    private $secureRandom;
 
     /** @var IURLGenerator */
     private $urlGenerator;
@@ -46,7 +42,6 @@ class GetSignLinkLocal extends Controller
 
     public function __construct(
         IRootFolder $storage,
-        ISecureRandom $secureRandom,
         IURLGenerator $urlGenerator,
         SessionMapper $mapper,
         Config $config,
@@ -55,7 +50,6 @@ class GetSignLinkLocal extends Controller
     {
         $this->userId = $UserId;
         $this->storage = $storage;
-        $this->secureRandom = $secureRandom;
         $this->urlGenerator = $urlGenerator;
         $this->mapper = $mapper;
         $this->config = $config;
