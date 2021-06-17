@@ -21,6 +21,9 @@ export default {
       mimeType: this.$parent.mimeType,
       fileContent: this.$parent.fileContent,
       fileName: this.$parent.fileName,
+      clientId: this.$parent.clientId,
+      fileUrl: this.$parent.fileUrl,
+      signedContainerUrl: null,
     };
   },
   computed: {
@@ -35,6 +38,9 @@ export default {
     selectMethod(method) {
       this.selectedMethod = method;
     },
+    handleSigningSuccess(result) {
+      this.signedContainerUrl = result.data.containerUrl;
+    },
   },
 };
 </script>
@@ -45,12 +51,13 @@ export default {
       <div class="Layout_mainContainer">
         <div class="Layout_section">
           <h2 class="h2">
-            1. {{ $t($globalConfig.appId, 'Review the file contents before signing:') }}
+            1. {{ $t($globalConfig.appId, 'You are signing the following documents:') }}
           </h2>
-          <div> {{ docId }} </div>
+
           <FilePreview
               :file-content="fileContent"
               :file-name="fileName"
+              :file-url="fileUrl"
               :mime-type="mimeType" />
         </div>
       </div>
@@ -59,14 +66,32 @@ export default {
       <h2 class="h2">
         2. {{ $t($globalConfig.appId, 'Sign:') }}
       </h2>
-      <div class="widgetHolder">
+      <div
+        v-if="signedContainerUrl">
+        <span class="alert alert-success">
+          {{ $t($globalConfig.appId, 'File successfully signed!') }}
+        </span>
+        <a
+            :href="signedContainerUrl"
+            :download="fileName"
+            target="_blank"
+            class="button">
+        <span class="filePreview_actionIcon">
+          <span class="icon icon-download-white" />
+        </span>
+          {{ $t($globalConfig.appId, 'Download signed document') }}
+        </a>
+      </div>
+      <div
+          v-else
+          class="widgetHolder">
         <eideasy-signing-widget
             :doc-id="docId"
-            client-id="r1NXWSK6LZzEcTShjfLmu4kbqE3zi0oo"
-            id-host="https://id.eideasy.com"
+            client-id="2IaeiZXbcKzlP1KvjZH9ghty2IJKM8Lg"
+            id-host="https://test.eideasy.com"
             country-code="EE"
             language="en"
-            :on-success.prop="() => console.log('test')"
+            :on-success.prop="handleSigningSuccess"
             :sandbox="true" />
       </div>
     </div>
@@ -104,6 +129,25 @@ export default {
   max-width: 480px;
   margin: 50px auto 0 auto;
   padding: 0 20px;
+}
+
+.h2 {
+  margin-bottom: 30px;
+}
+
+.alert {
+  display: block;
+  position: relative;
+  padding: .75rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: .25rem;
+}
+
+.alert-success {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
 }
 
 @media (min-width: 768px) {
