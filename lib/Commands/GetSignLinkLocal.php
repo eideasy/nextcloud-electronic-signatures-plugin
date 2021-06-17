@@ -12,7 +12,6 @@ use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Db\SessionMapper;
 use OCA\ElectronicSignatures\Exceptions\EidEasyException;
 use OCP\Files\IRootFolder;
-use OCP\Http\Client\IClientService;
 use OCP\AppFramework\Controller;
 use OCP\IURLGenerator;
 use OCP\Security\ISecureRandom;
@@ -23,9 +22,6 @@ class GetSignLinkLocal extends Controller
     use SavesSession;
 
     private $userId;
-
-    /** @var  IClientService */
-    private $httpClientService;
 
     /** @var IRootFolder */
     private $storage;
@@ -50,7 +46,6 @@ class GetSignLinkLocal extends Controller
 
     public function __construct(
         IRootFolder $storage,
-        IClientService $clientService,
         ISecureRandom $secureRandom,
         IURLGenerator $urlGenerator,
         SessionMapper $mapper,
@@ -63,7 +58,6 @@ class GetSignLinkLocal extends Controller
         $this->secureRandom = $secureRandom;
         $this->urlGenerator = $urlGenerator;
         $this->mapper = $mapper;
-        $this->httpClientService = $clientService;
         $this->config = $config;
         $this->padesApi = $config->getPadesApi();
         $this->eidEasyApi = $config->getApi();
