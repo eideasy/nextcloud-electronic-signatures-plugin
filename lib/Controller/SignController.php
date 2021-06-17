@@ -62,8 +62,8 @@ class SignController extends OCSController {
 
 		$csp = new ContentSecurityPolicy();
 		$csp->addAllowedFrameDomain("'self'");
-		$csp->addAllowedFrameDomain('https://test.eideasy.com');
-		$csp->addAllowedConnectDomain('https://test.eideasy.com');
+		$csp->addAllowedFrameDomain($this->config->getApiUrl());
+		$csp->addAllowedConnectDomain($this->config->getApiUrl());
 		$csp->addAllowedObjectDomain("'self'");
 		$response->setContentSecurityPolicy($csp);
 
