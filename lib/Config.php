@@ -80,25 +80,14 @@ class Config {
         return "$this->baseUrl/$path";
     }
 
-	public function getPadesApiUrl(string $path = ''): string
+	public function getPadesApiUrl(): string
 	{
-		$path = ltrim($path, '/');
-
 		if (!isset($this->padesBaseUrl)) {
 			$url = $this->config->getAppValue('electronicsignatures', 'pades_url');
 			$this->padesBaseUrl = rtrim($url, '/');
 		}
 
-        // TODO could we check here whether the app is up and running?
-        if (!$this->padesBaseUrl) {
-            throw new EidEasyException('Pades API url is not set.');
-        }
-
-		if (!$path) {
-			return $this->padesBaseUrl;
-		}
-
-		return "$this->padesBaseUrl/$path";
+        return $this->padesBaseUrl;
 	}
 
     public function getApi(): EidEasyApi
