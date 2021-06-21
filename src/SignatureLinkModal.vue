@@ -65,6 +65,9 @@ export default {
     shouldShowContainerSelect() {
       return this.fileExtension === CONTAINER_TYPE.pdf;
     },
+    isSupportedFileType() {
+      return this.fileExtension !== 'asice';
+    },
   },
   mounted() {
     const _self = this;
@@ -188,7 +191,14 @@ export default {
             <span class="alert alert-success">{{ successMessage }}</span>
           </div>
 
+          <div
+              v-if="!isSupportedFileType">
+            <span class="alert alert-warning">
+              {{ $t($globalConfig.appId, 'Signing existing .asice containers is currently not supported.') }}
+            </span>
+          </div>
           <form
+              v-else
               action=""
               @submit.prevent="onSubmit">
             <div v-if="shouldShowContainerSelect">
