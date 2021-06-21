@@ -99,6 +99,14 @@ export default {
   </div>
 </template>
 
+<style>
+@media (min-width: 768px) {
+  #body-public #content {
+    min-height: 100%;
+  }
+}
+</style>
+
 <style scoped>
 .container {
   margin-left: auto;
@@ -157,7 +165,6 @@ export default {
     max-width: 100%;
     margin: 0;
     padding: 0;
-    height: 100vh;
   }
 
   .Layout_mainContainer {
