@@ -6,6 +6,7 @@ use DateTime;
 use DateTimeInterface;
 use EidEasy\Api\EidEasyApi;
 use EidEasy\Signatures\Pades;
+use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use OCA\ElectronicSignatures\Config;
@@ -65,7 +66,7 @@ class GetSignLinkLocal extends Controller
 
     public function getSignLink(string $userId, string $path, string $containerType)
     {
-        list($mimeType, $fileContent) = $this->getFile($path, $userId);
+        list($mimeType, $fileContent, $fileName) = $this->getFile($path, $userId);
 
         $signatureTime = null;
 
@@ -82,12 +83,19 @@ class GetSignLinkLocal extends Controller
 
             $signatureContainer = 'cades';
         } elseif ($containerType === 'asice') {
+            $fileContent = base64_encode(hash('sha256', $fileContent, true));
+
             $signatureContainer = 'xades';
+        } else {
+            // Throw this because otherwise the non-hashed file is sent to remote server, betraying the user's expectations.
+            throw new Exception('Unknown container type.');
         }
 
+        $this->logger->alert('basinga  ' . json_encode(strlen($fileContent)));
+        $this->logger->alert('conttype ' . $containerType);
         $sourceFiles = [
             [
-                'fileName' => 'anonymized.txt',
+                'fileName' => $fileName,
                 'mimeType' => $mimeType,
                 'fileContent' => $fileContent,
             ]
