@@ -30,7 +30,7 @@ export default {
       if (mimeTypeIncludes(['image/jpeg', 'image/jpg', 'image/svg+xml', 'image/png'])) {
         type = 'img';
       } else if (mimeTypeIncludes(['application/pdf'])) {
-        type = 'object';
+        type = 'none'; // 'object'; <- disable filepreview for now as it needs some more BE work.
       }
 
       return type;
