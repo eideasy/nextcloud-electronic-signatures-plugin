@@ -4,8 +4,38 @@
     <id>electronicsignatures</id>
     <name>Electronic Signatures</name>
     <summary>Accept electronic signatures on your documents.</summary>
-    <description><![CDATA[Send out a link to accept electronic signatures on your documents.]]></description>
-    <version>1.1.0</version>
+    <description><![CDATA[# Features
+- 🔒🔒 Accept Qualified Electronic Signatures (QES - strongest legal value) in PDF or ASICE formats
+- 🔒 Accept Simple Electronic Signatures (email based signature - simple to sign)
+- 🥷 Own your data. Accept QES while never exposing your file to a remote service
+
+Currently, this app enables the user to gather a single signature onto an existing file:
+1. Pick a file which you want signed by another person
+1. Select "Signing" in the file's dropdown menu
+1. Enter the signer's email address
+1. The signer receives a link on their e-mail
+1. They sign the document
+1. The signed document appears in your Nextcloud instance, next to the original file
+
+# Built on top of eID Easy
+The app uses [eID Easy](https://eideasy.com) as its signing back-end. eID Easy handles the signing process. Refer to [eID Easy's pricing](https://eideasy.com/pricing/) to see the cost of each signing method.
+
+# Two levels of electronic signatures
+*Qualified Electronic Signature* - the strongest kind of electronic signature. The signer's identity and approval is linked to the file contents and a timestamp by cryptographic means. The signing time and the document's integrity can be verified to ensure that the document has not been tampered with after signing.
+
+With QES, you can opt to only send the file hashes to eID Easy. This way, the actual content of your files is never exposed to a third party.
+
+*Simple Electronic Signature* - the simplest kind of electronic signature. eID Easy sends a unique link to the signer's e-mail. The signer opens the link, reviews the file and confirms their approval. A visual signature is added to the file. eId Easy adds a cryptographic e-seal to the file, to ensure that it cannot be modified after signing.
+
+With Simple Electronic Signatures, the contents of your file need to be sent to eID Easy. This provides legal value to the signature, as we can state with certainty that the signer had the opportunity to review the file they were signing.
+
+# Feedback is welcome
+This is a young app, merely a newborn in app terms. Help it grow and evolve by sending your ideas and suggestions to us at nextcloud@eideasy.com.
+
+]]></description>
+    <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-dropdown.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-modal.png</screenshot>
+    <version>1.0.1</version>
     <licence>agpl</licence>
     <author mail="tonis.palts@eideasy.com" homepage="https://eideasy.com">Tõnis Palts</author>
     <namespace>ElectronicSignatures</namespace>
