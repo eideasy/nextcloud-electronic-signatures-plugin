@@ -11,4 +11,5 @@
         data-file-content="<?php echo $_['file_content'] ?>"
         data-file-url="<?php echo $_['file_url'] ?>"
         data-file-name="<?php echo $_['file_name'] ?>"
+        data-api-url="<?php echo $_['api_url'] ?>"
 ></div>

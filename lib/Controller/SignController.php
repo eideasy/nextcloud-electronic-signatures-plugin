@@ -54,6 +54,7 @@ class SignController extends OCSController {
 			'file_url' => $this->urlGenerator->linkToRouteAbsolute('electronicsignatures.sign.downloadFilePreview', ['doc_id' => $docId]),
 			'file_name' => $fileName,
 			'client_id' => $this->config->getClientId(),
+            'api_url' => $this->config->getApiUrl(),
 		];
 
 		$response = new TemplateResponse(

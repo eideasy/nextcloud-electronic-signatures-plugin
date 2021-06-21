@@ -23,6 +23,7 @@ export default {
       fileName: this.$parent.fileName,
       clientId: this.$parent.clientId,
       fileUrl: this.$parent.fileUrl,
+      apiUrl: this.$parent.apiUrl,
       signedContainerUrl: null,
     };
   },
@@ -88,7 +89,7 @@ export default {
         <eideasy-signing-widget
             :doc-id="docId"
             client-id="2IaeiZXbcKzlP1KvjZH9ghty2IJKM8Lg"
-            id-host="https://test.eideasy.com"
+            :id-host="apiUrl"
             country-code="EE"
             language="en"
             :on-success.prop="handleSigningSuccess"
