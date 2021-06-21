@@ -11,5 +11,6 @@
   data-secret="<?php echo $_['secret_placeholder'] ?>"
   data-enable-otp="<?php echo $_['enable_otp'] ?>"
   data-enable-local-signing="<?php echo $_['enable_local_signing'] ?>"
+  data-pades-url="<?php echo $_['pades_url'] ?>"
 ></div>
 

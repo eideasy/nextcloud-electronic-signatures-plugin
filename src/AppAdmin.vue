@@ -21,6 +21,7 @@ export default {
       secretPlaceholder: this.$parent.secret,
       allowSimpleSignatures: this.$parent.enableOtp,
       enableLocalSigning: this.$parent.enableLocalSigning,
+      padesUrl: this.$parent.padesUrl,
     };
   },
   computed: {
@@ -138,6 +139,21 @@ export default {
           <button
               class="button"
               @click="debouncedSaveSetting({secret})">
+            {{ $t('electronicsignatures', 'Save') }}
+          </button>
+        </label>
+      </div>
+      <div>
+        <label>
+          <span class="settingsLabel">{{ $t('electronicsignatures', 'Pades URL') }}</span>
+          <input
+              v-model="padesUrl"
+              :placeholder="secretPlaceholder"
+              class="input"
+              type="text">
+          <button
+              class="button"
+              @click="debouncedSaveSetting({pades_url: padesUrl})">
             {{ $t('electronicsignatures', 'Save') }}
           </button>
         </label>
