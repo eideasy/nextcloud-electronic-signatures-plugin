@@ -14,6 +14,7 @@ use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\OCSController;
 use OCP\IRequest;
 use OCP\Mail\IMailer;
+use Psr\Log\LoggerInterface;
 
 class SignApiController extends OCSController
 {
@@ -40,6 +41,9 @@ class SignApiController extends OCSController
     /** @var Pades */
     private $pades;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     public function __construct(
         $AppName,
         IRequest $request,
@@ -50,6 +54,7 @@ class SignApiController extends OCSController
         FetchSignedFile $fetchSignedFile,
         Config $config,
         Pades $pades,
+        LoggerInterface $logger,
         $UserId
     )
     {
@@ -62,6 +67,7 @@ class SignApiController extends OCSController
         $this->sendSigningLinkToEmail = $sendSigningLinkToEmail;
         $this->config = $config;
         $this->pades = $pades;
+        $this->logger = $logger;
     }
 
     /**
@@ -86,7 +92,7 @@ class SignApiController extends OCSController
 
             return new JSONResponse(['message' => 'E-mail sent!']);
         } catch (\Throwable $e) {
-            // TODO log the exception into file.
+            $this->logger->alert($e->getMessage() . "\n" . $e->getTraceAsString());
             return new JSONResponse(['message' => "Failed to send email: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);
         }
     }
@@ -107,7 +113,7 @@ class SignApiController extends OCSController
 
             return new JSONResponse(['message' => 'Fetched successfully!']);
         } catch (\Throwable $e) {
-            // TODO log the exception into file.
+            $this->logger->alert($e->getMessage() . "\n" . $e->getTraceAsString());
             return new JSONResponse(['message' => "Failed to get link: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);
         }
     }

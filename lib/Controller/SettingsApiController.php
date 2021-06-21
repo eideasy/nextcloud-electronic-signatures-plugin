@@ -8,6 +8,7 @@ use OCP\AppFramework\Http\JSONResponse;
 use OCP\IConfig;
 use OCP\IRequest;
 use OCP\AppFramework\Controller;
+use Psr\Log\LoggerInterface;
 
 class SettingsApiController extends Controller {
     private $userId;
@@ -18,11 +19,15 @@ class SettingsApiController extends Controller {
     /** @var Config */
     private $config;
 
-	public function __construct($AppName, IRequest $request, IConfig $iConfig, Config $config, $UserId) {
+    /** @var LoggerInterface */
+    private $logger;
+
+	public function __construct($AppName, IRequest $request, IConfig $iConfig, Config $config, LoggerInterface $logger, $UserId) {
 		parent::__construct($AppName, $request);
 		$this->userId = $UserId;
 		$this->iConfig = $iConfig;
 		$this->config = $config;
+		$this->logger = $logger;
 	}
 
 	public function getSettings() {
@@ -67,7 +72,7 @@ class SettingsApiController extends Controller {
 
             return new JSONResponse(['message' => 'Settings updated!']);
         } catch (\Throwable $e) {
-            // TODO log the exception into file.
+            $this->logger->alert($e->getMessage() . "\n" . $e->getTraceAsString());
             return new JSONResponse(['message' => "Failed to update credentials: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);
         }
 	}
