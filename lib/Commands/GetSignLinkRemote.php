@@ -8,6 +8,7 @@ use OCA\ElectronicSignatures\Db\SessionMapper;
 use OCA\ElectronicSignatures\Exceptions\EidEasyException;
 use OCP\Files\IRootFolder;
 use OCP\AppFramework\Controller;
+use Psr\Log\LoggerInterface;
 
 class GetSignLinkRemote extends Controller {
     use GetsFile;
@@ -21,16 +22,20 @@ class GetSignLinkRemote extends Controller {
     /** @var SessionMapper */
     private $mapper;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     /** @var Config */
     private $config;
 
     /** @var EidEasyApi */
     private $eidEasyApi;
 
-    public function __construct(IRootFolder $storage, SessionMapper $mapper, Config $config, $UserId) {
+    public function __construct(IRootFolder $storage, SessionMapper $mapper, LoggerInterface $logger, Config $config, $UserId) {
         $this->userId = $UserId;
         $this->storage = $storage;
         $this->mapper = $mapper;
+        $this->logger = $logger;
         $this->config = $config;
         $this->eidEasyApi = $config->getApi();
     }
@@ -42,7 +47,8 @@ class GetSignLinkRemote extends Controller {
         $responseBody = $this->startSigningSession($path, $base64, $mimeType, $email, $containerType);
 
         if (!isset($responseBody['doc_id'])) {
-            $message = isset($responseBody['message']) ? $responseBody['message'] : 'eID Easy error!';
+            $this->logger->alert(json_encode($responseBody));
+            $message = isset($responseBody['message']) ? $responseBody['message'] . 'yoo' : 'eID Easy error!';
             throw new EidEasyException($message);
         }
 
@@ -87,6 +93,7 @@ class GetSignLinkRemote extends Controller {
         $responseBody = $this->eidEasyApi->prepareFiles($files, $params);
 
         if ($responseBody['status'] !== 'OK') {
+            $this->logger->alert(json_encode($responseBody));
             $message = $responseBody['message'] ? "eID Easy error: {$responseBody['message']}" : 'eID Easy error';
             throw new EidEasyException($message);
         }

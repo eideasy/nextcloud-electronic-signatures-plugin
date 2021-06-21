@@ -14,6 +14,7 @@ use OCA\ElectronicSignatures\Exceptions\EidEasyException;
 use OCP\Files\IRootFolder;
 use OCP\AppFramework\Controller;
 use OCP\IURLGenerator;
+use Psr\Log\LoggerInterface;
 
 class GetSignLinkLocal extends Controller
 {
@@ -34,6 +35,9 @@ class GetSignLinkLocal extends Controller
     /** @var Config */
     private $config;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     /** @var EidEasyApi */
     private $eidEasyApi;
 
@@ -45,6 +49,7 @@ class GetSignLinkLocal extends Controller
         IURLGenerator $urlGenerator,
         SessionMapper $mapper,
         Config $config,
+        LoggerInterface $logger,
         $UserId
     )
     {
@@ -55,6 +60,7 @@ class GetSignLinkLocal extends Controller
         $this->config = $config;
         $this->padesApi = $config->getPadesApi();
         $this->eidEasyApi = $config->getApi();
+        $this->logger = $logger;
     }
 
     public function getSignLink(string $userId, string $path, string $containerType)
@@ -98,6 +104,7 @@ class GetSignLinkLocal extends Controller
         $data = $this->eidEasyApi->prepareFiles($sourceFiles, $prepareParams);
 
         if (!isset($data['status']) || $data['status'] !== 'OK') {
+            $this->logger->alert(json_encode($data));
             $message = isset($data['message']) ?
                 "eID Easy error: {$data['message']}" :
                 'eID Easy error';
