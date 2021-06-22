@@ -30,7 +30,7 @@ With QES, you can opt to only send the file hashes to eID Easy. This way, the ac
 With Simple Electronic Signatures, the contents of your file need to be sent to eID Easy. This provides legal value to the signature, as we can state with certainty that the signer had the opportunity to review the file they were signing.
 
 # Feedback is welcome
-This is a young app, merely a newborn in app terms. Help it grow and evolve by sending your ideas and suggestions to us at nextcloud@eideasy.com.
+Are you not seeing your preferred signature card / signing app / other QES method? Are we not quite covering your use case? Let us know at support@eideasy.com
 
 ]]></description>
     <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-dropdown.png</screenshot>
