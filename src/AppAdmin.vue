@@ -1,13 +1,9 @@
 <script>
-import debounce from 'lodash.debounce';
-import axios from 'axios';
 import { generateUrl } from '@nextcloud/router';
 import SettingsSection from './SettingsSection';
 import SettingsGroup from './SettingsGroup';
 import SettingsTextInput from './SettingsTextInput';
 import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch';
-
-const { OC } = window;
 
 export default {
   name: 'AppAdmin',
@@ -21,14 +17,10 @@ export default {
     return {
       clientId: '',
       secret: '',
-      isLoading: false,
-      successMessage: null,
-      errorMessage: null,
       clientIdPlaceholder: this.$parent.clientId,
       secretPlaceholder: this.$parent.secret,
       allowSimpleSignatures: this.$parent.enableOtp,
-      enableLocalSigning: this.$parent.enableLocalSigning,
-      signingMode: 'eideasy',
+      fileHandling: this.$parent.enableLocalSigning ? 'local' : 'remote',
       padesUrl: this.$parent.padesUrl,
     };
   },
@@ -37,56 +29,13 @@ export default {
       return window.location.origin + this.generateNextcloudUrl('/apps/electronicsignatures/fetch_signed_file');
     },
   },
-  created() {
-    this.debouncedSaveSetting = debounce(this.saveSetting, 300);
-  },
   methods: {
-    setIsLoading(isLoading) {
-      this.isLoading = isLoading;
-    },
-    setSuccessMessage(message) {
-      this.successMessage = message;
-    },
-    setErrorMessage(message) {
-      this.errorMessage = message;
-    },
     generateNextcloudUrl(url) {
       return generateUrl(url);
     },
-    saveSetting(setting) {
-      const _self = this;
-      // do not save empty values
-      let shouldSave = true;
-      Object.keys(setting).forEach(key => {
-        if (setting[key] === undefined) {
-          shouldSave = false;
-        }
-      });
-      if (!shouldSave) {
-        return;
-      }
-
-      _self.setIsLoading(true);
-      _self.setSuccessMessage(null);
-      _self.setErrorMessage(null);
-      axios({
-        method: 'post',
-        url: this.generateNextcloudUrl('/apps/electronicsignatures/settings'),
-        responseType: 'json',
-        headers: {
-          requesttoken: OC.requestToken,
-        },
-        data: setting,
-      })
-          .then(function(response) {
-            _self.setSuccessMessage(_self.$t('electronicsignatures', 'Saved'));
-          })
-          .catch(function() {
-            _self.setErrorMessage(_self.$t('electronicsignatures', 'Something went wrong, settings were not saved.'));
-          })
-          .then(function() {
-            _self.setIsLoading(false);
-          });
+    onFileHandlingToggle(saveSetting) {
+      const enableLocalSigning = this.fileHandling === 'local';
+      saveSetting({ enable_local_signing: enableLocalSigning });
     },
   },
 };
@@ -164,27 +113,28 @@ export default {
     <SettingsSection :title="$t($globalConfig.appId, 'File handling')">
       <template #settingsHint>
         <p>
-          {{ $t($globalConfig.appId, 'This setting determines how and where your files are signed.') }}
+          {{ $t($globalConfig.appId, 'This setting determines how and where the files are signed.') }}
         </p>
       </template>
       <SettingsGroup>
         <template v-slot:default="slotProps">
-          {{ slotProps }}
           <CheckboxRadioSwitch
-              :checked.sync="signingMode"
-              value="eideasy"
+              :checked.sync="fileHandling"
+              value="remote"
               name="signing_mode_radio"
-              type="radio">
+              type="radio"
+              @update:checked="onFileHandlingToggle(slotProps.saveSetting)">
             {{ $t($globalConfig.appId, 'Remote with eID Easy') }}
           </CheckboxRadioSwitch>
           <p>
             {{ $t($globalConfig.appId, 'With remote signing, the files are sent to the eID Easy server. The signer will go to a signing page on the eID Easy site, where they will be guided through the signing process.') }}
           </p>
           <CheckboxRadioSwitch
-            :checked.sync="signingMode"
+            :checked.sync="fileHandling"
             value="local"
             name="signing_mode_radio"
-            type="radio">
+            type="radio"
+            @update:checked="onFileHandlingToggle(slotProps.saveSetting)">
             {{ $t($globalConfig.appId, 'Local') }}
           </CheckboxRadioSwitch>
           <p>

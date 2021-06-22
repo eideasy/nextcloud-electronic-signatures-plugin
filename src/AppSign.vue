@@ -88,12 +88,12 @@ export default {
           class="widgetHolder">
         <eideasy-signing-widget
             :doc-id="docId"
-            client-id="2IaeiZXbcKzlP1KvjZH9ghty2IJKM8Lg"
+            :client-id="clientId"
             :id-host="apiUrl"
             country-code="EE"
             language="en"
             :on-success.prop="handleSigningSuccess"
-            :sandbox="true" />
+            :sandbox="false" />
       </div>
     </div>
   </div>
