@@ -183,7 +183,7 @@ export default {
         <label for="enableLocalSigning">
           {{ $t($globalConfig.appId, 'Allow local signing') }}
           <p>
-            {{ $t($globalConfig.appId, 'With local signing, the signer is directed to your Nextcloud instance for the signing process. They will not need an account in your Nextcloud instance. The files never leave your server.') }}
+            {{ $t($globalConfig.appId, 'With local signing, the signer is directed to your Nextcloud instance for the signing process. They will not need an account in your Nextcloud instance. The files never leave your server. The file names and signatory names will pass through eID Easy server, to enable electronic signature creation.') }}
           </p>
           <p>
             {{ $t($globalConfig.appId, 'To enable local signing for pdf containers, you must set up a PADES service on your server. To do this:') }}
