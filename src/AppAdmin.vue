@@ -197,7 +197,7 @@ export default {
             <li>Install docker</li>
             <li>Pull the service container into the directory of your choice: docker pull eideasy/pades-external-digital-signatures</li>
             <li>cd eideasy-external-pades-digital-signatures/</li>
-            <li v-pre>Start the container: sudo docker run -p 8080:8084 --name=eideasy_detached_pades --restart always --log-driver syslog --log-opt tag="{{.Name}}/{{.ID}}" eideasy/pades-external-digital-signatures</li>
+            <li>Start the container: <span v-pre>sudo docker run -p 8080:8084 --name=eideasy_detached_pades --restart always --log-driver syslog --log-opt tag="{{.Name}}/{{.ID}}" eideasy/pades-external-digital-signatures</span></li>
             <li>Provide the container's url for the PADES URL setting below. If you didn't change the above 'docker run' command, the url is 0.0.0.0:8080.</li>
           </ol>
         </template>
@@ -225,5 +225,18 @@ export default {
 
   p {
     margin-bottom: 10px;
+  }
+
+  ol {
+    list-style: none;
+    counter-reset: list-item-counter;
+  }
+
+  ol li {
+    counter-increment: list-item-counter;
+  }
+
+  ol li::before {
+    content: counter(list-item-counter) '. ';
   }
 </style>
