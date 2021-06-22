@@ -23,7 +23,7 @@
 		"@eid-easy/eideasy-signing-widget": "0.1.0-alpha.10",
 		"@nextcloud/l10n": "^1.4.1",
 		"@nextcloud/router": "^2.0.0",
-		"@nextcloud/vue": "^3.9.0",
+		"@nextcloud/vue": "^4.0.2",
 		"axios": "^0.21.1",
 		"copy-to-clipboard": "^3.3.1",
 		"lodash.debounce": "^4.0.8",
