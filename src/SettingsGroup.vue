@@ -36,7 +36,7 @@ export default {
       // do not save empty values
       let shouldSave = true;
       Object.keys(setting).forEach(key => {
-        if (setting[key] === undefined) {
+        if (setting[key] === undefined || setting[key] === '') {
           shouldSave = false;
         }
       });
