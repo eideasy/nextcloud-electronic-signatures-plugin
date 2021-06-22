@@ -35,7 +35,7 @@ This is a young app, merely a newborn in app terms. Help it grow and evolve by s
 ]]></description>
     <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-dropdown.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-modal.png</screenshot>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <licence>agpl</licence>
     <author mail="tonis.palts@eideasy.com" homepage="https://eideasy.com">Tõnis Palts</author>
     <namespace>ElectronicSignatures</namespace>
