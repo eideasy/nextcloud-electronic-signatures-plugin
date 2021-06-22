@@ -1,26 +1,26 @@
 <script>
-import debounce from 'lodash.debounce';
-import axios from 'axios';
 import { generateUrl } from '@nextcloud/router';
-import SettingsStatus from './SettingsStatus';
-const { OC } = window;
+import SettingsSection from './SettingsSection';
+import SettingsGroup from './SettingsGroup';
+import SettingsTextInput from './SettingsTextInput';
+import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch';
 
 export default {
   name: 'AppAdmin',
   components: {
-    SettingsStatus,
+    SettingsSection,
+    SettingsGroup,
+    SettingsTextInput,
+    CheckboxRadioSwitch,
   },
   data() {
     return {
       clientId: '',
       secret: '',
-      isLoading: false,
-      successMessage: null,
-      errorMessage: null,
       clientIdPlaceholder: this.$parent.clientId,
       secretPlaceholder: this.$parent.secret,
       allowSimpleSignatures: this.$parent.enableOtp,
-      enableLocalSigning: this.$parent.enableLocalSigning,
+      fileHandling: this.$parent.enableLocalSigning ? 'local' : 'remote',
       padesUrl: this.$parent.padesUrl,
     };
   },
@@ -29,56 +29,13 @@ export default {
       return window.location.origin + this.generateNextcloudUrl('/apps/electronicsignatures/fetch_signed_file');
     },
   },
-  created() {
-    this.debouncedSaveSetting = debounce(this.saveSetting, 300);
-  },
   methods: {
-    setIsLoading(isLoading) {
-      this.isLoading = isLoading;
-    },
-    setSuccessMessage(message) {
-      this.successMessage = message;
-    },
-    setErrorMessage(message) {
-      this.errorMessage = message;
-    },
     generateNextcloudUrl(url) {
       return generateUrl(url);
     },
-    saveSetting(setting) {
-      const _self = this;
-      // do not save empty values
-      let shouldSave = true;
-      Object.keys(setting).forEach(key => {
-        if (setting[key] === undefined) {
-          shouldSave = false;
-        }
-      });
-      if (!shouldSave) {
-        return;
-      }
-
-      _self.setIsLoading(true);
-      _self.setSuccessMessage(null);
-      _self.setErrorMessage(null);
-      axios({
-        method: 'post',
-        url: this.generateNextcloudUrl('/apps/electronicsignatures/settings'),
-        responseType: 'json',
-        headers: {
-          requesttoken: OC.requestToken,
-        },
-        data: setting,
-      })
-          .then(function(response) {
-            _self.setSuccessMessage(_self.$t('electronicsignatures', 'Saved'));
-          })
-          .catch(function() {
-            _self.setErrorMessage(_self.$t('electronicsignatures', 'Something went wrong, settings were not saved.'));
-          })
-          .then(function() {
-            _self.setIsLoading(false);
-          });
+    onFileHandlingToggle(saveSetting) {
+      const enableLocalSigning = this.fileHandling === 'local';
+      saveSetting({ enable_local_signing: enableLocalSigning });
     },
   },
 };
@@ -86,157 +43,150 @@ export default {
 
 <template>
   <div>
-    <div class="section">
-      <h2>{{ $t('electronicsignatures', 'Electronic signatures settings') }}</h2>
-      <p class="settings-hint settingsHint">
-        {{ $t('electronicsignatures', 'You can find your credentials under the "My Webpages" section on your dashboard at: ') }}
-        <a
-            class="link"
-            target="_blank"
-            href="https://id.eideasy.com/">
-          id.eideasy.com
-        </a>
-      </p>
+    <SettingsSection :title="$t($globalConfig.appId, 'eID Easy credentials')">
+      <template #settingsHint>
+        <p>
+          {{ $t($globalConfig.appId, 'You can find your credentials under the "My Webpages" section on your dashboard at: ') }}
+          <a
+              class="link"
+              target="_blank"
+              href="https://id.eideasy.com/">
+            id.eideasy.com
+          </a>
+        </p>
+        <p>
+          {{ $t($globalConfig.appId, 'Ensure that in your eID Easy panel under "My Websites", you have added the following notification hook to your website: ') }} <b>{{ fetchSignedFileUrl }}</b>
+        </p>
+      </template>
+      <SettingsGroup>
+        <template v-slot:default="slotProps">
+          <div>
+            <SettingsTextInput
+                v-model="clientId"
+                :placeholder="clientIdPlaceholder"
+                :on-button-click="() => slotProps.saveSetting({client_id: clientId})">
+              <template #label>
+                {{ $t($globalConfig.appId, 'Client ID') }}
+              </template>
+            </SettingsTextInput>
+          </div>
+          <div>
+            <SettingsTextInput
+                v-model="secret"
+                :placeholder="secretPlaceholder"
+                :on-button-click="() => slotProps.saveSetting({secret})">
+              <template #label>
+                {{ $t($globalConfig.appId, 'Secret') }}
+              </template>
+            </SettingsTextInput>
+          </div>
+        </template>
+      </SettingsGroup>
+    </SettingsSection>
 
-      <p class="settings-hint settingsHint">
-        {{ $t('electronicsignatures', 'Ensure that in your eID Easy panel under "My Websites", you have added the following notification hook to your website: ') + fetchSignedFileUrl }}
-      </p>
+    <SettingsSection :title="$t($globalConfig.appId, 'Features')">
+      <SettingsGroup>
+        <template v-slot:default="slotProps">
+          <div class="checkboxWrap">
+            <input
+                id="allowOnlyEmail"
+                v-model="allowSimpleSignatures"
+                type="checkbox"
+                class="checkbox"
+                true-value="1"
+                false-value="0"
+                @change="slotProps.saveSetting({enable_otp: allowSimpleSignatures === '1'})">
+            <label for="allowOnlyEmail">
+              {{ $t($globalConfig.appId, 'Allow simple signatures.') }}
+            </label>
+          </div>
+          <p>
+            {{ $t($globalConfig.appId, 'Simple signatures are generated by sending a unique signing link to the signer\'s e-mail address or phone number. When the user clicks the link and expresses their consent, they are considered to have signed the document. A cryptographic e-seal will be added to the document to ensure that the document is not modified after it was accepted by the signer. Simple signatures are easier to use, but provide lower legal certainty compared to Qualified Electronic Signatures.') }}
+          </p>
+          <p>
+            {{ $t($globalConfig.appId, 'Please note that Simple Electronic Signatures are always collected remotely, in order to increase the legal value of the signature.') }}
+          </p>
+        </template>
+      </SettingsGroup>
+    </SettingsSection>
 
-      <p class="settings-hint settingsHint">
-        {{ $t('electronicsignatures', 'NB! Please note that whenever you are generating a signature link, the contents of your document are securely sent to the eID Easy server for signing.') }}
-      </p>
-
-      <div class="statusWrap">
-        <SettingsStatus
-          :is-loading="isLoading"
-          :error-message="errorMessage"
-          :success-message="successMessage" />
-      </div>
-
-      <div>
-        <label>
-          <span class="settingsLabel">{{ $t('electronicsignatures', 'Client ID') }}</span>
-          <input
-              v-model="clientId"
-              :placeholder="clientIdPlaceholder"
-              class="input"
-              type="text">
-          <button
-              class="button"
-              @click="debouncedSaveSetting({client_id: clientId})">
-            {{ $t('electronicsignatures', 'Save') }}
-          </button>
-        </label>
-      </div>
-      <div>
-        <label>
-          <span class="settingsLabel">{{ $t('electronicsignatures', 'Secret') }}</span>
-          <input
-              v-model="secret"
-              :placeholder="secretPlaceholder"
-              class="input"
-              type="text">
-          <button
-              class="button"
-              @click="debouncedSaveSetting({secret})">
-            {{ $t('electronicsignatures', 'Save') }}
-          </button>
-        </label>
-      </div>
-      <div>
-        <label>
-          <span class="settingsLabel">{{ $t('electronicsignatures', 'Pades URL') }}</span>
-          <input
-              v-model="padesUrl"
-              :placeholder="secretPlaceholder"
-              class="input"
-              type="text">
-          <button
-              class="button"
-              @click="debouncedSaveSetting({pades_url: padesUrl})">
-            {{ $t('electronicsignatures', 'Save') }}
-          </button>
-        </label>
-      </div>
-      <div class="checkboxWrap">
-        <input
-            id="allowOnlyEmail"
-            v-model="allowSimpleSignatures"
-            type="checkbox"
-            class="checkbox"
-            true-value="1"
-            false-value="0"
-            @change="debouncedSaveSetting({enable_otp: allowSimpleSignatures === '1'})">
-        <label for="allowOnlyEmail">
-          {{ $t($globalConfig.appId, 'Allow simple signatures. Simple signatures are generated by sending a unique signing link to the signer\'s e-mail address or phone number. When the user clicks the link and expresses their consent, they are considered to have signed the document. A cryptographic e-seal will be added to the document to ensure that the document is not modified after it was accepted by the signer. Simple signatures are easier to use, but provide lower legal certainty compared to Qualified Electronic Signatures.') }}
-        </label>
-      </div>
-      <div class="checkboxWrap">
-        <input
-            id="enableLocalSigning"
-            v-model="enableLocalSigning"
-            type="checkbox"
-            class="checkbox"
-            true-value="1"
-            false-value="0"
-            @change="debouncedSaveSetting({enable_local_signing: enableLocalSigning === '1'})">
-        <label for="enableLocalSigning">
-          {{ $t($globalConfig.appId, 'Allow local signing') }}
+    <SettingsSection :title="$t($globalConfig.appId, 'File handling')">
+      <template #settingsHint>
+        <p>
+          {{ $t($globalConfig.appId, 'This setting determines how and where the files are signed.') }}
+        </p>
+      </template>
+      <SettingsGroup>
+        <template v-slot:default="slotProps">
+          <CheckboxRadioSwitch
+              :checked.sync="fileHandling"
+              value="remote"
+              name="signing_mode_radio"
+              type="radio"
+              @update:checked="onFileHandlingToggle(slotProps.saveSetting)">
+            {{ $t($globalConfig.appId, 'Remote with eID Easy') }}
+          </CheckboxRadioSwitch>
+          <p>
+            {{ $t($globalConfig.appId, 'With remote signing, the files are sent to the eID Easy server. The signer will go to a signing page on the eID Easy site, where they will be guided through the signing process.') }}
+          </p>
+          <CheckboxRadioSwitch
+            :checked.sync="fileHandling"
+            value="local"
+            name="signing_mode_radio"
+            type="radio"
+            @update:checked="onFileHandlingToggle(slotProps.saveSetting)">
+            {{ $t($globalConfig.appId, 'Local') }}
+          </CheckboxRadioSwitch>
           <p>
             {{ $t($globalConfig.appId, 'With local signing, the signer is directed to your Nextcloud instance for the signing process. They will not need an account in your Nextcloud instance. The files never leave your server. The file names and signatory names will pass through eID Easy server, to enable electronic signature creation.') }}
           </p>
           <p>
             {{ $t($globalConfig.appId, 'To enable local signing for pdf containers, you must set up a PADES service on your server. To do this:') }}
-            <ol>
-                <li>Install docker</li>
-                <li>Pull the service container into the directory of your choice: docker pull eideasy/pades-external-digital-signatures</li>
-                <li>cd eideasy-external-pades-digital-signatures/</li>
-                <li v-pre>Start the container: sudo docker run -p 8080:8084 --name=eideasy_detached_pades --restart always --log-driver syslog --log-opt tag="{{.Name}}/{{.ID}}" eideasy/pades-external-digital-signatures</li>
-                <li>Enter the container's url into the box above. If you didn't change the above 'docker run' command, the url is 0.0.0.0:8080.</li>
-            </ol>
           </p>
-          <p>
-            {{ $t($globalConfig.appId, 'With remote signing, the files are sent to the eID Easy server. The signer will go to a signing page on the eID Easy site, where they will be guided through the signing process.') }}
-          </p>
-          <p>
-            {{ $t($globalConfig.appId, 'Please note that Simple Electronic Signatures are always collected remotely, in order to increase the legal value of the signature.') }}
-          </p>
-        </label>
-      </div>
-    </div>
+          <ol>
+            <li>{{ $t($globalConfig.appId, 'Install docker') }}</li>
+            <li>{{ $t($globalConfig.appId, 'Pull the service container into the directory of your choice: docker pull eideasy/pades-external-digital-signatures') }}</li>
+            <li>cd eideasy-external-pades-digital-signatures/</li>
+            <li>{{ $t($globalConfig.appId, 'Start the container: ') }}<span v-pre>sudo docker run -p 8080:8084 --name=eideasy_detached_pades --restart always --log-driver syslog --log-opt tag="{{.Name}}/{{.ID}}" eideasy/pades-external-digital-signatures</span></li>
+            <li>{{ $t($globalConfig.appId, 'Provide the container\'s url for the PADES URL setting below. If you didn\'t change the above "docker run" command, the url is 0.0.0.0:8080.') }}</li>
+          </ol>
+        </template>
+      </SettingsGroup>
+      <SettingsGroup>
+        <template v-slot:default="slotProps">
+          <SettingsTextInput
+              v-model="padesUrl"
+              :placeholder="padesUrl"
+              :on-button-click="() => slotProps.saveSetting({pades_url: padesUrl})">
+            <template #label>
+              {{ $t($globalConfig.appId, 'PADES URL') }}
+            </template>
+          </SettingsTextInput>
+        </template>
+      </SettingsGroup>
+    </SettingsSection>
   </div>
 </template>
 
 <style scoped>
-  .settingsLabel {
-    min-width: 110px;
-    display: inline-block;
-    padding: 8px 0;
-    vertical-align: top;
-  }
-
-  .input {
-    width: 100%;
-    max-width: 270px;
-  }
-
-  .statusWrap {
-    margin: 10px;
-  }
-
   .link {
     color: #0082c9;
   }
 
-  .settingsHint {
-    opacity: 0.9;
+  p {
+    margin-bottom: 10px;
   }
 
-  .checkboxWrap {
-    margin-top: 20px;
+  ol {
+    list-style: none;
+    counter-reset: list-item-counter;
   }
 
-  .settingsHint + .settingsHint {
-    margin-top: 0;
+  ol li {
+    counter-increment: list-item-counter;
+  }
+
+  ol li::before {
+    content: counter(list-item-counter) '. ';
   }
 </style>
