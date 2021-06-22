@@ -1,10 +1,13 @@
 import Vue from 'vue';
+import VueCompositionAPI from '@vue/composition-api';
 import { translate, translatePlural } from '@nextcloud/l10n';
 import App from './App';
 import AppAdmin from './AppAdmin';
 import AppSign from './AppSign';
 import './fileActions';
 import config from './config';
+
+Vue.use(VueCompositionAPI);
 
 Vue.prototype.$t = translate;
 Vue.prototype.$n = translatePlural;

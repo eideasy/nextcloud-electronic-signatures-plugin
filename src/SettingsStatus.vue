@@ -81,6 +81,7 @@ export default {
   .wrap {
     text-align: left;
     min-height: 24px;
+    margin: 10px;
   }
 
   .wrap:after {
