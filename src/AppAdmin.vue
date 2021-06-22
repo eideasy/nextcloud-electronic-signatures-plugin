@@ -161,10 +161,10 @@ export default {
       </SettingsGroup>
     </SettingsSection>
 
-    <SettingsSection :title="$t($globalConfig.appId, 'Signing service mode')">
+    <SettingsSection :title="$t($globalConfig.appId, 'File handling')">
       <template #settingsHint>
         <p>
-          {{ $t($globalConfig.appId, 'E') }}
+          {{ $t($globalConfig.appId, 'This setting determines how and where your files are signed.') }}
         </p>
       </template>
       <SettingsGroup>
@@ -175,7 +175,7 @@ export default {
               value="eideasy"
               name="signing_mode_radio"
               type="radio">
-            Remote with eID Easy
+            {{ $t($globalConfig.appId, 'Remote with eID Easy') }}
           </CheckboxRadioSwitch>
           <p>
             {{ $t($globalConfig.appId, 'With remote signing, the files are sent to the eID Easy server. The signer will go to a signing page on the eID Easy site, where they will be guided through the signing process.') }}
@@ -185,7 +185,7 @@ export default {
             value="local"
             name="signing_mode_radio"
             type="radio">
-            Local
+            {{ $t($globalConfig.appId, 'Local') }}
           </CheckboxRadioSwitch>
           <p>
             {{ $t($globalConfig.appId, 'With local signing, the signer is directed to your Nextcloud instance for the signing process. They will not need an account in your Nextcloud instance. The files never leave your server. The file names and signatory names will pass through eID Easy server, to enable electronic signature creation.') }}
@@ -194,11 +194,11 @@ export default {
             {{ $t($globalConfig.appId, 'To enable local signing for pdf containers, you must set up a PADES service on your server. To do this:') }}
           </p>
           <ol>
-            <li>Install docker</li>
-            <li>Pull the service container into the directory of your choice: docker pull eideasy/pades-external-digital-signatures</li>
+            <li>{{ $t($globalConfig.appId, 'Install docker') }}</li>
+            <li>{{ $t($globalConfig.appId, 'Pull the service container into the directory of your choice: docker pull eideasy/pades-external-digital-signatures') }}</li>
             <li>cd eideasy-external-pades-digital-signatures/</li>
-            <li>Start the container: <span v-pre>sudo docker run -p 8080:8084 --name=eideasy_detached_pades --restart always --log-driver syslog --log-opt tag="{{.Name}}/{{.ID}}" eideasy/pades-external-digital-signatures</span></li>
-            <li>Provide the container's url for the PADES URL setting below. If you didn't change the above 'docker run' command, the url is 0.0.0.0:8080.</li>
+            <li>{{ $t($globalConfig.appId, 'Start the container: ') }}<span v-pre>sudo docker run -p 8080:8084 --name=eideasy_detached_pades --restart always --log-driver syslog --log-opt tag="{{.Name}}/{{.ID}}" eideasy/pades-external-digital-signatures</span></li>
+            <li>{{ $t($globalConfig.appId, 'Provide the container\'s url for the PADES URL setting below. If you didn\'t change the above "docker run" command, the url is 0.0.0.0:8080.') }}</li>
           </ol>
         </template>
       </SettingsGroup>
