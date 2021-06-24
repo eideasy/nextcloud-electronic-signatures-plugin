@@ -177,12 +177,6 @@ export default {
             {{ $t($globalConfig.appId, 'Send the signing link by email') }}
           </h3>
 
-          <div v-if="adminSettings && adminSettings.enable_otp && containerTypeModel !== 'pdf'">
-            <span class="alert alert-warning">
-              {{ $t($globalConfig.appId, 'You have enabled simple signatures in the settings, however it is not possible to add simple signatures to .asice containers') }}
-            </span>
-          </div>
-
           <div v-if="errorMessage">
             <span class="alert alert-danger">{{ errorMessage }}</span>
           </div>
@@ -201,25 +195,6 @@ export default {
               v-else
               action=""
               @submit.prevent="onSubmit">
-            <div v-if="shouldShowContainerSelect">
-              <label
-                  class="label"
-                  for="containerType">
-                {{ $t($globalConfig.appId, 'Container type') }}
-              </label>
-              <div class="fieldRow">
-                <select
-                    id="containerType"
-                    v-model="containerTypeModel">
-                  <option
-                      v-for="option in containerTypeOptions"
-                      :key="option.value"
-                      :value="option.value">
-                    {{ option.text }}
-                  </option>
-                </select>
-              </div>
-            </div>
             <label
                 class="label"
                 for="signingLinkEmail">
@@ -240,7 +215,30 @@ export default {
                 {{ $t($globalConfig.appId, 'Send') }}
               </button>
             </div>
+            <div v-if="shouldShowContainerSelect">
+              <label
+                  class="label"
+                  for="containerType">
+                {{ $t($globalConfig.appId, 'Signed file type') }}
+              </label>
+              <div class="fieldRow">
+                <select
+                    id="containerType"
+                    v-model="containerTypeModel">
+                  <option
+                      v-for="option in containerTypeOptions"
+                      :key="option.value"
+                      :value="option.value">
+                    {{ option.text }}
+                  </option>
+                </select>
+              </div>
+            </div>
           </form>
+
+          <div v-if="adminSettings && adminSettings.enable_otp && containerTypeModel !== 'pdf' && isSupportedFileType">
+            {{ $t($globalConfig.appId, 'Note: You have enabled simple signatures in the settings. Simple signatures can only be added to pdf files, but this file is not a pdf file. This means that the signer can not sign this file using simple signatures. However, they can still use all the other available signing methods.') }}
+          </div>
         </div>
       </div>
     </modal>
