@@ -73,6 +73,7 @@ export default {
           {{ $t($globalConfig.appId, 'File successfully signed!') }}
         </span>
         <a
+            v-if="false"
             :href="signedContainerUrl"
             :download="fileName"
             target="_blank"
