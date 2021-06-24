@@ -205,7 +205,7 @@ export default {
               <label
                   class="label"
                   for="containerType">
-                {{ $t($globalConfig.appId, 'Container type') }}
+                {{ $t($globalConfig.appId, 'Signed file type') }}
               </label>
               <div class="fieldRow">
                 <select
