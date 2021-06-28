@@ -1,8 +1,8 @@
 <?php
-//script('activity', 'admin');
-//style('activity', 'settings');
+$appId = OCA\ElectronicSignatures\AppInfo\Application::APP_ID;
+OCP\Util::addscript($appId, 'electronic-signatures-adminSettings');
 /** @var array $_ */
-/** @var \OCP\IL10N $l */
+/** @var OCP\IL10N $l */
 ?>
 
 <div
