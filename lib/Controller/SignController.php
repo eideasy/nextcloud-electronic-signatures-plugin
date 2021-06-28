@@ -95,7 +95,11 @@ class SignController extends OCSController {
      */
     public function downloadSignedFile(): DataDownloadResponse
     {
-        list($mimeType, $fileContent, $fileName) = $this->getFile->getSignedFileData($this->request->getParam('doc_id'));
+        $docId = $this->request->getParam('doc_id');
+
+        $this->fetchFileCommand->fetchByDocId($docId);
+
+        list($mimeType, $fileContent, $fileName) = $this->getFile->getSignedFileData($docId);
 
         return new DataDownloadResponse($fileContent, $fileName, $mimeType);
     }
