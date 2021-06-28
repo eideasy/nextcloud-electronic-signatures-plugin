@@ -109,7 +109,7 @@ class SignApiController extends OCSController
         try {
             $docId = $this->request->getParam('doc_id');
 
-            $this->fetchFileCommand->fetch($docId);
+            $this->fetchFileCommand->fetchByDocId($docId);
 
             return new JSONResponse(['message' => 'Fetched successfully!']);
         } catch (\Throwable $e) {

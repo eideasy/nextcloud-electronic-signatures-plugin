@@ -19,5 +19,6 @@ return [
 		['name' => 'sign#showSigningPageDepr', 'url' => '/sign', 'verb' => 'GET'],
 		['name' => 'sign#showSigningPage', 'url' => '/sign/{doc_id}', 'verb' => 'GET'],
 		['name' => 'sign#downloadFilePreview', 'url' => '/download-preview/{doc_id}', 'verb' => 'GET'],
+		['name' => 'sign#showSuccessPage', 'url' => '/success/{token}', 'verb' => 'GET'],
 	]
 ];

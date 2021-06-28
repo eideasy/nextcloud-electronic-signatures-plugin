@@ -2,6 +2,7 @@
 
 namespace OCA\ElectronicSignatures\Controller;
 
+use OCA\ElectronicSignatures\Commands\FetchSignedFile;
 use OCA\ElectronicSignatures\Commands\GetFileForPreview;
 use OCA\ElectronicSignatures\Config;
 use OCP\AppFramework\Http\ContentSecurityPolicy;
@@ -21,12 +22,16 @@ class SignController extends OCSController {
 	/** @var Config */
 	private $config;
 
-	public function __construct($AppName, IRequest $request, GetFileForPreview $getFile, IURLGenerator $urlGenerator, Config $config, $UserId) {
+    /** @var FetchSignedFile */
+    private $fetchFileCommand;
+
+	public function __construct($AppName, IRequest $request, GetFileForPreview $getFile, IURLGenerator $urlGenerator, Config $config, FetchSignedFile $fetchSignedFile, $UserId) {
 		parent::__construct($AppName, $request);
 		$this->userId = $UserId;
 		$this->getFile = $getFile;
 		$this->urlGenerator = $urlGenerator;
 		$this->config = $config;
+		$this->fetchFileCommand = $fetchSignedFile;
 	}
 
     /**
@@ -83,4 +88,20 @@ class SignController extends OCSController {
 
 		return new DataDownloadResponse($fileContent, $fileName, $mimeType);
 	}
+
+    /**
+     * @PublicPage
+     * @NoCSRFRequired
+     */
+    public function showSuccessPage(): TemplateResponse {
+        $token = $this->request->getParam('token');
+
+        $this->fetchFileCommand->fetchByToken($token);
+
+        $response = new TemplateResponse(
+            'electronicsignatures', 'success', [], 'public'
+        );
+
+        return $response;
+    }
 }

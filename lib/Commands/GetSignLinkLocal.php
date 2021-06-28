@@ -121,7 +121,7 @@ class GetSignLinkLocal extends Controller
 
         $docId = $data['doc_id'];
 
-        $this->saveSession($docId, $path, $userId, $containerType, true, $signatureTime);
+        $this->saveSession($docId, $path, $userId, $containerType, null, true, $signatureTime);
 
         return $this->urlGenerator->linkToRouteAbsolute('electronicsignatures.sign.showSigningPage', ['doc_id' => $docId]);
     }

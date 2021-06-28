@@ -39,15 +39,38 @@ class FetchSignedFile extends Controller
         $this->eidEasyApi = $config->getApi();
     }
 
-    public function fetch(string $docId): void
+    public function fetchByToken(string $token): void
+    {
+        /** @var Session $session */
+        $session = $this->mapper->findByToken($token);
+
+        $this->fetch($session);
+    }
+
+    public function fetchByDocId(string $docId): void
     {
         /** @var Session $session */
         $session = $this->mapper->findByDocId($docId);
 
+        $this->fetch($session);
+    }
+
+    public function fetch(Session $session): void
+    {
+        if ($session->getUsed()) {
+            return;
+        }
+
+        // Mark that the session is used, aka the file is downloaded. This
+        // prevents race condition, where there are two simultaneous
+        // callbacks which both fetch the signed file.
+        $session->setUsed(1);
+        $this->mapper->update($session);
+
         $isHashBased = (bool)$session->getIsHashBased();
         $containerType = $session->getContainerType();
 
-        $data = $this->eidEasyApi->downloadSignedFile($docId);
+        $data = $this->eidEasyApi->downloadSignedFile($session->getDocId());
 
         $signedFileContents = $data['signed_file_contents'];
 

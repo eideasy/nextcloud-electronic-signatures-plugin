@@ -11,11 +11,12 @@ trait SavesSession
         string $path,
         string $userId,
         string $containerType,
+        ?string $token = null,
         bool $isHashBased = false,
         ?string $signatureTime = null
     ): void
     {
-        $token = $this->generateRandomString(30);
+        $token = $token ?: $this->generateRandomString(30);
 
         // TODO  |  We should actually be getting the file by ID, not by path. Otherwise,
         // TODO  |  if it is moved after signature link is generated, then the
