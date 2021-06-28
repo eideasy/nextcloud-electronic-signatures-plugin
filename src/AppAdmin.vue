@@ -149,10 +149,10 @@ export default {
             {{ $t($globalConfig.appId, 'Local') }}
           </CheckboxRadioSwitch>
           <p>
-            {{ $t($globalConfig.appId, 'With local signing, the signer is directed to your Nextcloud instance for the signing process. They will not need an account in your Nextcloud instance. The files never leave your server. The file names and signatory names will pass through eID Easy server, to enable electronic signature creation.') }}
+            {{ $t($globalConfig.appId, 'With local signing, the signer is directed to your Nextcloud instance for the signing process. They will not need an account in your Nextcloud instance. The file contents are not sent to the eID Easy server, however the file names and signatory names will pass through eID Easy server, to enable electronic signature creation.') }}
           </p>
           <p>
-            {{ $t($globalConfig.appId, 'Note: local signing currently supports only smart-card (e.g. personal id-card) based signatures.') }}
+            {{ $t($globalConfig.appId, 'Note: local signing supports Finnish, Portuguese, Estonian, Latvian and Lithuanian id card based signatures. We are continuously adding new signing methods. Please let us know at support@eideasy.com if there are any signing methods you\'d like us to add next and we will happily prioritize them.') }}
           </p>
           <p>
             {{ $t($globalConfig.appId, 'To enable local signing for pdf containers, you must set up a PADES service on your server. To do this:') }}
