@@ -261,6 +261,12 @@ export default {
   </div>
 </template>
 
+<style>
+.modal-wrapper .modal-container.modal-container {
+  overflow: auto;
+}
+</style>
+
 <style scoped>
   .modal__content {
     width: 68vw;
