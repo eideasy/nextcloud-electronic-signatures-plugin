@@ -4,11 +4,7 @@ namespace OCA\ElectronicSignatures\Commands;
 
 use DateTime;
 use DateTimeInterface;
-use EidEasy\Api\EidEasyApi;
-use EidEasy\Signatures\Pades;
 use Exception;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Session;
 use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Db\SessionMapper;
 use OCA\ElectronicSignatures\Exceptions\EidEasyException;
@@ -16,6 +12,13 @@ use OCP\Files\IRootFolder;
 use OCP\AppFramework\Controller;
 use OCP\IURLGenerator;
 use Psr\Log\LoggerInterface;
+
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+use EidEasy\Api\EidEasyApi;
+use EidEasy\Signatures\Pades;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class GetSignLinkLocal extends Controller
 {

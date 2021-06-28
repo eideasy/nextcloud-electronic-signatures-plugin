@@ -2,7 +2,6 @@
 
 namespace OCA\ElectronicSignatures\Controller;
 
-use EidEasy\Signatures\Pades;
 use Exception;
 use OCA\ElectronicSignatures\Commands\FetchSignedFile;
 use OCA\ElectronicSignatures\Commands\GetSignLinkLocal;
@@ -15,6 +14,10 @@ use OCP\AppFramework\OCSController;
 use OCP\IRequest;
 use OCP\Mail\IMailer;
 use Psr\Log\LoggerInterface;
+
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+use EidEasy\Signatures\Pades;
 
 class SignApiController extends OCSController
 {

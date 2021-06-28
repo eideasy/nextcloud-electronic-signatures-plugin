@@ -2,10 +2,13 @@
 
 namespace OCA\ElectronicSignatures;
 
-use EidEasy\Api\EidEasyApi;
-use EidEasy\Signatures\Pades;
 use OCA\ElectronicSignatures\Exceptions\EidEasyException;
 use OCP\IConfig;
+
+use EidEasy\Api\EidEasyApi;
+use EidEasy\Signatures\Pades;
+
+require_once __DIR__ . '/../vendor/autoload.php';
 
 class Config {
     public const CONTAINER_TYPE_ASICE = 'asice';
