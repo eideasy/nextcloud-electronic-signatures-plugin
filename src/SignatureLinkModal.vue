@@ -1,6 +1,7 @@
 <script>
 import axios from 'axios';
 import Modal from '@nextcloud/vue/dist/Components/Modal';
+import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch';
 import EventBus from './EventBus';
 import { generateUrl } from '@nextcloud/router';
 import queryString from 'query-string';
@@ -19,6 +20,7 @@ export default {
   name: 'SignatureLinkModal',
   components: {
     Modal,
+    CheckboxRadioSwitch,
   },
   data() {
     return {
@@ -215,30 +217,44 @@ export default {
                 {{ $t($globalConfig.appId, 'Send') }}
               </button>
             </div>
+            <div
+                v-if="adminSettings && adminSettings.enable_otp && containerTypeModel !== 'pdf' && isSupportedFileType"
+                class="basicNote">
+              {{ $t($globalConfig.appId, 'Note: You have enabled simple signatures in the settings. Simple signatures can only be added to pdf files, but this file is not a pdf file. This means that the signer can not sign this file using simple signatures. However, they can still use all the other available signing methods.') }}
+            </div>
             <div v-if="shouldShowContainerSelect">
               <label
-                  class="label"
-                  for="containerType">
-                {{ $t($globalConfig.appId, 'Signed file type') }}
+                  class="label">
+                {{ $t($globalConfig.appId, 'Output file type') }}
               </label>
-              <div class="fieldRow">
-                <select
-                    id="containerType"
-                    v-model="containerTypeModel">
-                  <option
-                      v-for="option in containerTypeOptions"
-                      :key="option.value"
-                      :value="option.value">
-                    {{ option.text }}
-                  </option>
-                </select>
+              <div class="radioRow">
+                <CheckboxRadioSwitch
+                    :checked.sync="containerTypeModel"
+                    value="pdf"
+                    name="container_type_radio"
+                    type="radio">
+                  {{ $t($globalConfig.appId, '.pdf') }}
+                </CheckboxRadioSwitch>
+              </div>
+              <div class="radioRow">
+                <CheckboxRadioSwitch
+                    :checked.sync="containerTypeModel"
+                    value="asice"
+                    name="container_type_radio"
+                    type="radio">
+                  {{ $t($globalConfig.appId, '.asice') }}
+                </CheckboxRadioSwitch>
+                <div>
+                  {{ $t($globalConfig.appId, '.asice files can be opened and verified with the DigiDoc4 application that is available for download at:') }}
+                  <a
+                    href="https://www.id.ee/en/article/install-id-software/"
+                    target="_blank">
+                      https://www.id.ee/en/article/install-id-software
+                  </a>
+                </div>
               </div>
             </div>
           </form>
-
-          <div v-if="adminSettings && adminSettings.enable_otp && containerTypeModel !== 'pdf' && isSupportedFileType">
-            {{ $t($globalConfig.appId, 'Note: You have enabled simple signatures in the settings. Simple signatures can only be added to pdf files, but this file is not a pdf file. This means that the signer can not sign this file using simple signatures. However, they can still use all the other available signing methods.') }}
-          </div>
         </div>
       </div>
     </modal>
@@ -283,9 +299,17 @@ export default {
     font-weight: bold;
   }
 
+  a {
+    color: var(--color-primary-element);
+  }
+
   .fieldRow {
     display: flex;
     margin-bottom: 1rem;
+  }
+
+  .radioRow + .radioRow {
+    margin-top: 2px;
   }
 
   .label {
@@ -327,6 +351,11 @@ export default {
     color: #856404;
     background-color: #fff3cd;
     border-color: #ffeeba;
+  }
+
+  .basicNote {
+    margin-bottom: 16px;
+    font-style: italic;
   }
 
   @media (min-width: 600px) {
