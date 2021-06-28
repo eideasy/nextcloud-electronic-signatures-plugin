@@ -50,7 +50,7 @@ class SignController extends OCSController {
 	public function showSigningPage(): TemplateResponse {
 		$docId = $this->request->getParam('doc_id');
 
-		list($mimeType, $fileContent, $fileName) = $this->getFile->getFileData($docId);
+		list($mimeType, $fileContent, $fileName) = $this->getFile->getOriginalFileData($docId);
 
 		$parameters = [
 			'doc_id' => $this->request->getParam('doc_id'),
@@ -84,10 +84,21 @@ class SignController extends OCSController {
 	 */
 	public function downloadFilePreview(): DataDownloadResponse
 	{
-		list($mimeType, $fileContent, $fileName) = $this->getFile->getFileData($this->request->getParam('doc_id'));
+		list($mimeType, $fileContent, $fileName) = $this->getFile->getOriginalFileData($this->request->getParam('doc_id'));
 
 		return new DataDownloadResponse($fileContent, $fileName, $mimeType);
 	}
+
+    /**
+     * @PublicPage
+     * @NoCSRFRequired
+     */
+    public function downloadSignedFile(): DataDownloadResponse
+    {
+        list($mimeType, $fileContent, $fileName) = $this->getFile->getOriginalFileData($this->request->getParam('doc_id'));
+
+        return new DataDownloadResponse($fileContent, $fileName, $mimeType);
+    }
 
     /**
      * @PublicPage

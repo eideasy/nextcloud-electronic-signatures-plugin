@@ -24,9 +24,15 @@ class GetFileForPreview extends Controller
     	$this->mapper = $mapper;
     }
 
-    public function getFileData(string $docId): array
+    public function getOriginalFileData(string $docId): array
     {
         $session = $this->mapper->findByDocId($docId);
     	return $this->getFile($session->getPath(), $session->getUserId());
+    }
+
+    public function getSignedFileData(string $docId): array
+    {
+        $session = $this->mapper->findByDocId($docId);
+        return $this->getFile($session->getSignedPath(), $session->getUserId());
     }
 }

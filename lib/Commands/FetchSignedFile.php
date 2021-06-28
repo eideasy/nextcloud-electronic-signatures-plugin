@@ -57,14 +57,14 @@ class FetchSignedFile extends Controller
 
     public function fetch(Session $session): void
     {
-        if ($session->getUsed()) {
+        if ((bool)$session->getIsDownloaded()) {
             return;
         }
 
         // Mark that the session is used, aka the file is downloaded. This
         // prevents race condition, where there are two simultaneous
         // callbacks which both fetch the signed file.
-        $session->setUsed(1);
+        $session->setIsDownloaded(1);
         $this->mapper->update($session);
 
         $isHashBased = (bool)$session->getIsHashBased();
@@ -97,7 +97,11 @@ class FetchSignedFile extends Controller
             $signedFileContents = $asice->addSignatureAsice($unsignedContainer, base64_decode($signedFileContents));
         }
 
-        $this->saveContainer($session, $signedFileContents);
+        $containerPath = $this->getContainerPath($session);
+        $this->saveContainer($session, $signedFileContents, $containerPath);
+
+        $session->setSignedPath($containerPath);
+        $this->mapper->update($session);
     }
 
     /**
@@ -119,13 +123,12 @@ class FetchSignedFile extends Controller
         return $asice->createAsiceContainer($sourceFiles);
     }
 
-    private function saveContainer(Session $session, string $contents): void
+    private function saveContainer(Session $session, string $contents, string $containerPath): void
     {
         $userFolder = $this->storage->getUserFolder($session->getUserId());
 
-        $path = $this->getContainerPath($session);
-        $userFolder->touch($path);
-        $userFolder->newFile($path, $contents);
+        $userFolder->touch($containerPath);
+        $userFolder->newFile($containerPath, $contents);
     }
 
     private function getContainerPath(Session $session): string
