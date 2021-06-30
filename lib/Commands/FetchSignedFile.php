@@ -140,7 +140,7 @@ class FetchSignedFile extends Controller
         array_pop($originalParts);
 
         $beginning = implode('.', $originalParts);
-        $dateTime = (new DateTime)->format('Ymd-His');
+        $dateTime = (new \DateTime)->format('Ymd-His');
         return "$beginning-{$dateTime}.{$session->getContainerType()}";
     }
 }
