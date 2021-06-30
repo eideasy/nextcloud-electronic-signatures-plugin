@@ -20,7 +20,7 @@
 
 <div class="container">
     <div class="content">
-        <h2>Thank you!</h2>
-        <h3>The signed file has been downloaded to your browser.</h3>
+        <h2><?php p($l->t('Thank you!')); ?></h2>
+        <h3><?php p($l->t('The signed file has been downloaded to your browser.')); ?></h3>
     </div>
 </div>
