@@ -1,7 +1,10 @@
 <script>
+import axios from 'axios';
+import OC from './OC';
 import '@eid-easy/eideasy-signing-widget';
 import { imagePath } from '@nextcloud/router';
 import FilePreview from './FilePreview';
+import generateAppUrl from './generateAppUrl';
 
 const METHODS = {
   smartCard: 'smartCard',
@@ -39,8 +42,8 @@ export default {
     selectMethod(method) {
       this.selectedMethod = method;
     },
-    handleSigningSuccess(result) {
-      this.signedContainerUrl = result.data.containerUrl;
+    handleSigningSuccess() {
+      this.signedContainerUrl = generateAppUrl('/download-signed-file/' + this.docId);
     },
   },
 };
@@ -73,7 +76,7 @@ export default {
           {{ $t($globalConfig.appId, 'File successfully signed!') }}
         </span>
         <a
-            v-if="false"
+            v-if="signedContainerUrl"
             :href="signedContainerUrl"
             :download="fileName"
             target="_blank"
