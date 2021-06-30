@@ -26,7 +26,6 @@ trait SavesSession
         $session->setDocId($docId);
         $session->setUserId($userId);
         $session->setPath($path);
-        $session->setUsed(0);
         $session->setIsHashBased((int)$isHashBased);
         $session->setContainerType($containerType);
         if ($signatureTime) {

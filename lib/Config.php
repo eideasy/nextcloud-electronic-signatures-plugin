@@ -13,14 +13,29 @@ class Config {
     public const ENABLE_OTP_BY_DEFAULT = true;
     public const ENABLE_LOCAL_SIGNING_BY_DEFAULT = true;
 
-    private IConfig $config;
-    private string $clientId;
-    private string $secret;
-    private bool $enableOtp;
-    private bool $enableLocalSigning;
-    private string $baseUrl;
-    private EidEasyApi $api;
-    private Pades $padesApi;
+    /** @var IConfig */
+    private $config;
+
+    /** @var string */
+    private $clientId;
+
+    /** @var string */
+    private $secret;
+
+    /** @var bool */
+    private $enableOtp;
+
+    /** @var bool */
+    private $enableLocalSigning;
+
+    /** @var string */
+    private $baseUrl;
+
+    /** @var EidEasyApi */
+    private $api;
+
+    /** @var Pades */
+    private $padesApi;
 
     public function __construct(IConfig $config, EidEasyApi $api, Pades $padesApi) {
         $this->config = $config;
