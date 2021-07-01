@@ -88,8 +88,7 @@ class GetSignLinkRemote extends Controller {
             'signature_redirect' => $this->urlGenerator->linkToRouteAbsolute('electronicsignatures.sign.showSuccessPage', ['token' => $token]),
         ];
 
-
-        if ($this->config->isOtpEnabled()) {
+        if ($this->config->isOtpEnabled() && $containerType === 'pdf') {
 			$params['signer'] = [
                 'send_now' => true,
                 'contacts' => [
