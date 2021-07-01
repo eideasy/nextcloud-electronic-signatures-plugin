@@ -2,14 +2,17 @@
 
 namespace OCA\ElectronicSignatures\Commands;
 
-use EidEasy\Api\EidEasyApi;
-use EidEasy\Signatures\Asice;
-use EidEasy\Signatures\Pades;
 use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Db\Session;
 use OCA\ElectronicSignatures\Db\SessionMapper;
 use OCP\Files\IRootFolder;
 use OCP\AppFramework\Controller;
+
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+use EidEasy\Api\EidEasyApi;
+use EidEasy\Signatures\Asice;
+use EidEasy\Signatures\Pades;
 
 class FetchSignedFile extends Controller
 {

@@ -1,7 +1,8 @@
 import Vue from 'vue';
 import VueCompositionAPI from '@vue/composition-api';
 import { translate, translatePlural } from '@nextcloud/l10n';
-import App from './App';
+import AppSign from './AppSign';
+import './fileActions';
 import config from './config';
 
 Vue.use(VueCompositionAPI);
@@ -16,8 +17,10 @@ Vue.prototype.n = window.n;
 Vue.prototype.OC = window.OC;
 Vue.prototype.OCA = window.OCA;
 
+const signingRootElement = document.getElementById('electronic-signatures-sign-root');
 // eslint-disable-next-line
 new Vue({
-    el: '#electronic-signatures-root',
-    render: h => h(App),
+    el: '#electronic-signatures-sign-root',
+    data: () => Object.assign({}, signingRootElement.dataset),
+    render: h => h(AppSign),
 });

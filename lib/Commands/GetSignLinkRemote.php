@@ -2,7 +2,6 @@
 
 namespace OCA\ElectronicSignatures\Commands;
 
-use EidEasy\Api\EidEasyApi;
 use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Db\SessionMapper;
 use OCA\ElectronicSignatures\Exceptions\EidEasyException;
@@ -10,6 +9,10 @@ use OCP\Files\IRootFolder;
 use OCP\AppFramework\Controller;
 use OCP\IURLGenerator;
 use Psr\Log\LoggerInterface;
+
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+use EidEasy\Api\EidEasyApi;
 
 class GetSignLinkRemote extends Controller {
     use GetsFile;

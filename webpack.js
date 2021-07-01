@@ -1,3 +1,4 @@
+const path = require('path')
 const webpackConfig = require('@nextcloud/webpack-vue-config');
 webpackConfig.module.rules = [
   {
@@ -31,5 +32,12 @@ webpackConfig.module.rules = [
     }
   },
 ];
+
+webpackConfig.entry = {
+    adminSettings: path.join(__dirname, 'src', 'adminSettings.js'),
+    signFile: path.join(__dirname, 'src', 'signFile.js'),
+    fileActions: path.join(__dirname, 'src', 'fileActions.js'),
+    main: path.join(__dirname, 'src', 'main.js'),
+}
 
 module.exports = webpackConfig
