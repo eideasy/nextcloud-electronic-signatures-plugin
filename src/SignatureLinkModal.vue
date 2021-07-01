@@ -1,15 +1,26 @@
 <script>
 import axios from 'axios';
 import Modal from '@nextcloud/vue/dist/Components/Modal';
+import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch';
 import EventBus from './EventBus';
 import { generateUrl } from '@nextcloud/router';
 import queryString from 'query-string';
 import OC from './OC';
 
+const CONTAINER_TYPE = {
+  asice: 'asice',
+  pdf: 'pdf',
+};
+
+const getFileExtension = function getFileExtension(filename) {
+  return filename.split('.').pop();
+};
+
 export default {
   name: 'SignatureLinkModal',
   components: {
     Modal,
+    CheckboxRadioSwitch,
   },
   data() {
     return {
@@ -18,9 +29,47 @@ export default {
       successMessage: null,
       isLoading: false,
       adminSettings: null,
+      containerType: '',
+      containerTypeOptions: [
+        {
+          value: CONTAINER_TYPE.asice,
+          text: '.asice',
+        },
+        {
+          value: CONTAINER_TYPE.pdf,
+          text: '.pdf',
+        },
+      ],
       email: '',
       filename: '',
     };
+  },
+  computed: {
+    fileExtension() {
+      return getFileExtension(this.filename);
+    },
+    containerTypeModel: {
+      get() {
+        if (getFileExtension(this.filename) !== CONTAINER_TYPE.pdf) {
+          return CONTAINER_TYPE.asice;
+        }
+
+        if (this.containerType) {
+          return this.containerType;
+        } else {
+          return CONTAINER_TYPE.pdf;
+        }
+      },
+      set(val) {
+        this.containerType = val;
+      },
+    },
+    shouldShowContainerSelect() {
+      return this.fileExtension === CONTAINER_TYPE.pdf;
+    },
+    isSupportedFileType() {
+      return this.fileExtension !== 'asice';
+    },
   },
   mounted() {
     const _self = this;
@@ -29,14 +78,9 @@ export default {
       _self.filename = payload.filename;
     });
   },
-  computed: {
-    fileExtension() {
-      return this.filename.split('.').pop();
-    }
-  },
   methods: {
     generateNextcloudUrl(url) {
-      return generateUrl(url);
+	return generateUrl(url);
     },
     showModal() {
       if (!this.adminSettings) {
@@ -101,6 +145,7 @@ export default {
         data: {
           path: this.getFilePath(),
           email: this.email,
+          container_type: this.containerTypeModel,
         },
       })
         .then(function() {
@@ -134,12 +179,6 @@ export default {
             {{ $t($globalConfig.appId, 'Send the signing link by email') }}
           </h3>
 
-          <div v-if="adminSettings && adminSettings.enable_otp && fileExtension !== 'pdf'">
-            <span class="alert alert-warning">
-              {{ $t($globalConfig.appId, 'You have enabled simple signatures, but this file is not a pdf. User cannot add a simple electronic signature to this file.') }}
-            </span>
-          </div>
-
           <div v-if="errorMessage">
             <span class="alert alert-danger">{{ errorMessage }}</span>
           </div>
@@ -148,7 +187,14 @@ export default {
             <span class="alert alert-success">{{ successMessage }}</span>
           </div>
 
+          <div
+              v-if="!isSupportedFileType">
+            <span class="alert alert-warning">
+              {{ $t($globalConfig.appId, 'Signing existing .asice containers is currently not supported.') }}
+            </span>
+          </div>
           <form
+              v-else
               action=""
               @submit.prevent="onSubmit">
             <label
@@ -171,12 +217,55 @@ export default {
                 {{ $t($globalConfig.appId, 'Send') }}
               </button>
             </div>
+            <div
+                v-if="adminSettings && adminSettings.enable_otp && containerTypeModel !== 'pdf' && isSupportedFileType"
+                class="basicNote">
+              {{ $t($globalConfig.appId, 'Note: You have enabled simple signatures in the settings. Simple signatures can only be added to pdf files, but this file is not a pdf file. This means that the signer can not sign this file using simple signatures. However, they can still use all the other available signing methods.') }}
+            </div>
+            <div v-if="shouldShowContainerSelect">
+              <label
+                  class="label">
+                {{ $t($globalConfig.appId, 'Output file type') }}
+              </label>
+              <div class="radioRow">
+                <CheckboxRadioSwitch
+                    :checked.sync="containerTypeModel"
+                    value="pdf"
+                    name="container_type_radio"
+                    type="radio">
+                  {{ $t($globalConfig.appId, '.pdf') }}
+                </CheckboxRadioSwitch>
+              </div>
+              <div class="radioRow">
+                <CheckboxRadioSwitch
+                    :checked.sync="containerTypeModel"
+                    value="asice"
+                    name="container_type_radio"
+                    type="radio">
+                  {{ $t($globalConfig.appId, '.asice') }}
+                </CheckboxRadioSwitch>
+                <div>
+                  {{ $t($globalConfig.appId, '.asice files can be opened and verified with the DigiDoc4 application that is available for download at:') }}
+                  <a
+                    href="https://www.id.ee/en/article/install-id-software/"
+                    target="_blank">
+                      https://www.id.ee/en/article/install-id-software
+                  </a>
+                </div>
+              </div>
+            </div>
           </form>
         </div>
       </div>
     </modal>
   </div>
 </template>
+
+<style>
+.modal-wrapper .modal-container.modal-container {
+  overflow: auto;
+}
+</style>
 
 <style scoped>
   .modal__content {
@@ -216,9 +305,17 @@ export default {
     font-weight: bold;
   }
 
+  a {
+    color: var(--color-primary-element);
+  }
+
   .fieldRow {
     display: flex;
     margin-bottom: 1rem;
+  }
+
+  .radioRow + .radioRow {
+    margin-top: 2px;
   }
 
   .label {
@@ -260,6 +357,11 @@ export default {
     color: #856404;
     background-color: #fff3cd;
     border-color: #ffeeba;
+  }
+
+  .basicNote {
+    margin-bottom: 16px;
+    font-style: italic;
   }
 
   @media (min-width: 600px) {

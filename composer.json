@@ -1,14 +1,7 @@
 {
-    "name": "Electronic Signatures",
-    "description": "Accept electronic signatures on your documents.",
-    "type": "project",
-    "license": "AGPL",
-    "authors": [
-        {
-            "name": "Tõnis Palts"
-        }
-    ],
-    "require": {},
+    "require": {
+        "eideasy/eideasy-php": "1.8"
+    },
     "require-dev": {
         "phpunit/phpunit": "^5.4"
     }

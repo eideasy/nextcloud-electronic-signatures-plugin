@@ -5,14 +5,18 @@ namespace OCA\ElectronicSignatures\Commands;
 use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Db\Session;
 use OCA\ElectronicSignatures\Db\SessionMapper;
-use OCA\ElectronicSignatures\Exceptions\EidEasyException;
 use OCP\Files\IRootFolder;
-use OCP\Http\Client\IClientService;
 use OCP\AppFramework\Controller;
 
-class FetchSignedFile extends Controller {
-    /** @var  IClientService */
-    private $httpClientService;
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+use EidEasy\Api\EidEasyApi;
+use EidEasy\Signatures\Asice;
+use EidEasy\Signatures\Pades;
+
+class FetchSignedFile extends Controller
+{
+    use GetsFile;
 
     /** @var IRootFolder */
     private $storage;
@@ -20,75 +24,126 @@ class FetchSignedFile extends Controller {
     /** @var SessionMapper */
     private $mapper;
 
-    /** @var Config */
-    private $config;
+    /** @var EidEasyApi */
+    private $eidEasyApi;
+
+    /** @var Pades */
+    private $padesApi;
 
     public function __construct(
         IRootFolder $storage,
-        IClientService $clientService,
         SessionMapper $mapper,
         Config $config
-    ){
+    )
+    {
         $this->storage = $storage;
-        $this->httpClientService = $clientService;
         $this->mapper = $mapper;
-        $this->config = $config;
+        $this->padesApi = $config->getPadesApi();
+        $this->eidEasyApi = $config->getApi();
     }
 
-    public function fetch(string $docId): void {
+    public function fetchByToken(string $token): void
+    {
+        /** @var Session $session */
+        $session = $this->mapper->findByToken($token);
+
+        $this->fetch($session);
+    }
+
+    public function fetchByDocId(string $docId): void
+    {
+        /** @var Session $session */
         $session = $this->mapper->findByDocId($docId);
 
-        $responseBody = $this->getContainerResponse($session);
+        $this->fetch($session);
+    }
 
-        if (!isset($responseBody['signed_file_contents'])) {
-            $message = isset($responseBody['message']) ? $responseBody['message'] : 'eID Easy error!';
-            throw new EidEasyException($message);
+    public function fetch(Session $session): void
+    {
+        if ((bool)$session->getIsDownloaded()) {
+            return;
         }
 
-        $this->saveContainer($responseBody['signed_file_contents'], $session);
+        // Mark that the session is used, aka the file is downloaded. This
+        // prevents race condition, where there are two simultaneous
+        // callbacks which both fetch the signed file.
+        $session->setIsDownloaded(1);
+        $this->mapper->update($session);
+
+        $isHashBased = (bool)$session->getIsHashBased();
+        $containerType = $session->getContainerType();
+
+        $data = $this->eidEasyApi->downloadSignedFile($session->getDocId());
+
+        $signedFileContents = $data['signed_file_contents'];
+
+        // Assemble signed file and make sure its in binary form.
+        if (!$isHashBased) {
+            $signedFileContents = base64_decode($signedFileContents);
+        } elseif ($containerType === "pdf") {
+            list($mimeType, $fileContent) = $this->getFile($session->getPath(), $session->getUserId());
+
+            /** @var array $padesDssData */
+            $padesDssData = $data['pades_dss_data'] ?? null;
+
+            $padesResponse = $this->padesApi->addSignaturePades(
+                $fileContent,
+                $session->getSignatureTime(),
+                $signedFileContents,
+                $padesDssData
+            );
+
+            $signedFileContents = base64_decode($padesResponse['signedFile']);
+        } elseif ($containerType === "asice") {
+            $asice = new Asice();
+            $unsignedContainer = $this->createAsiceContainer($session);
+            $signedFileContents = $asice->addSignatureAsice($unsignedContainer, base64_decode($signedFileContents));
+        }
+
+        $containerPath = $this->getContainerPath($session);
+        $this->saveContainer($session, $signedFileContents, $containerPath);
+
+        $session->setSignedPath($containerPath);
+        $this->mapper->update($session);
     }
 
-    private function getContainerResponse(Session $session): array {
-        // Download signed doc.
-        // Send file to eID Easy server.
-        $body = [
-            'doc_id' => $session->getDocId(),
-            'client_id' => $this->config->getClientId(),
-            'secret' => $this->config->getSecret(),
-            'lang' => 'en',
+    /**
+     * Creates asice container and returns it in binary form.
+     * */
+    private function createAsiceContainer(Session $session): string
+    {
+        list($mimeType, $fileContent, $fileName) = $this->getFile($session->getPath(), $session->getUserId());
+
+        $sourceFiles = [
+            [
+                'fileName' => $fileName,
+                'fileContent' => $fileContent,
+                'mimeType' => $mimeType,
+            ]
         ];
 
-        $client = $this->httpClientService->newClient();
-        $response = $client->post($this->config->getUrl('api/signatures/download-signed-asice'), [
-            'body' => json_encode($body),
-            'headers' => [
-                // TODO dynamically get the plugin version and inject to User-Agent.
-                'User-Agent' => 'NextCloud-plugin',
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
-            ],
-        ]);
-
-        return json_decode($response->getBody(), true);
+        $asice = new Asice();
+        return $asice->createAsiceContainer($sourceFiles);
     }
 
-    private function saveContainer(string $base64Content, Session $session): void {
+    private function saveContainer(Session $session, string $contents, string $containerPath): void
+    {
         $userFolder = $this->storage->getUserFolder($session->getUserId());
 
-        $path = $this->getContainerPath($session);
-        $userFolder->touch($path);
-        $userFolder->newFile($path, base64_decode($base64Content));
+        $userFolder->touch($containerPath);
+        $userFolder->newFile($containerPath, $contents);
     }
 
-    private function getContainerPath(Session $session): string {
+    private function getContainerPath(Session $session): string
+    {
         $originalPath = $session->getPath();
-        $parts = explode('.', $originalPath);
+        $originalParts = explode('.', $originalPath);
 
         // Remove file extension.
-        array_pop($parts);
+        array_pop($originalParts);
 
-        $beginning = implode('.', $parts);
-        $extension = Config::CONTAINER_TYPE;
-        return "$beginning-{$session->getToken()}.$extension";
+        $beginning = implode('.', $originalParts);
+        $dateTime = (new \DateTime)->format('Ymd-His');
+        return "$beginning-{$dateTime}.{$session->getContainerType()}";
     }
 }

@@ -15,5 +15,11 @@ return [
 		// TODO remove (deprecated)
         ['name' => 'settingsApi#updateSettingsDepr', 'url' => '/update_settings', 'verb' => 'POST'],
 		['name' => 'settingsApi#updateSettings', 'url' => '/settings', 'verb' => 'POST'],
+		// TODO remove (deprecated)
+		['name' => 'sign#showSigningPageDepr', 'url' => '/sign', 'verb' => 'GET'],
+		['name' => 'sign#showSigningPage', 'url' => '/sign/{doc_id}', 'verb' => 'GET'],
+		['name' => 'sign#downloadFilePreview', 'url' => '/download-preview/{doc_id}', 'verb' => 'GET'],
+		['name' => 'sign#downloadSignedFile', 'url' => '/download-signed-file/{doc_id}', 'verb' => 'GET'],
+		['name' => 'sign#showSuccessPage', 'url' => '/success/{token}', 'verb' => 'GET'],
 	]
 ];
