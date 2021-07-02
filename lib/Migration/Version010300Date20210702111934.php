@@ -9,7 +9,7 @@ use OCP\IDBConnection;
 use OCP\Migration\SimpleMigrationStep;
 use OCP\Migration\IOutput;
 
-class Version010200Date20210628210500 extends SimpleMigrationStep {
+class Version010300Date20210702111934 extends SimpleMigrationStep {
     /** @var IDBConnection */
     private $dbConnection;
 
@@ -28,15 +28,19 @@ class Version010200Date20210628210500 extends SimpleMigrationStep {
         $schema = $schemaClosure();
 
         $table = $schema->getTable('esignature_sessions');
-        $table->addColumn('is_downloaded', Types::INTEGER, [
-            'notnull' => true,
-            'length' => 1,
-            'default' => 0,
-        ]);
-        $table->addColumn('signed_path', 'string', [
-            'notnull' => false,
-            'length' => 4000,
-        ]);
+        if (!$table->hasColumn('is_downloaded')) {
+            $table->addColumn('is_downloaded', Types::INTEGER, [
+                'notnull' => true,
+                'length' => 1,
+                'default' => 0,
+            ]);
+        }
+        if (!$table->hasColumn('signed_path')) {
+            $table->addColumn('signed_path', Types::STRING, [
+                'notnull' => false,
+                'length' => 4000,
+            ]);
+        }
         return $schema;
     }
 
@@ -44,6 +48,6 @@ class Version010200Date20210628210500 extends SimpleMigrationStep {
         $query = $this->dbConnection->getQueryBuilder();
         $query->update('esignature_sessions')
             ->set('is_downloaded', 'used');
-        $query->executeStatement();
+        $query->execute();
     }
 }
