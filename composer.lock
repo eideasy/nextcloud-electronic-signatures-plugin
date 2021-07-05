@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ff47cb7e06e7347d0b649986e5344a5b",
+    "content-hash": "6fab13191187ab56bfd35e2f5e083942",
     "packages": [
         {
             "name": "eideasy/eideasy-php",
-            "version": "v1.8",
+            "version": "v1.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/eideasy/eideasy-php.git",
-                "reference": "4b91289da4fa50267265c4d34d4972fb5c460fe9"
+                "reference": "966aac4924787914d2843f92dd1f67c376ec17b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eideasy/eideasy-php/zipball/4b91289da4fa50267265c4d34d4972fb5c460fe9",
-                "reference": "4b91289da4fa50267265c4d34d4972fb5c460fe9",
+                "url": "https://api.github.com/repos/eideasy/eideasy-php/zipball/966aac4924787914d2843f92dd1f67c376ec17b2",
+                "reference": "966aac4924787914d2843f92dd1f67c376ec17b2",
                 "shasum": ""
             },
             "require": {
@@ -45,11 +45,7 @@
                 }
             ],
             "description": "Create ASIC-E digital signature containers and add XAdES signatures to the container. Helper SDK for eID Easy API-s.",
-            "support": {
-                "issues": "https://github.com/eideasy/eideasy-php/issues",
-                "source": "https://github.com/eideasy/eideasy-php/tree/v1.8"
-            },
-            "time": "2021-06-12T18:30:29+00:00"
+            "time": "2021-07-05T10:30:48+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -134,24 +130,6 @@
                 "issues": "https://github.com/guzzle/guzzle/issues",
                 "source": "https://github.com/guzzle/guzzle/tree/7.3.0"
             },
-            "funding": [
-                {
-                    "url": "https://github.com/GrahamCampbell",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/Nyholm",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/alexeyshockov",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/gmponos",
-                    "type": "github"
-                }
-            ],
             "time": "2021-03-23T11:33:13+00:00"
         },
         {
@@ -1825,6 +1803,5 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
-    "platform-dev": [],
-    "plugin-api-version": "2.0.0"
+    "platform-dev": []
 }
