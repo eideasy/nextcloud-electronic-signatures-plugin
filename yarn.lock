@@ -1013,10 +1013,10 @@
   dependencies:
     axios "^0.21.1"
 
-"@eid-easy/eideasy-signing-widget@0.1.0-alpha.12":
-  version "0.1.0-alpha.12"
-  resolved "https://registry.yarnpkg.com/@eid-easy/eideasy-signing-widget/-/eideasy-signing-widget-0.1.0-alpha.12.tgz#96e67e77d7e77dbf506fed62456c333b35db3692"
-  integrity sha512-nEUmkfUPuwprQYrKg23ucHpJ0CGhlN9K/3ElWkb5v1xybK2gT6MTsrY5jsKKGL6Ag2qrDYq/bFJyoLFtDFliHg==
+"@eid-easy/eideasy-signing-widget@0.1.0-alpha.13":
+  version "0.1.0-alpha.13"
+  resolved "https://registry.yarnpkg.com/@eid-easy/eideasy-signing-widget/-/eideasy-signing-widget-0.1.0-alpha.13.tgz#8d46e3720a76e57861954d4cbda02bd0cde8d2c4"
+  integrity sha512-D1N9w0UfBSvOwsrXBI14fxHsAedkx3yOT19fELfyjd6eh7GkzA2DtqiI1j2JLkhQoMmCvsldIrkW0jJumF9U+Q==
   dependencies:
     "@eid-easy/eideasy-js-sdk" "^0.13.0"
     axios "^0.21.1"
