@@ -45,9 +45,16 @@ class Version010300Date20210702111934 extends SimpleMigrationStep {
     }
 
     public function postSchemaChange(IOutput $output, \Closure $schemaClosure, array $options) {
-        $query = $this->dbConnection->getQueryBuilder();
-        $query->update('esignature_sessions')
-            ->set('is_downloaded', 'used');
-        $query->execute();
+        /** @var ISchemaWrapper $schema */
+        $schema = $schemaClosure();
+
+        $table = $schema->getTable('esignature_sessions');
+
+        if ($table->hasColumn('used')) {
+            $query = $this->dbConnection->getQueryBuilder();
+            $query->update('esignature_sessions')
+                ->set('is_downloaded', 'used');
+            $query->execute();
+        }
     }
 }
