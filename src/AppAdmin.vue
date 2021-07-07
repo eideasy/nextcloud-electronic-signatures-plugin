@@ -28,6 +28,9 @@ export default {
     fetchSignedFileUrl() {
       return window.location.origin + this.generateNextcloudUrl('/apps/electronicsignatures/fetch_signed_file');
     },
+    instanceUrl() {
+      return window.location.origin;
+    },
     simpleSignaturesSettingIsDisabled() {
       return this.fileHandling === 'local';
     },
@@ -64,6 +67,7 @@ export default {
           </a>
         </p>
         <p>
+          {{ $t($globalConfig.appId, 'Your application url is: ') }} <b>{{ instanceUrl }}</b><br>
           {{ $t($globalConfig.appId, 'Ensure that in your eID Easy panel under "My Websites", you have added the following notification hook to your website: ') }} <b>{{ fetchSignedFileUrl }}</b>
         </p>
       </template>
