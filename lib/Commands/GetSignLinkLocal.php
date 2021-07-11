@@ -76,7 +76,7 @@ class GetSignLinkLocal extends Controller
         // Handle digest based signature starting.
         if ($containerType === "pdf") {
             if (!$this->config->isPadesApiSet()) {
-                throw new EidEasyException('Pades URL has not been specified in the settings. If you wish to sign PDFs locally, please set up PADES service (see settings for more info)');
+                throw new EidEasyException('Pades URL has not been specified in the settings. If you wish to sign PDFs locally, please set up PADES service (see Settings -> Electronic Signatures for more info)');
             }
 
             $padesResponse = $this->padesApi->getPadesDigest($fileContent);
