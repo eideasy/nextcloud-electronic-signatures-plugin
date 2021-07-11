@@ -2,9 +2,7 @@
 
 namespace OCA\ElectronicSignatures;
 
-use OCA\ElectronicSignatures\Exceptions\EidEasyException;
 use OCP\IConfig;
-
 use EidEasy\Api\EidEasyApi;
 use EidEasy\Signatures\Pades;
 
@@ -117,6 +115,11 @@ class Config {
 	{
 		return $this->padesApi;
 	}
+
+    public function isPadesApiSet(): bool
+    {
+        return !!$this->getPadesApiUrl();
+    }
 
     private function initApi(EidEasyApi $api): void
     {

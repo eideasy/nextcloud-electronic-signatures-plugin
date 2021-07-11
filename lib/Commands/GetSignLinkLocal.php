@@ -74,8 +74,11 @@ class GetSignLinkLocal extends Controller
         $signatureTime = null;
 
         // Handle digest based signature starting.
-        $signatureContainer = $containerType;
         if ($containerType === "pdf") {
+            if (!$this->config->isPadesApiSet()) {
+                throw new EidEasyException('Pades URL has not been specified in the settings. If you wish to sign PDFs locally, please set up PADES service (see settings for more info)');
+            }
+
             $padesResponse = $this->padesApi->getPadesDigest($fileContent);
             if (!isset($padesResponse['digest'])) {
                 throw new EidEasyException('Pades preparation failed.');
@@ -94,8 +97,6 @@ class GetSignLinkLocal extends Controller
             throw new Exception('Unknown container type.');
         }
 
-        $this->logger->alert('basinga  ' . json_encode(strlen($fileContent)));
-        $this->logger->alert('conttype ' . $containerType);
         $sourceFiles = [
             [
                 'fileName' => $fileName,
