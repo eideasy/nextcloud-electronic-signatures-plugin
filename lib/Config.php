@@ -2,15 +2,15 @@
 
 namespace OCA\ElectronicSignatures;
 
-use OCA\ElectronicSignatures\Exceptions\EidEasyException;
 use OCP\IConfig;
-
 use EidEasy\Api\EidEasyApi;
 use EidEasy\Signatures\Pades;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
 class Config {
+    public const PROD_URL = 'https://id.eideasy.com';
+    public const SANDBOX_URL = 'https://test.eideasy.com';
     public const CONTAINER_TYPE_ASICE = 'asice';
     public const CONTAINER_TYPE_PDF = 'pdf';
     public const ENABLE_OTP_BY_DEFAULT = true;
@@ -24,6 +24,9 @@ class Config {
 
     /** @var string */
     private $secret;
+
+    /** @var bool */
+    private $enableSandbox;
 
     /** @var bool */
     private $enableOtp;
@@ -64,6 +67,15 @@ class Config {
         return $this->secret;
     }
 
+    public function isSandboxEnabled(): bool
+    {
+        if (!isset($this->enableSandbox)) {
+            $this->enableSandbox = (bool) $this->config->getAppValue('electronicsignatures', 'enable_sandbox', false);
+        }
+
+        return $this->enableSandbox;
+    }
+
     public function isOtpEnabled(): bool
     {
         if (!isset($this->enableOtp)) {
@@ -87,7 +99,11 @@ class Config {
         $path = ltrim($path, '/');
 
         if (!isset($this->baseUrl)) {
-            $url = $this->config->getAppValue('electronicsignatures', 'base_url', 'https://id.eideasy.com');
+            $url = $this->config->getAppValue(
+                'electronicsignatures',
+                'base_url',
+                $this->isSandboxEnabled() ? self::SANDBOX_URL : self::PROD_URL
+            );
             $this->baseUrl = rtrim($url, '/');
         }
 
@@ -117,6 +133,11 @@ class Config {
 	{
 		return $this->padesApi;
 	}
+
+    public function isPadesApiSet(): bool
+    {
+        return !!$this->getPadesApiUrl();
+    }
 
     private function initApi(EidEasyApi $api): void
     {

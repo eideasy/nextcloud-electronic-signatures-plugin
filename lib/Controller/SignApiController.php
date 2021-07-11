@@ -8,6 +8,7 @@ use OCA\ElectronicSignatures\Commands\GetSignLinkLocal;
 use OCA\ElectronicSignatures\Commands\GetSignLinkRemote;
 use OCA\ElectronicSignatures\Commands\SendSigningLinkToEmail;
 use OCA\ElectronicSignatures\Config;
+use OCA\ElectronicSignatures\Exceptions\EidEasyException;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\OCSController;
@@ -79,6 +80,8 @@ class SignApiController extends OCSController
     public function sendSignLinkByEmail()
     {
         try {
+            $this->checkCredentials();
+
             $path = $this->request->getParam('path');
             $email = $this->request->getParam('email');
             $containerType = $this->getContainerType($path);
@@ -147,6 +150,13 @@ class SignApiController extends OCSController
             return $this->getSignLinkLocalCommand->getSignLink($this->userId, $path, $containerType);
         } else {
             return $this->getSignLinkRemoteCommand->getSignLink($this->userId, $path, $containerType, $email);
+        }
+    }
+
+    private function checkCredentials(): void
+    {
+        if (!$this->config->getClientId() || !$this->config->getSecret()) {
+            throw new EidEasyException('Please specify your eID Easy Client ID and secret under Settings -> Electronic Signatures.');
         }
     }
 }

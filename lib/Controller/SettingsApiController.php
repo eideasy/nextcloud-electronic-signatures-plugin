@@ -55,6 +55,11 @@ class SettingsApiController extends Controller {
                 $this->iConfig->setAppValue('electronicsignatures', 'secret', $secret);
             }
 
+            $enableSandbox = $this->request->getParam('enable_sandbox', null);
+            if ($enableSandbox !== null) {
+                $this->iConfig->setAppValue('electronicsignatures', 'enable_sandbox', (int) (bool) $enableSandbox);
+            }
+
             $enableOtp = $this->request->getParam('enable_otp', null);
             if ($enableOtp !== null) {
                 $this->iConfig->setAppValue('electronicsignatures', 'enable_otp', (int) (bool) $enableOtp);
