@@ -47,8 +47,7 @@ class SendSigningLinkToEmail extends Controller {
         $emailTemplate->addBodyButton('Review document', $link);
         $emailTemplate->addFooter();
 
-        $recipient = $email;
-        $message = $this->createMessage([$recipient => $recipient], $emailTemplate);
+        $message = $this->createMessage([$email => $email], $emailTemplate);
 
         try {
             $this->mailer->send($message);
