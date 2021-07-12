@@ -28,6 +28,7 @@ export default {
       fileUrl: this.$parent.fileUrl,
       apiUrl: this.$parent.apiUrl,
       signedContainerUrl: null,
+      enableSandbox: !!this.$parent.enableSandbox,
     };
   },
   computed: {
@@ -97,7 +98,7 @@ export default {
             country-code="EE"
             language="en"
             :on-success.prop="handleSigningSuccess"
-            :sandbox="false" />
+            :sandbox="enableSandbox" />
       </div>
     </div>
   </div>

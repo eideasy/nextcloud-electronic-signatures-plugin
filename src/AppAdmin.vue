@@ -51,7 +51,6 @@ export default {
       saveSetting(settings);
     },
     onSandboxToggle(saveSetting) {
-      console.log(this.enableSandbox);
       saveSetting({
         enable_sandbox: this.enableSandbox,
       });

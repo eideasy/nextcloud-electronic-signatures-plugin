@@ -15,4 +15,5 @@ OCP\Util::addStyle($appId, 'icons');
         data-file-url="<?php echo $_['file_url'] ?>"
         data-file-name="<?php echo $_['file_name'] ?>"
         data-api-url="<?php echo $_['api_url'] ?>"
+        data-enable-sandbox="<?php echo $_['enable_sandbox'] ?>"
 ></div>
