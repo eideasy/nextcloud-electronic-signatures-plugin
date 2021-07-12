@@ -215,7 +215,9 @@ export default {
             <div class="alert alert-danger">
               {{ $t($globalConfig.appId, 'The following credentials are missing: ') }}
               <ul>
-                <li v-for="credential in missingAdminSettings" :key="credential"><b>{{ credential }}</b></li>
+                <li v-for="credential in missingAdminSettings" :key="credential">
+                  <b>{{ credential }}</b>
+                </li>
               </ul>
               {{ $t($globalConfig.appId, 'Please make sure that you have filled in the eID Easy credential fields on the "Electronic Signatures" app settings page.') }}
             </div>
@@ -278,7 +280,7 @@ export default {
                   {{ $t($globalConfig.appId, '.asice') }}
                 </CheckboxRadioSwitch>
                 <a href="#" class="infoTip">
-                  <span class="icon icon-details"></span>
+                  <span class="icon icon-details" />
                 </a>
                 <div>
                   {{ $t($globalConfig.appId, '.asice files can be opened and verified with the DigiDoc4 application that is available at:') }}
@@ -307,7 +309,6 @@ export default {
                         https://www.id.ee/en/article/install-id-software
                       </a>
                     </li>
-
                   </ul>
                 </div>
               </div>

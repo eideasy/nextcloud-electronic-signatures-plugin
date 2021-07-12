@@ -193,20 +193,12 @@ export default {
     <SettingsSection :title="$t($globalConfig.appId, 'Sandbox mode')">
       <template #settingsHint>
         <p>
-          {{ $t($globalConfig.appId, 'You can use the sandbox mode to test out our service without having a paid account.') }}
+          {{ $t($globalConfig.appId, 'You can use the sandbox mode to test out our service free of charge.') }}
         </p>
         <p>
-          {{ $t($globalConfig.appId, 'Every action is free of charge in the sandbox mode, but you can only use the test credentials specified here: ') }}
-          <a
-            class="link"
-            href="https://eideasy.com/developer-documentation/sandbox/"
-            target="_blank">
-            https://eideasy.com/developer-documentation/sandbox/
-          </a>
-        </p>
-        <p>
-          <b>{{ $t($globalConfig.appId, 'Security notice!') }}</b>
-          {{ $t($globalConfig.appId, 'Unless you use your own national ID card or create your own eID Easy account to log in to the test admin panel, ALL of your signed test documents will be open to anyone who uses the same login. You have been warned!') }}
+          {{ $t($globalConfig.appId, 'Sign up here:') }}
+          <a href="https://test.eideasy.com/" target="_blank" class="link">https://test.eideasy.com/</a>
+          {{ $t($globalConfig.appId, 'to get the eID Easy credentials for the sandbox mode.') }}
         </p>
       </template>
       <SettingsGroup>
@@ -219,6 +211,50 @@ export default {
           </CheckboxRadioSwitch>
         </template>
       </SettingsGroup>
+      <p>
+        {{ $t($globalConfig.appId, 'While in sandbox mode, you can authenticate and sign with:') }}
+      </p>
+      <ul>
+        <li>
+          {{ $t($globalConfig.appId, 'Mobile ID') }}
+          <a
+            class="link"
+            href="https://github.com/SK-EID/MID/wiki/Test-number-for-automated-testing-in-DEMO"
+            target="_blank">
+            {{ $t($globalConfig.appId, 'test numbers') }}
+          </a>
+        </li>
+        <li>
+          {{ $t($globalConfig.appId, 'Your own Mobile ID, if you whitelist it beforehand at ') }}
+          <a
+              class="link"
+              href="https://demo.sk.ee/MIDCertsReg/"
+              target="_blank">
+            {{ $t($globalConfig.appId, 'https://demo.sk.ee/') }}
+          </a>
+        </li>
+        <li>
+          {{ $t($globalConfig.appId, 'Smart ID') }}
+          <a
+              class="link"
+              href="https://github.com/SK-EID/smart-id-documentation/wiki/Environment-technical-parameters#accounts"
+              target="_blank">
+            {{ $t($globalConfig.appId, 'test numbers') }}
+          </a>
+        </li>
+        <li>
+          {{ $t($globalConfig.appId, 'Production ID card from any of our supported countries (does not work for signing asice/bdoc containers),') }}
+        </li>
+        <li>
+          {{ $t($globalConfig.appId, 'Estonian test ID-card (or any other supported country). More info regarding Estonian test ID-cards can be found on') }}
+          <a
+              class="link"
+              href="https://www.id.ee/en/article/service-testing-general-information-2/"
+              target="_blank">
+            {{ $t($globalConfig.appId, 'SK’s site.') }}
+          </a>
+        </li>
+      </ul>
     </SettingsSection>
   </div>
 </template>
@@ -252,4 +288,23 @@ export default {
   ol li::before {
     content: counter(list-item-counter) '. ';
   }
+
+  li {
+    display: block;
+    position: relative;
+    padding-left: 16px;
+  }
+
+  li + li {
+    margin-top: 6px;
+  }
+
+  li:before {
+    content: '•';
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
 </style>

@@ -1,6 +1,4 @@
 <script>
-import axios from 'axios';
-import OC from './OC';
 import '@eid-easy/eideasy-signing-widget';
 import { imagePath } from '@nextcloud/router';
 import FilePreview from './FilePreview';
