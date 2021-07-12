@@ -22,6 +22,7 @@ export default {
       allowSimpleSignatures: this.$parent.enableOtp,
       fileHandling: this.$parent.enableLocalSigning ? 'local' : 'remote',
       padesUrl: this.$parent.padesUrl,
+      enableSandbox: !!this.$parent.enableSandbox,
     };
   },
   computed: {
@@ -48,6 +49,11 @@ export default {
         settings.enable_otp = false;
       }
       saveSetting(settings);
+    },
+    onSandboxToggle(saveSetting) {
+      saveSetting({
+        enable_sandbox: this.enableSandbox,
+      });
     },
   },
 };
@@ -100,7 +106,7 @@ export default {
     <SettingsSection :title="$t($globalConfig.appId, 'File handling')">
       <template #settingsHint>
         <p>
-          {{ $t($globalConfig.appId, 'This setting determines how and where the files are signed.') }}
+          {{ $t($globalConfig.appId, 'These settings determine how and where the files are signed.') }}
         </p>
       </template>
       <SettingsGroup>
@@ -145,11 +151,11 @@ export default {
           </div>
 
           <CheckboxRadioSwitch
-            :checked.sync="fileHandling"
-            value="local"
-            name="signing_mode_radio"
-            type="radio"
-            @update:checked="onFileHandlingToggle(slotProps.saveSetting)">
+              :checked.sync="fileHandling"
+              value="local"
+              name="signing_mode_radio"
+              type="radio"
+              @update:checked="onFileHandlingToggle(slotProps.saveSetting)">
             {{ $t($globalConfig.appId, 'Local') }}
           </CheckboxRadioSwitch>
           <p>
@@ -183,6 +189,73 @@ export default {
         </template>
       </SettingsGroup>
     </SettingsSection>
+
+    <SettingsSection :title="$t($globalConfig.appId, 'Sandbox mode')">
+      <template #settingsHint>
+        <p>
+          {{ $t($globalConfig.appId, 'You can use the sandbox mode to test out our service free of charge.') }}
+        </p>
+        <p>
+          {{ $t($globalConfig.appId, 'Sign up here:') }}
+          <a href="https://test.eideasy.com/" target="_blank" class="link">https://test.eideasy.com/</a>
+          {{ $t($globalConfig.appId, 'to get the eID Easy credentials for the sandbox mode.') }}
+        </p>
+      </template>
+      <SettingsGroup>
+        <template v-slot:default="slotProps">
+          <CheckboxRadioSwitch
+              :checked.sync="enableSandbox"
+              type="switch"
+              @update:checked="onSandboxToggle(slotProps.saveSetting)">
+            {{ $t($globalConfig.appId, 'Enable sandbox mode') }}
+          </CheckboxRadioSwitch>
+        </template>
+      </SettingsGroup>
+      <p>
+        {{ $t($globalConfig.appId, 'While in sandbox mode, you can authenticate and sign with:') }}
+      </p>
+      <ul>
+        <li>
+          {{ $t($globalConfig.appId, 'Mobile ID') }}
+          <a
+            class="link"
+            href="https://github.com/SK-EID/MID/wiki/Test-number-for-automated-testing-in-DEMO"
+            target="_blank">
+            {{ $t($globalConfig.appId, 'test numbers') }}
+          </a>
+        </li>
+        <li>
+          {{ $t($globalConfig.appId, 'Your own Mobile ID, if you whitelist it beforehand at ') }}
+          <a
+              class="link"
+              href="https://demo.sk.ee/MIDCertsReg/"
+              target="_blank">
+            {{ $t($globalConfig.appId, 'https://demo.sk.ee/') }}
+          </a>
+        </li>
+        <li>
+          {{ $t($globalConfig.appId, 'Smart ID') }}
+          <a
+              class="link"
+              href="https://github.com/SK-EID/smart-id-documentation/wiki/Environment-technical-parameters#accounts"
+              target="_blank">
+            {{ $t($globalConfig.appId, 'test numbers') }}
+          </a>
+        </li>
+        <li>
+          {{ $t($globalConfig.appId, 'Production ID card from any of our supported countries (does not work for signing asice/bdoc containers),') }}
+        </li>
+        <li>
+          {{ $t($globalConfig.appId, 'Estonian test ID-card (or any other supported country). More info regarding Estonian test ID-cards can be found on') }}
+          <a
+              class="link"
+              href="https://www.id.ee/en/article/service-testing-general-information-2/"
+              target="_blank">
+            {{ $t($globalConfig.appId, 'SK’s site.') }}
+          </a>
+        </li>
+      </ul>
+    </SettingsSection>
   </div>
 </template>
 
@@ -215,4 +288,23 @@ export default {
   ol li::before {
     content: counter(list-item-counter) '. ';
   }
+
+  li {
+    display: block;
+    position: relative;
+    padding-left: 16px;
+  }
+
+  li + li {
+    margin-top: 6px;
+  }
+
+  li:before {
+    content: '•';
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
 </style>

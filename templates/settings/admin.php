@@ -12,5 +12,6 @@ OCP\Util::addscript($appId, 'electronic-signatures-adminSettings');
   data-enable-otp="<?php echo $_['enable_otp'] ?>"
   data-enable-local-signing="<?php echo $_['enable_local_signing'] ?>"
   data-pades-url="<?php echo $_['pades_url'] ?>"
+  data-enable-sandbox="<?php echo $_['enable_sandbox'] ?>"
 ></div>
 

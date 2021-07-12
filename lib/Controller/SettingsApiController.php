@@ -33,6 +33,8 @@ class SettingsApiController extends Controller {
 	public function getSettings() {
         return new JSONResponse([
             'enable_otp' => $this->config->isOtpEnabled(),
+            'client_id_provided' => !empty($this->config->getClientId()),
+            'secret_provided' => !empty($this->config->getSecret()),
         ]);
     }
 
