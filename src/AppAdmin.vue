@@ -100,7 +100,7 @@ export default {
     <SettingsSection :title="$t($globalConfig.appId, 'File handling')">
       <template #settingsHint>
         <p>
-          {{ $t($globalConfig.appId, 'This setting determines how and where the files are signed.') }}
+          {{ $t($globalConfig.appId, 'These settings determine how and where the files are signed.') }}
         </p>
       </template>
       <SettingsGroup>
