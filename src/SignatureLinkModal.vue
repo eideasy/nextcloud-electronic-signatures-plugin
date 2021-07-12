@@ -70,6 +70,21 @@ export default {
     isSupportedFileType() {
       return this.fileExtension !== 'asice';
     },
+    missingAdminSettings() {
+      const missingSettings = [];
+      /* eslint-disable camelcase */
+      if (this.adminSettings) {
+        const { client_id_provided, secret_provided } = this.adminSettings;
+        if (!client_id_provided) {
+          missingSettings.push('client_id');
+        }
+        if (!secret_provided) {
+          missingSettings.push('secret');
+        }
+      }
+      /* eslint-enable camelcase */
+      return missingSettings;
+    },
   },
   mounted() {
     const _self = this;
@@ -118,6 +133,7 @@ export default {
     },
     fetchAdminSettings() {
       const _self = this;
+      _self.isLoading = true;
       axios({
         method: 'get',
         url: this.generateNextcloudUrl('/apps/electronicsignatures/settings'),
@@ -128,6 +144,13 @@ export default {
       })
           .then(function(response) {
             _self.setAdminSettings(response.data);
+          })
+          .catch(function(error) {
+            console.error(error);
+            _self.setErrorMessage(_self.$t(_self.$globalConfig.appId, 'Failed to fetch electronicsignatures settings'));
+          })
+          .then(function() {
+            _self.isLoading = false;
           });
     },
     onSubmit() {
@@ -188,7 +211,17 @@ export default {
           </div>
 
           <div
-              v-if="!isSupportedFileType">
+            v-if="missingAdminSettings.length">
+            <div class="alert alert-danger">
+              {{ $t($globalConfig.appId, 'The following credentials are missing: ') }}
+              <ul>
+                <li v-for="credential in missingAdminSettings" :key="credential"><b>{{ credential }}</b></li>
+              </ul>
+              {{ $t($globalConfig.appId, 'Please make sure that you have filled in the eID Easy credential fields on the "Electronic Signatures" app settings page.') }}
+            </div>
+          </div>
+          <div
+              v-else-if="!isSupportedFileType">
             <span class="alert alert-warning">
               {{ $t($globalConfig.appId, 'Signing existing .asice containers is currently not supported.') }}
             </span>
@@ -244,13 +277,38 @@ export default {
                     type="radio">
                   {{ $t($globalConfig.appId, '.asice') }}
                 </CheckboxRadioSwitch>
+                <a href="#" class="infoTip">
+                  <span class="icon icon-details"></span>
+                </a>
                 <div>
-                  {{ $t($globalConfig.appId, '.asice files can be opened and verified with the DigiDoc4 application that is available for download at:') }}
-                  <a
-                    href="https://www.id.ee/en/article/install-id-software/"
-                    target="_blank">
-                      https://www.id.ee/en/article/install-id-software
-                  </a>
+                  {{ $t($globalConfig.appId, '.asice files can be opened and verified with the DigiDoc4 application that is available at:') }}
+                  <ul>
+                    <li>
+                      {{ $t($globalConfig.appId, 'Windows - ') }}
+                      <a
+                        href="https://www.microsoft.com/en-us/p/digidoc4-client/9pfpfk4dj1s6"
+                        target="_blank">
+                        https://www.microsoft.com/en-us/p/digidoc4-client/9pfpfk4dj1s6
+                      </a>
+                    </li>
+                    <li>
+                      {{ $t($globalConfig.appId, 'macOS - ') }}
+                      <a
+                        href="https://apps.apple.com/us/app/digidoc4-client/id1370791134"
+                        target="_blank">
+                        https://apps.apple.com/us/app/digidoc4-client/id1370791134
+                      </a>
+                    </li>
+                    <li>
+                      {{ $t($globalConfig.appId, 'or alternatively - ') }}
+                      <a
+                        href="https://www.id.ee/en/article/install-id-software/"
+                        target="_blank">
+                        https://www.id.ee/en/article/install-id-software
+                      </a>
+                    </li>
+
+                  </ul>
                 </div>
               </div>
             </div>
