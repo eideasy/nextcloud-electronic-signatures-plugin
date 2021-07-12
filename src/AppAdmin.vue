@@ -22,6 +22,7 @@ export default {
       allowSimpleSignatures: this.$parent.enableOtp,
       fileHandling: this.$parent.enableLocalSigning ? 'local' : 'remote',
       padesUrl: this.$parent.padesUrl,
+      enableSandbox: !!this.$parent.enableSandbox,
     };
   },
   computed: {
@@ -48,6 +49,11 @@ export default {
         settings.enable_otp = false;
       }
       saveSetting(settings);
+    },
+    onSandboxToggle(saveSetting) {
+      saveSetting({
+        enable_sandbox: this.enableSandbox,
+      });
     },
   },
 };
@@ -100,7 +106,7 @@ export default {
     <SettingsSection :title="$t($globalConfig.appId, 'File handling')">
       <template #settingsHint>
         <p>
-          {{ $t($globalConfig.appId, 'This setting determines how and where the files are signed.') }}
+          {{ $t($globalConfig.appId, 'These settings determine how and where the files are signed.') }}
         </p>
       </template>
       <SettingsGroup>
@@ -145,11 +151,11 @@ export default {
           </div>
 
           <CheckboxRadioSwitch
-            :checked.sync="fileHandling"
-            value="local"
-            name="signing_mode_radio"
-            type="radio"
-            @update:checked="onFileHandlingToggle(slotProps.saveSetting)">
+              :checked.sync="fileHandling"
+              value="local"
+              name="signing_mode_radio"
+              type="radio"
+              @update:checked="onFileHandlingToggle(slotProps.saveSetting)">
             {{ $t($globalConfig.appId, 'Local') }}
           </CheckboxRadioSwitch>
           <p>
@@ -180,6 +186,37 @@ export default {
               {{ $t($globalConfig.appId, 'PADES URL') }}
             </template>
           </SettingsTextInput>
+        </template>
+      </SettingsGroup>
+    </SettingsSection>
+
+    <SettingsSection :title="$t($globalConfig.appId, 'Sandbox mode')">
+      <template #settingsHint>
+        <p>
+          {{ $t($globalConfig.appId, 'You can use the sandbox mode to test out our service without having a paid account.') }}
+        </p>
+        <p>
+          {{ $t($globalConfig.appId, 'Every action is free of charge in the sandbox mode, but you can only use the test credentials specified here: ') }}
+          <a
+            class="link"
+            href="https://eideasy.com/developer-documentation/sandbox/"
+            target="_blank">
+            https://eideasy.com/developer-documentation/sandbox/
+          </a>
+        </p>
+        <p>
+          <b>{{ $t($globalConfig.appId, 'Security notice!') }}</b>
+          {{ $t($globalConfig.appId, 'Unless you use your own national ID card or create your own eID Easy account to log in to the test admin panel, ALL of your signed test documents will be open to anyone who uses the same login. You have been warned!') }}
+        </p>
+      </template>
+      <SettingsGroup>
+        <template v-slot:default="slotProps">
+          <CheckboxRadioSwitch
+              :checked.sync="enableSandbox"
+              type="switch"
+              @update:checked="onSandboxToggle(slotProps.saveSetting)">
+            {{ $t($globalConfig.appId, 'Enable sandbox mode') }}
+          </CheckboxRadioSwitch>
         </template>
       </SettingsGroup>
     </SettingsSection>
