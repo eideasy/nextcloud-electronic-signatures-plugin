@@ -194,7 +194,7 @@ export default {
     <SettingsSection :title="$t($globalConfig.appId, 'Sandbox mode')">
       <template #settingsHint>
         <p>
-          You can use the sandbox mode to test out our service without having a paid account.
+          {{ $t($globalConfig.appId, 'You can use the sandbox mode to test out our service without having a paid account.') }}
         </p>
         <p>
           {{ $t($globalConfig.appId, 'Every action is free of charge in the sandbox mode, but you can only use the test credentials specified here: ') }}
