@@ -3,7 +3,6 @@
 namespace OCA\ElectronicSignatures\Commands;
 
 use OCA\ElectronicSignatures\Config;
-use OCP\AppFramework\Controller;
 use OCP\IUser;
 use OCP\IUserSession;
 use OCP\Mail\IEMailTemplate;
