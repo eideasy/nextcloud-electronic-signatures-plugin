@@ -3,15 +3,14 @@
 namespace OCA\ElectronicSignatures\Commands;
 
 use OCA\ElectronicSignatures\Config;
-use OCP\AppFramework\Controller;
+use OCP\IUser;
 use OCP\IUserSession;
 use OCP\Mail\IEMailTemplate;
 use OCP\Mail\IMailer;
 use OCP\Mail\IMessage;
+use OCP\Util;
 
-class SendSigningLinkToEmail extends Controller {
-    private $userId;
-
+class SendSigningLinkToEmail {
     /** @var IMailer */
     private $mailer;
 
@@ -21,8 +20,7 @@ class SendSigningLinkToEmail extends Controller {
     /** @var Config */
     private $config;
 
-    public function __construct(IMailer $mailer, IUserSession $userSession, Config $config, $UserId) {
-        $this->userId = $UserId;
+    public function __construct(IMailer $mailer, IUserSession $userSession, Config $config) {
         $this->mailer = $mailer;
         $this->session = $userSession;
         $this->config = $config;
@@ -35,19 +33,25 @@ class SendSigningLinkToEmail extends Controller {
             return;
         }
 
+        $user = $this->session->getUser();
+
+        if (!$user->getDisplayName()) {
+            throw new \Exception('Your profile e-mail display name must be set.');
+        }
+
         $emailTemplate = $this->mailer->createEMailTemplate('calendar.PublicShareNotification', [
             'link' => $link,
         ]);
 
-        $emailTemplate->setSubject('Document awaits your signature');
+        $emailTemplate->setSubject('A document awaits your signature');
 
         $emailTemplate->addHeader();
-        $emailTemplate->addHeading('A document awaits your signature.');
+        $emailTemplate->addHeading("{$user->getDisplayName()} has sent you a document for signing.");
         $emailTemplate->addBodyText('By clicking the button below, you can review it and sign it.');
         $emailTemplate->addBodyButton('Review document', $link);
         $emailTemplate->addFooter();
 
-        $message = $this->createMessage([$email => $email], $emailTemplate);
+        $message = $this->createMessage([$email => $email], $emailTemplate, $user);
 
         try {
             $this->mailer->send($message);
@@ -64,16 +68,11 @@ class SendSigningLinkToEmail extends Controller {
      */
     private function createMessage(
         array $recipients,
-        IEMailTemplate $template
+        IEMailTemplate $template,
+        IUser $user
     ): IMessage {
-        $user = $this->session->getUser();
-
-        if (!$user->getEMailAddress() || !$user->getDisplayName()) {
-            throw new \Exception('Your profile e-mail address and display name must be set.');
-        }
-
         $message = $this->mailer->createMessage();
-        $message->setFrom([$user->getEMailAddress() => $user->getDisplayName()]);
+        $message->setFrom([Util::getDefaultEmailAddress('no-reply') => $user->getDisplayName()]);
         $message->setTo($recipients);
         $message->useTemplate($template);
 
