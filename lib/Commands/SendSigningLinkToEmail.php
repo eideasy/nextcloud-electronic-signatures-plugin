@@ -11,9 +11,7 @@ use OCP\Mail\IMailer;
 use OCP\Mail\IMessage;
 use OCP\Util;
 
-class SendSigningLinkToEmail extends Controller {
-    private $userId;
-
+class SendSigningLinkToEmail {
     /** @var IMailer */
     private $mailer;
 
@@ -23,8 +21,7 @@ class SendSigningLinkToEmail extends Controller {
     /** @var Config */
     private $config;
 
-    public function __construct(IMailer $mailer, IUserSession $userSession, Config $config, $UserId) {
-        $this->userId = $UserId;
+    public function __construct(IMailer $mailer, IUserSession $userSession, Config $config) {
         $this->mailer = $mailer;
         $this->session = $userSession;
         $this->config = $config;
