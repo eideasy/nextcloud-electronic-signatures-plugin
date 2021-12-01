@@ -30,6 +30,9 @@ class SettingsApiController extends Controller {
 		$this->logger = $logger;
 	}
 
+    /**
+     * @NoAdminRequired
+     */
 	public function getSettings() {
         return new JSONResponse([
             'enable_otp' => $this->config->isOtpEnabled(),
