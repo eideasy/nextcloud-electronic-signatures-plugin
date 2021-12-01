@@ -29,7 +29,7 @@ class SendSigningLinkToEmail {
     public function sendIfNecessary(string $containerType, string $email, string $link): void {
         // We do not need to send the e-mail if OTP is enabled, because in
         // this case, eID Easy will be sending the e-mail instead of us.
-        if ($containerType === Config::CONTAINER_TYPE_PDF && $this->config->isOtpEnabled()) {
+        if ($containerType === Config::CONTAINER_TYPE_PDF && $this->config->isOtpEnabled() && !$this->config->isSigningLocal()) {
             return;
         }
 
