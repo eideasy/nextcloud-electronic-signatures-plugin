@@ -40,9 +40,9 @@ Are you not seeing your preferred signature card / signing app / other QES metho
 ]]></description>
     <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-dropdown.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-modal.png</screenshot>
-    <version>1.7.0</version>
+    <version>1.8.0</version>
     <licence>agpl</licence>
-    <author mail="tonis.palts@eideasy.com" homepage="https://eideasy.com">Tõnis Palts</author>
+    <author mail="support@eideasy.com" homepage="https://eideasy.com">eID Easy</author>
     <namespace>ElectronicSignatures</namespace>
     <category>files</category>
     <category>integration</category>
@@ -50,7 +50,7 @@ Are you not seeing your preferred signature card / signing app / other QES metho
     <bugs>https://github.com/eideasy/nextcloud-electronic-signatures-plugin/issues</bugs>
     <dependencies>
         <php min-version="7.3"/>
-        <nextcloud min-version="21" max-version="22"/>
+        <nextcloud min-version="21" max-version="23"/>
     </dependencies>
     <settings>
         <admin-section>OCA\ElectronicSignatures\Settings\AdminSection</admin-section>
