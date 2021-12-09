@@ -9,6 +9,7 @@ use OCA\ElectronicSignatures\Commands\GetSignLinkRemote;
 use OCA\ElectronicSignatures\Commands\SendSigningLinkToEmail;
 use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Exceptions\EidEasyException;
+use OCA\Files_External\NotFoundException;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\OCSController;
@@ -113,9 +114,25 @@ class SignApiController extends OCSController
     public function fetchSignedFile()
     {
         try {
+            $this->checkCredentials();
+
             $docId = $this->request->getParam('doc_id');
 
-            $this->fetchFileCommand->fetchByDocId($docId);
+            $session = $this->fetchFileCommand->fetchByDocId($docId);
+            $path = $session->getSignedPath();
+            [$email, $signerEmails] = $this->checkForNextEmail($session);
+            $containerType = $session->getContainerType();
+            $userId = $session->getUserId();
+
+//            if (!$this->mailer->validateMailAddress($email)) {
+//                return new JSONResponse([
+//                    'message' => 'Provided email address is not valid',
+//                ], Http::STATUS_BAD_REQUEST);
+//            }
+
+            $link = $this->getNextSignLink($userId, $path, $containerType, $email, $signerEmails);
+
+            $this->sendSigningLinkToEmail->sendIfNecessary($containerType, $email, $link);
 
             return new JSONResponse(['message' => 'Fetched successfully!']);
         } catch (\Throwable $e) {
@@ -146,10 +163,21 @@ class SignApiController extends OCSController
 
     private function getSignLink(string $path, string $containerType, ?string $email = null): string
     {
+        $emailss = 'raul@gmail.com,tonis@gmail.com';
+
         if ($this->config->isSigningLocal()) {
-            return $this->getSignLinkLocalCommand->getSignLink($this->userId, $path, $containerType);
+            return $this->getSignLinkLocalCommand->getSignLink($this->userId, $path, $containerType, $emailss);
         } else {
-            return $this->getSignLinkRemoteCommand->getSignLink($this->userId, $path, $containerType, $email);
+            return $this->getSignLinkRemoteCommand->getSignLink($this->userId, $path, $containerType, $emailss, $email);
+        }
+    }
+
+    private function getNextSignLink(string $userId, string $path, string $containerType, ?string $email = null, ?string $signerEmails = null): string
+    {
+        if ($this->config->isSigningLocal()) {
+            return $this->getSignLinkLocalCommand->getSignLink($userId, $path, $containerType, $signerEmails);
+        } else {
+            return $this->getSignLinkRemoteCommand->getSignLink($userId, $path, $containerType, $signerEmails, $email);
         }
     }
 
@@ -158,5 +186,22 @@ class SignApiController extends OCSController
         if (!$this->config->getClientId() || !$this->config->getSecret()) {
             throw new EidEasyException('Please specify your eID Easy Client ID and secret under Settings -> Electronic Signatures.');
         }
+    }
+
+    /**
+     * @throws NotFoundException|\OCP\DB\Exception
+     */
+    private function checkForNextEmail($session): array
+    {
+        $emails = explode(',', $session->getSignerEmails());
+
+        if (!isset($emails[0]) && $emails[0] !== '') {
+            throw new NotFoundException('All have signed');
+        }
+        $sendMailTo = $emails[0];
+        array_shift($emails);
+        $nextSigners = implode(',', $emails);
+
+        return [$sendMailTo, $nextSigners];
     }
 }

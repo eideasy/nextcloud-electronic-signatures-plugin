@@ -12,6 +12,7 @@ trait SavesSession
         string $userId,
         string $containerType,
         ?string $token = null,
+        ?string $signerEmails = null,
         bool $isHashBased = false,
         ?string $signatureTime = null
     ): void
@@ -31,6 +32,7 @@ trait SavesSession
         if ($signatureTime) {
             $session->setSignatureTime($signatureTime);
         }
+        $session->setSignerEmails($signerEmails);
         $this->mapper->insert($session);
     }
 

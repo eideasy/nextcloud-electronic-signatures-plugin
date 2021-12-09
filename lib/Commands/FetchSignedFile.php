@@ -50,12 +50,14 @@ class FetchSignedFile extends Controller
         $this->fetch($session);
     }
 
-    public function fetchByDocId(string $docId): void
+    public function fetchByDocId(string $docId): Session
     {
         /** @var Session $session */
         $session = $this->mapper->findByDocId($docId);
 
         $this->fetch($session);
+
+        return $session;
     }
 
     public function fetch(Session $session): void
@@ -103,6 +105,7 @@ class FetchSignedFile extends Controller
         $containerPath = $this->getContainerPath($session);
         $this->saveContainer($session, $signedFileContents, $containerPath);
 
+        //$session->setPath($containerPath);
         $session->setSignedPath($containerPath);
         $this->mapper->update($session);
     }
@@ -142,8 +145,14 @@ class FetchSignedFile extends Controller
         // Remove file extension.
         array_pop($originalParts);
 
-        $beginning = implode('.', $originalParts);
+        $fileName = implode('.', $originalParts);
+
+        $fileNameArray = explode('-', $fileName);
+        if (end($fileNameArray) === 'eidSigned') {
+            $fileName = explode('-eidSigned', $fileName)[0];
+        }
+
         $dateTime = (new \DateTime)->format('Ymd-His');
-        return "$beginning-{$dateTime}.{$session->getContainerType()}";
+        return "$fileName-eidSigned.{$session->getContainerType()}";
     }
 }
