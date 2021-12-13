@@ -3,18 +3,15 @@
 namespace OCA\ElectronicSignatures\Controller;
 
 use Exception;
+use JsonSchema\Exception\ValidationException;
 use OCA\ElectronicSignatures\Commands\FetchSignedFile;
-use OCA\ElectronicSignatures\Commands\GetSignLinkLocal;
-use OCA\ElectronicSignatures\Commands\GetSignLinkRemote;
-use OCA\ElectronicSignatures\Commands\SendSigningLinkToEmail;
 use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Exceptions\EidEasyException;
-use OCA\Files_External\NotFoundException;
+use OCA\ElectronicSignatures\Service\SigningLinkService;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\OCSController;
 use OCP\IRequest;
-use OCP\Mail\IMailer;
 use Psr\Log\LoggerInterface;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -25,23 +22,8 @@ class SignApiController extends OCSController
 {
     private $userId;
 
-    /** @var IMailer */
-    private $mailer;
-
-    /** @var GetSignLinkRemote */
-    private $getSignLinkRemoteCommand;
-
-    /** @var GetSignLinkLocal */
-    private $getSignLinkLocalCommand;
-
     /** @var FetchSignedFile */
     private $fetchFileCommand;
-
-    /** @var SendSigningLinkToEmail */
-    private $sendSigningLinkToEmail;
-
-    /** @var Config */
-    private $config;
 
     /** @var Pades */
     private $pades;
@@ -49,27 +31,27 @@ class SignApiController extends OCSController
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var SigningLinkService */
+    private $signingLinkService;
+
+    /** @var Config */
+    private $config;
+
     public function __construct(
         $AppName,
         IRequest $request,
-        Imailer $mailer,
-        GetSignLinkRemote $getSignLinkRemote,
-        GetSignLinkLocal $getSignLinkLocal,
-        SendSigningLinkToEmail $sendSigningLinkToEmail,
         FetchSignedFile $fetchSignedFile,
-        Config $config,
+        SigningLinkService $signingLinkService,
         Pades $pades,
         LoggerInterface $logger,
+        Config $config,
         $UserId
     )
     {
         parent::__construct($AppName, $request);
         $this->userId = $UserId;
-        $this->mailer = $mailer;
-        $this->getSignLinkRemoteCommand = $getSignLinkRemote;
-        $this->getSignLinkLocalCommand = $getSignLinkLocal;
         $this->fetchFileCommand = $fetchSignedFile;
-        $this->sendSigningLinkToEmail = $sendSigningLinkToEmail;
+        $this->signingLinkService = $signingLinkService;
         $this->config = $config;
         $this->pades = $pades;
         $this->logger = $logger;
@@ -84,24 +66,24 @@ class SignApiController extends OCSController
             $this->checkCredentials();
 
             $path = $this->request->getParam('path');
-            $email = $this->request->getParam('email');
+            //$emails = $this->request->getParam('email', 'raul@gmail.com,tonis@gmail.com');
+            $emails = 'raul@gmail.com,tonis@gmail.com,pala@gmail.com';
             $containerType = $this->getContainerType($path);
 
-            if (!$this->mailer->validateMailAddress($email)) {
-                return new JSONResponse([
-                    'message' => 'Provided email address is not valid',
-                ], Http::STATUS_BAD_REQUEST);
-            }
-
-            $link = $this->getSignLink($path, $containerType, $email);
-
-            $this->sendSigningLinkToEmail->sendIfNecessary($containerType, $email, $link);
-
-            return new JSONResponse(['message' => 'E-mail sent!']);
+            $this->signingLinkService->validateEmails($emails);
+            $this->signingLinkService->sendSignLinkToEmail($this->userId, $path, $containerType, $emails);
+        } catch (ValidationException $e) {
+            return new JSONResponse([
+                'message' => 'Provided email address is not valid',
+            ], Http::STATUS_BAD_REQUEST);
         } catch (\Throwable $e) {
             $this->logger->alert($e->getMessage() . "\n" . $e->getTraceAsString());
-            return new JSONResponse(['message' => "Failed to send email: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);
+            return new JSONResponse([
+                'message' => "Failed to send email: {$e->getMessage()}"
+            ], Http::STATUS_INTERNAL_SERVER_ERROR);
         }
+
+        return new JSONResponse(['message' => 'E-mail sent!']);
     }
 
     /**
@@ -114,31 +96,21 @@ class SignApiController extends OCSController
     public function fetchSignedFile()
     {
         try {
-            $this->checkCredentials();
-
             $docId = $this->request->getParam('doc_id');
-
             $session = $this->fetchFileCommand->fetchByDocId($docId);
+
             $path = $session->getSignedPath();
-            [$email, $signerEmails] = $this->checkForNextEmail($session);
+            $emails = $session->getSignerEmails();
             $containerType = $session->getContainerType();
             $userId = $session->getUserId();
 
-//            if (!$this->mailer->validateMailAddress($email)) {
-//                return new JSONResponse([
-//                    'message' => 'Provided email address is not valid',
-//                ], Http::STATUS_BAD_REQUEST);
-//            }
-
-            $link = $this->getNextSignLink($userId, $path, $containerType, $email, $signerEmails);
-
-            $this->sendSigningLinkToEmail->sendIfNecessary($containerType, $email, $link);
-
-            return new JSONResponse(['message' => 'Fetched successfully!']);
+            $this->signingLinkService->sendSignLinkToEmail($userId, $path, $containerType, $emails);
         } catch (\Throwable $e) {
             $this->logger->alert($e->getMessage() . "\n" . $e->getTraceAsString());
             return new JSONResponse(['message' => "Failed to get link: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);
         }
+
+        return new JSONResponse(['message' => 'Fetched successfully!']);
     }
 
     private function getContainerType(string $path)
@@ -161,47 +133,10 @@ class SignApiController extends OCSController
         return $containerType;
     }
 
-    private function getSignLink(string $path, string $containerType, ?string $email = null): string
-    {
-        $emailss = 'raul@gmail.com,tonis@gmail.com';
-
-        if ($this->config->isSigningLocal()) {
-            return $this->getSignLinkLocalCommand->getSignLink($this->userId, $path, $containerType, $emailss);
-        } else {
-            return $this->getSignLinkRemoteCommand->getSignLink($this->userId, $path, $containerType, $emailss, $email);
-        }
-    }
-
-    private function getNextSignLink(string $userId, string $path, string $containerType, ?string $email = null, ?string $signerEmails = null): string
-    {
-        if ($this->config->isSigningLocal()) {
-            return $this->getSignLinkLocalCommand->getSignLink($userId, $path, $containerType, $signerEmails);
-        } else {
-            return $this->getSignLinkRemoteCommand->getSignLink($userId, $path, $containerType, $signerEmails, $email);
-        }
-    }
-
     private function checkCredentials(): void
     {
         if (!$this->config->getClientId() || !$this->config->getSecret()) {
             throw new EidEasyException('Please specify your eID Easy Client ID and secret under Settings -> Electronic Signatures.');
         }
-    }
-
-    /**
-     * @throws NotFoundException|\OCP\DB\Exception
-     */
-    private function checkForNextEmail($session): array
-    {
-        $emails = explode(',', $session->getSignerEmails());
-
-        if (!isset($emails[0]) && $emails[0] !== '') {
-            throw new NotFoundException('All have signed');
-        }
-        $sendMailTo = $emails[0];
-        array_shift($emails);
-        $nextSigners = implode(',', $emails);
-
-        return [$sendMailTo, $nextSigners];
     }
 }
