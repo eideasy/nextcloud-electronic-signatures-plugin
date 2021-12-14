@@ -105,7 +105,6 @@ class FetchSignedFile extends Controller
         $containerPath = $this->getContainerPath($session);
         $this->saveContainer($session, $signedFileContents, $containerPath);
 
-        //$session->setPath($containerPath);
         $session->setSignedPath($containerPath);
         $this->mapper->update($session);
     }
@@ -144,15 +143,14 @@ class FetchSignedFile extends Controller
 
         // Remove file extension.
         array_pop($originalParts);
-
         $fileName = implode('.', $originalParts);
 
-        $fileNameArray = explode('-', $fileName);
-        if (end($fileNameArray) === 'eidSigned') {
-            $fileName = explode('-eidSigned', $fileName)[0];
+        // Add date
+        if (!str_contains($fileName, '_eidSignedAt-')) {
+            $dateTime = (new \DateTime)->format('Ymd-His');
+            $fileName = $fileName.'_eidSignedAt-'.$dateTime;
         }
 
-        $dateTime = (new \DateTime)->format('Ymd-His');
-        return "$fileName-eidSigned.{$session->getContainerType()}";
+        return $fileName.'.'.$session->getContainerType();
     }
 }

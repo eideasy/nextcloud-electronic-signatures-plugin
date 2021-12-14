@@ -66,11 +66,10 @@ class SignApiController extends OCSController
             $this->checkCredentials();
 
             $path = $this->request->getParam('path');
-            //$emails = $this->request->getParam('email', 'raul@gmail.com,tonis@gmail.com');
-            $emails = 'raul@gmail.com,tonis@gmail.com,pala@gmail.com';
             $containerType = $this->getContainerType($path);
+            $emailsJson = $this->request->getParam('emails', '["raul@gmail.com","tonis@gmail.com"]');
+            $emails = $this->signingLinkService->validateEmails($emailsJson);
 
-            $this->signingLinkService->validateEmails($emails);
             $this->signingLinkService->sendSignLinkToEmail($this->userId, $path, $containerType, $emails);
         } catch (ValidationException $e) {
             return new JSONResponse([

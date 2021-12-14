@@ -89,11 +89,11 @@ class SigningLinkService
     /**
      * @param string $emails
      */
-    public function validateEmails(string $emails): void
+    public function validateEmails(string $emails): string
     {
-        $emailArray = explode(',', $emails);
+        $emailArray = json_decode($emails);
 
-        if ($emailArray === false) {
+        if (empty($emailArray)) {
             throw new ValidationException("no emails submitted");
         }
 
@@ -102,5 +102,7 @@ class SigningLinkService
                 throw new ValidationException("no emails submitted");
             }
         }
+
+        return implode(',', $emailArray);
     }
 }
