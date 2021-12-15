@@ -5,6 +5,11 @@ import SettingsGroup from './SettingsGroup';
 import SettingsTextInput from './SettingsTextInput';
 import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch';
 
+const CONTAINER_TYPE = {
+  asice: 'asice',
+  pdf: 'pdf',
+};
+
 export default {
   name: 'AppAdmin',
   components: {
@@ -23,6 +28,17 @@ export default {
       fileHandling: this.$parent.enableLocalSigning ? 'local' : 'remote',
       padesUrl: this.$parent.padesUrl,
       enableSandbox: !!this.$parent.enableSandbox,
+      containerType: this.$parent.containerType,
+      containerTypeOptions: [
+        {
+          value: CONTAINER_TYPE.asice,
+          text: '.asice',
+        },
+        {
+          value: CONTAINER_TYPE.pdf,
+          text: '.pdf',
+        },
+      ],
     };
   },
   computed: {
@@ -49,6 +65,11 @@ export default {
         settings.enable_otp = false;
       }
       saveSetting(settings);
+    },
+    onFileTypeToggle(saveSetting) {
+      saveSetting({
+        container_type: this.containerType,
+      });
     },
     onSandboxToggle(saveSetting) {
       saveSetting({
@@ -98,6 +119,73 @@ export default {
                 {{ $t($globalConfig.appId, 'Secret') }}
               </template>
             </SettingsTextInput>
+          </div>
+        </template>
+      </SettingsGroup>
+    </SettingsSection>
+
+    <SettingsSection :title="$t($globalConfig.appId, 'Output file type')">
+      <template #settingsHint>
+        <p>
+          {{ $t($globalConfig.appId, 'These settings determine the file type of the signed document.') }}
+        </p>
+      </template>
+
+      <SettingsGroup>
+        <template v-slot:default="slotProps">
+          <div class="radioRow">
+            <CheckboxRadioSwitch
+                :checked.sync="containerType"
+                value="pdf"
+                name="container_type_radio"
+                type="radio"
+                @update:checked="onFileTypeToggle(slotProps.saveSetting)">
+              {{ $t($globalConfig.appId, '.pdf') }}
+            </CheckboxRadioSwitch>
+          </div>
+          <div class="radioRow">
+            <CheckboxRadioSwitch
+                :checked.sync="containerType"
+                value="asice"
+                name="container_type_radio"
+                type="radio"
+                @update:checked="onFileTypeToggle(slotProps.saveSetting)">
+              {{ $t($globalConfig.appId, '.asice') }}
+            </CheckboxRadioSwitch>
+            <a href="#" class="infoTip">
+              <span class="icon icon-details" />
+            </a>
+            <div>
+              {{
+                $t($globalConfig.appId, '.asice files can be opened and verified with the DigiDoc4 application that is available at:')
+              }}
+              <ul>
+                <li>
+                  {{ $t($globalConfig.appId, 'Windows - ') }}
+                  <a
+                      href="https://www.microsoft.com/en-us/p/digidoc4-client/9pfpfk4dj1s6"
+                      target="_blank">
+                    https://www.microsoft.com/en-us/p/digidoc4-client/9pfpfk4dj1s6
+                  </a>
+                </li>
+                <li>
+                  {{ $t($globalConfig.appId, 'macOS - ') }}
+                  <a
+                      href="https://apps.apple.com/us/app/digidoc4-client/id1370791134"
+                      target="_blank">
+                    https://apps.apple.com/us/app/digidoc4-client/id1370791134
+                  </a>
+                </li>
+                <li>
+                  {{ $t($globalConfig.appId, 'or alternatively - ') }}
+                  <a
+                      href="https://www.id.ee/en/article/install-id-software/"
+                      target="_blank">
+                    https://www.id.ee/en/article/install-id-software
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
         </template>
       </SettingsGroup>

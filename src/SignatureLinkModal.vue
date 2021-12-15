@@ -1,16 +1,10 @@
 <script>
 import axios from 'axios';
 import Modal from '@nextcloud/vue/dist/Components/Modal';
-import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch';
 import EventBus from './EventBus';
 import { generateUrl } from '@nextcloud/router';
 import queryString from 'query-string';
 import OC from './OC';
-
-const CONTAINER_TYPE = {
-  asice: 'asice',
-  pdf: 'pdf',
-};
 
 const EMAIL_FIELD_TEMPLATE = {
   type: 'email',
@@ -25,7 +19,6 @@ export default {
   name: 'SignatureLinkModal',
   components: {
     Modal,
-    CheckboxRadioSwitch,
   },
   data() {
     return {
@@ -34,20 +27,9 @@ export default {
       successMessage: null,
       isLoading: false,
       adminSettings: null,
-      containerType: '',
       signeeFormSchema: [
         {
           ...EMAIL_FIELD_TEMPLATE,
-        }
-      ],
-      containerTypeOptions: [
-        {
-          value: CONTAINER_TYPE.asice,
-          text: '.asice',
-        },
-        {
-          value: CONTAINER_TYPE.pdf,
-          text: '.pdf',
         },
       ],
       email: '',
@@ -57,25 +39,6 @@ export default {
   computed: {
     fileExtension() {
       return getFileExtension(this.filename);
-    },
-    containerTypeModel: {
-      get() {
-        if (getFileExtension(this.filename) !== CONTAINER_TYPE.pdf) {
-          return CONTAINER_TYPE.asice;
-        }
-
-        if (this.containerType) {
-          return this.containerType;
-        } else {
-          return CONTAINER_TYPE.pdf;
-        }
-      },
-      set(val) {
-        this.containerType = val;
-      },
-    },
-    shouldShowContainerSelect() {
-      return this.fileExtension === CONTAINER_TYPE.pdf;
     },
     isSupportedFileType() {
       return this.fileExtension !== 'asice';
@@ -294,64 +257,6 @@ export default {
               {{
                 $t($globalConfig.appId, 'Note: You have enabled simple signatures in the settings. Simple signatures can only be added to pdf files, but this file is not a pdf file. This means that the signer can not sign this file using simple signatures. However, they can still use all the other available signing methods.')
               }}
-            </div>
-            <div v-if="shouldShowContainerSelect">
-              <label
-                  class="label">
-                <b>{{ $t($globalConfig.appId, 'Output file type') }}</b>
-              </label>
-              <div class="radioRow">
-                <CheckboxRadioSwitch
-                    :checked.sync="containerTypeModel"
-                    value="pdf"
-                    name="container_type_radio"
-                    type="radio">
-                  {{ $t($globalConfig.appId, '.pdf') }}
-                </CheckboxRadioSwitch>
-              </div>
-              <div class="radioRow">
-                <CheckboxRadioSwitch
-                    :checked.sync="containerTypeModel"
-                    value="asice"
-                    name="container_type_radio"
-                    type="radio">
-                  {{ $t($globalConfig.appId, '.asice') }}
-                </CheckboxRadioSwitch>
-                <a href="#" class="infoTip">
-                  <span class="icon icon-details" />
-                </a>
-                <div>
-                  {{
-                    $t($globalConfig.appId, '.asice files can be opened and verified with the DigiDoc4 application that is available at:')
-                  }}
-                  <ul>
-                    <li>
-                      {{ $t($globalConfig.appId, 'Windows - ') }}
-                      <a
-                          href="https://www.microsoft.com/en-us/p/digidoc4-client/9pfpfk4dj1s6"
-                          target="_blank">
-                        https://www.microsoft.com/en-us/p/digidoc4-client/9pfpfk4dj1s6
-                      </a>
-                    </li>
-                    <li>
-                      {{ $t($globalConfig.appId, 'macOS - ') }}
-                      <a
-                          href="https://apps.apple.com/us/app/digidoc4-client/id1370791134"
-                          target="_blank">
-                        https://apps.apple.com/us/app/digidoc4-client/id1370791134
-                      </a>
-                    </li>
-                    <li>
-                      {{ $t($globalConfig.appId, 'or alternatively - ') }}
-                      <a
-                          href="https://www.id.ee/en/article/install-id-software/"
-                          target="_blank">
-                        https://www.id.ee/en/article/install-id-software
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
             </div>
 
             <button
