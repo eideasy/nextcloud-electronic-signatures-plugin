@@ -179,6 +179,7 @@ export default {
       this.isLoading = true;
       this.setErrorMessage(null);
       this.setSuccessMessage(null);
+
       axios({
         method: 'post',
         url: generateUrl('/apps/electronicsignatures/send_sign_link_by_email'),
@@ -188,7 +189,7 @@ export default {
         },
         data: {
           path: this.getFilePath(),
-          email: this.email,
+          emails: this.signeeFormSchema.map(field => field.value),
           container_type: this.containerTypeModel,
         },
       })
