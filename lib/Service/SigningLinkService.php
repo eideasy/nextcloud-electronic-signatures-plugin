@@ -87,22 +87,21 @@ class SigningLinkService
     }
 
     /**
-     * @param string $emails
+     * @param array|null $emails
+     * @return string
      */
-    public function validateEmails(string $emails): string
+    public function validateEmails(?array $emails): string
     {
-        $emailArray = json_decode($emails);
-
-        if (empty($emailArray)) {
+        if (empty($emails)) {
             throw new ValidationException("no emails submitted");
         }
 
-        foreach ($emailArray as $email) {
+        foreach ($emails as $email) {
             if (!$this->mailer->validateMailAddress($email)) {
                 throw new ValidationException("no emails submitted");
             }
         }
 
-        return implode(',', $emailArray);
+        return implode(',', $emails);
     }
 }

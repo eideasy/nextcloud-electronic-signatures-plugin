@@ -14,7 +14,7 @@ class Config {
     public const CONTAINER_TYPE_ASICE = 'asice';
     public const CONTAINER_TYPE_PDF = 'pdf';
     public const ENABLE_OTP_BY_DEFAULT = true;
-    public const ENABLE_LOCAL_SIGNING_BY_DEFAULT = true;
+    public const ENABLE_LOCAL_SIGNING_BY_DEFAULT = false;
 
     /** @var IConfig */
     private $config;
@@ -24,6 +24,9 @@ class Config {
 
     /** @var string */
     private $secret;
+
+    /** @var string */
+    private $containerType;
 
     /** @var bool */
     private $enableSandbox;
@@ -65,6 +68,15 @@ class Config {
         }
 
         return $this->secret;
+    }
+
+    public function getContainerType(): string
+    {
+        if (!isset($this->containerType)) {
+            $this->containerType = $this->config->getAppValue('electronicsignatures', 'container_type');
+        }
+
+        return $this->containerType;
     }
 
     public function isSandboxEnabled(): bool

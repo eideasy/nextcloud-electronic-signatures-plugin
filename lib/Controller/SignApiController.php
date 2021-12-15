@@ -4,6 +4,8 @@ namespace OCA\ElectronicSignatures\Controller;
 
 use Exception;
 use JsonSchema\Exception\ValidationException;
+use OC\User\NoUserException;
+use OCA\ElectronicSignatures\AppInfo\Application;
 use OCA\ElectronicSignatures\Commands\FetchSignedFile;
 use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Exceptions\EidEasyException;
@@ -11,6 +13,9 @@ use OCA\ElectronicSignatures\Service\SigningLinkService;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\OCSController;
+use OCP\Files\InvalidPathException;
+use OCP\Files\NotPermittedException;
+use OCP\IConfig;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
@@ -34,6 +39,9 @@ class SignApiController extends OCSController
     /** @var SigningLinkService */
     private $signingLinkService;
 
+    /** @var IConfig */
+    private $iConfig;
+
     /** @var Config */
     private $config;
 
@@ -44,6 +52,7 @@ class SignApiController extends OCSController
         SigningLinkService $signingLinkService,
         Pades $pades,
         LoggerInterface $logger,
+        IConfig $iConfig,
         Config $config,
         $UserId
     )
@@ -52,6 +61,7 @@ class SignApiController extends OCSController
         $this->userId = $UserId;
         $this->fetchFileCommand = $fetchSignedFile;
         $this->signingLinkService = $signingLinkService;
+        $this->iConfig = $iConfig;
         $this->config = $config;
         $this->pades = $pades;
         $this->logger = $logger;
@@ -66,9 +76,9 @@ class SignApiController extends OCSController
             $this->checkCredentials();
 
             $path = $this->request->getParam('path');
-            $containerType = $this->getContainerType($path);
-            $emailsJson = $this->request->getParam('emails', '["raul@gmail.com","tonis@gmail.com"]');
-            $emails = $this->signingLinkService->validateEmails($emailsJson);
+            $containerType = $this->iConfig->getAppValue(Application::APP_ID, 'container_type');
+            $emailsInput = $this->request->getParam('emails');
+            $emails = $this->signingLinkService->validateEmails($emailsInput);
 
             $this->signingLinkService->sendSignLinkToEmail($this->userId, $path, $containerType, $emails);
         } catch (ValidationException $e) {
@@ -104,6 +114,9 @@ class SignApiController extends OCSController
             $userId = $session->getUserId();
 
             $this->signingLinkService->sendSignLinkToEmail($userId, $path, $containerType, $emails);
+        } catch (NoUserException | NotPermittedException | NotPermittedException | InvalidPathException $e) {
+            $this->logger->alert($e->getMessage() . "\n" . $e->getTraceAsString());
+            throw new EidEasyException('Failed to create event for activity.' . $e->getMessage() . ' trace ' . $e->getTraceAsString());
         } catch (\Throwable $e) {
             $this->logger->alert($e->getMessage() . "\n" . $e->getTraceAsString());
             return new JSONResponse(['message' => "Failed to get link: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);

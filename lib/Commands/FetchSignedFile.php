@@ -2,6 +2,7 @@
 
 namespace OCA\ElectronicSignatures\Commands;
 
+use OCA\ElectronicSignatures\Activity\ActivityManager;
 use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Db\Session;
 use OCA\ElectronicSignatures\Db\SessionMapper;
@@ -21,6 +22,9 @@ class FetchSignedFile extends Controller
     /** @var IRootFolder */
     private $storage;
 
+    /** @var ActivityManager */
+    private $activityManager;
+
     /** @var SessionMapper */
     private $mapper;
 
@@ -32,11 +36,13 @@ class FetchSignedFile extends Controller
 
     public function __construct(
         IRootFolder $storage,
+        ActivityManager $activityManager,
         SessionMapper $mapper,
         Config $config
     )
     {
         $this->storage = $storage;
+        $this->activityManager = $activityManager;
         $this->mapper = $mapper;
         $this->padesApi = $config->getPadesApi();
         $this->eidEasyApi = $config->getApi();
@@ -107,6 +113,8 @@ class FetchSignedFile extends Controller
 
         $session->setSignedPath($containerPath);
         $this->mapper->update($session);
+
+        $this->activityManager->createAndTriggerEvent($session, $data);
     }
 
     /**
