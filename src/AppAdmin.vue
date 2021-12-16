@@ -147,10 +147,14 @@ export default {
       </button>
     </SettingsSection>
 
-    <SettingsSection v-if="showAdvancedSettings" :title="$t($globalConfig.appId, 'Output file type')">
+    <SettingsSection v-if="showAdvancedSettings" :title="$t($globalConfig.appId, 'Output file type for pdf')">
       <template #settingsHint>
         <p>
-          {{ $t($globalConfig.appId, 'These settings determine the file type of the signed document.') }}
+          {{ $t($globalConfig.appId, 'These settings only apply to pdf files.') }}
+        </p>
+        <p>
+          {{ $t($globalConfig.appId, 'If you choose .pdf as the output file type, then your final signed file will be a pdf.') }}
+          {{ $t($globalConfig.appId, 'If you choose .asice, then your final signed file will be an .asice file that contains the original pdf file.') }}
         </p>
       </template>
 

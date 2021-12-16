@@ -206,18 +206,6 @@ export default {
               }}
             </div>
           </div>
-          <div
-              v-else-if="currentFileExtension === 'asice'">
-            <span class="alert alert-warning">
-              {{ $t($globalConfig.appId, 'Signing existing .asice containers is currently not supported.') }}
-            </span>
-          </div>
-          <div
-              v-else-if="currentFileExtension !== 'pdf' && adminSettings.container_type === 'pdf'">
-            <span class="alert alert-warning">
-              {{ $t($globalConfig.appId, 'This file is not a pdf. To sign non-pdf files, go to "Settings" > "Electronic signatures" > "Advanced settings" and select .asice for the "Output file type"') }}
-            </span>
-          </div>
           <div v-else>
             <form
                 action=""
