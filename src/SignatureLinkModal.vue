@@ -5,6 +5,7 @@ import EventBus from './EventBus';
 import { generateUrl } from '@nextcloud/router';
 import queryString from 'query-string';
 import OC from './OC';
+import fetchAdminSettings from './fetchAdminSettings';
 
 const EMAIL_FIELD_TEMPLATE = {
   type: 'email',
@@ -26,6 +27,7 @@ export default {
       errorMessage: null,
       successMessage: null,
       isLoading: false,
+      isLoadingSettings: false,
       adminSettings: null,
       signeeFormSchema: [
         {
@@ -37,11 +39,8 @@ export default {
     };
   },
   computed: {
-    fileExtension() {
+    currentFileExtension() {
       return getFileExtension(this.filename);
-    },
-    isSupportedFileType() {
-      return this.fileExtension !== 'asice';
     },
     missingAdminSettings() {
       const missingSettings = [];
@@ -117,15 +116,8 @@ export default {
     },
     fetchAdminSettings() {
       const _self = this;
-      _self.isLoading = true;
-      axios({
-        method: 'get',
-        url: this.generateNextcloudUrl('/apps/electronicsignatures/settings'),
-        responseType: 'json',
-        headers: {
-          requesttoken: OC.requestToken,
-        },
-      })
+      _self.isLoadingSettings = true;
+      fetchAdminSettings()
           .then(function(response) {
             _self.setAdminSettings(response.data);
           })
@@ -134,7 +126,7 @@ export default {
             _self.setErrorMessage(_self.$t(_self.$globalConfig.appId, 'Failed to fetch electronicsignatures settings'));
           })
           .then(function() {
-            _self.isLoading = false;
+            _self.isLoadingSettings = false;
           });
     },
     onSubmit() {
@@ -153,7 +145,6 @@ export default {
         data: {
           path: this.getFilePath(),
           emails: this.signeeFormSchema.map(field => field.value),
-          container_type: this.containerTypeModel,
         },
       })
           .then(function() {
@@ -178,11 +169,11 @@ export default {
       <div
           class="modal__content">
         <div
-            v-if="isLoading"
+            v-if="isLoading || isLoadingSettings"
             class="loader">
           <div class="icon-loading spinner" />
         </div>
-        <div class="contentWrap">
+        <div v-if="!isLoadingSettings" class="contentWrap">
           <h3>
             {{ $t($globalConfig.appId, 'Request a signature via email') }}
           </h3>
@@ -210,61 +201,69 @@ export default {
             </div>
           </div>
           <div
-              v-else-if="!isSupportedFileType">
+              v-else-if="currentFileExtension === 'asice'">
             <span class="alert alert-warning">
               {{ $t($globalConfig.appId, 'Signing existing .asice containers is currently not supported.') }}
             </span>
           </div>
-          <form
-              v-else
-              action=""
-              @submit.prevent="onSubmit">
-            <label
-                class="label"
-                for="signingLinkEmail">
-              {{ $t($globalConfig.appId, 'Email addresses') }}
-            </label>
+          <div
+              v-else-if="currentFileExtension !== 'pdf' && adminSettings.container_type === 'pdf'">
+            <span class="alert alert-warning">
+              {{ $t($globalConfig.appId, 'This file is not a pdf. To sign non-pdf files, go to "Settings" > "Electronic signatures" > "Advanced settings" and select .asice for the "Output file type"') }}
+            </span>
+          </div>
+          <div v-else>
+            <form
+                action=""
+                @submit.prevent="onSubmit">
+              <label
+                  class="label"
+                  for="signingLinkEmail">
+                {{ $t($globalConfig.appId, 'Email addresses') }}
+              </label>
 
-            <div
-                v-for="(field, index) in signeeFormSchema"
-                :key="index"
-                class="fieldRow">
-              <input
-                  id="signingLinkEmail"
-                  v-model="field.value"
-                  type="email"
-                  class="input"
-                  placeholder="Email"
-                  required
-                  aria-label="email">
-              <button
-                  v-if="index > 0"
-                  @click.prevent="removeEmailRow(index)">
-                {{ $t($globalConfig.appId, 'Remove') }}
+              <div
+                  v-for="(field, index) in signeeFormSchema"
+                  :key="index"
+                  class="fieldRow">
+                <input
+                    id="signingLinkEmail"
+                    v-model="field.value"
+                    type="email"
+                    class="input"
+                    placeholder="Email"
+                    required
+                    aria-label="email">
+                <button
+                    v-if="index > 0"
+                    @click.prevent="removeEmailRow(index)">
+                  {{ $t($globalConfig.appId, 'Remove') }}
+                </button>
+              </div>
+              <button @click.prevent="addEmailRow">
+                + {{ $t($globalConfig.appId, 'Add') }}
               </button>
-            </div>
-            <button @click.prevent="addEmailRow">
-              + {{ $t($globalConfig.appId, 'Add') }}
-            </button>
-            <div style="margin-bottom: 20px; margin-top: 20px">
-              {{
-                $t($globalConfig.appId, 'An email with a link to the signing page will be sent to the entered emails.')
-              }}
-            </div>
-            <div
-                v-if="adminSettings && adminSettings.enable_otp && containerTypeModel !== 'pdf' && isSupportedFileType"
-                class="basicNote">
-              {{
-                $t($globalConfig.appId, 'Note: You have enabled simple signatures in the settings. Simple signatures can only be added to pdf files, but this file is not a pdf file. This means that the signer can not sign this file using simple signatures. However, they can still use all the other available signing methods.')
-              }}
-            </div>
+              <div style="margin-bottom: 20px; margin-top: 20px">
+                {{
+                  $t($globalConfig.appId, 'An email with a link to the signing page will be sent to the entered emails.')
+                }}
+              </div>
+              <div
+                  v-if="adminSettings && adminSettings.enable_otp && adminSettings.container_type !== 'pdf' && currentFileExtension !== 'pdf'"
+                  class="basicNote">
+                {{
+                  $t($globalConfig.appId, 'Note: You have enabled simple signatures in the settings. Simple signatures can only be added to pdf files, but this file is not a pdf file. This means that the signer can not sign this file using simple signatures. However, they can still use all the other available signing methods.')
+                }}
+              </div>
 
-            <button
-                type="submit"
-                class="submitButton">
-              {{ $t($globalConfig.appId, 'Request signature') }}
-            </button>
-          </form>
+              <button
+                  type="submit"
+                  class="submitButton">
+                {{ $t($globalConfig.appId, 'Request signature') }}
+              </button>
+            </form>
+          </div>
+
         </div>
       </div>
     </modal>
