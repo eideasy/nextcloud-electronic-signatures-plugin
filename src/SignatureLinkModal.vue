@@ -243,7 +243,7 @@ export default {
                 }}
               </div>
               <div
-                  v-if="adminSettings && adminSettings.enable_otp && adminSettings.container_type !== 'pdf' && currentFileExtension !== 'pdf'"
+                  v-if="adminSettings && adminSettings.enable_otp && currentFileExtension !== 'pdf'"
                   class="basicNote">
                 {{
                   $t($globalConfig.appId, 'Note: You have enabled simple signatures in the settings. Simple signatures can only be added to pdf files, but this file is not a pdf file. This means that the signer can not sign this file using simple signatures. However, they can still use all the other available signing methods.')

@@ -30,16 +30,6 @@ export default {
       enableSandbox: !!this.$parent.enableSandbox,
       containerType: this.$parent.containerType,
       showAdvancedSettings: false,
-      containerTypeOptions: [
-        {
-          value: CONTAINER_TYPE.asice,
-          text: '.asice',
-        },
-        {
-          value: CONTAINER_TYPE.pdf,
-          text: '.pdf',
-        },
-      ],
     };
   },
   computed: {
@@ -50,7 +40,7 @@ export default {
       return window.location.origin;
     },
     simpleSignaturesSettingIsDisabled() {
-      return this.fileHandling === 'local';
+      return this.fileHandling === 'local' || this.containerType === 'asice';
     },
     buttonTextShowAdvanced() {
       if (this.showAdvancedSettings) {
@@ -75,9 +65,14 @@ export default {
       saveSetting(settings);
     },
     onFileTypeToggle(saveSetting) {
-      saveSetting({
+      const settings = {
         container_type: this.containerType,
-      });
+      };
+      if (this.containerType === 'asice') {
+        this.allowSimpleSignatures = '0';
+        settings.enable_otp = false;
+      }
+      saveSetting(settings);
     },
     onSandboxToggle(saveSetting) {
       saveSetting({
@@ -240,6 +235,10 @@ export default {
             }}
           </p>
 
+          <p v-if="simpleSignaturesSettingIsDisabled">
+            "Allow simple signatures" setting is only available if ".pdf" is selected in "Output file type for pdf" setting.
+          </p>
+
           <div :class="`subSection ${simpleSignaturesSettingIsDisabled ? 'disabled' : ''}`">
             <div class="checkboxWrap">
               <input
@@ -269,7 +268,9 @@ export default {
                   $t($globalConfig.appId, 'Simple Electronic Signatures are always collected remotely, in order to increase the legal value of the signature.')
                 }}
               </li>
-              <li>{{ $t($globalConfig.appId, 'Simple Electronic Signatures work with pdf files only.') }}</li>
+              <li>
+                {{ $t($globalConfig.appId, 'Simple Electronic Signatures work with pdf files only.') }}
+              </li>
             </ul>
           </div>
 
