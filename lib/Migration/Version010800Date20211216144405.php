@@ -9,7 +9,7 @@ use OCP\IDBConnection;
 use OCP\Migration\SimpleMigrationStep;
 use OCP\Migration\IOutput;
 
-class Version010300Date20210702111934 extends SimpleMigrationStep {
+class Version010800Date20211216144405 extends SimpleMigrationStep {
     /** @var IDBConnection */
     private $dbConnection;
 
@@ -35,5 +35,4 @@ class Version010300Date20210702111934 extends SimpleMigrationStep {
         }
         return $schema;
     }
-
 }
