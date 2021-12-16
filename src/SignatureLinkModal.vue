@@ -149,6 +149,12 @@ export default {
       })
           .then(function() {
             _self.setSuccessMessage(_self.$t(_self.$globalConfig.appId, 'Email successfully sent!'));
+            // reset the email fields after successful submit
+            _self.signeeFormSchema = [
+              {
+                ...EMAIL_FIELD_TEMPLATE,
+              },
+            ];
           })
           .catch(function(error) {
             _self.setErrorMessage(error.response && error.response.data && error.response.data.message);
