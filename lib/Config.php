@@ -73,7 +73,7 @@ class Config {
     public function getContainerType(): string
     {
         if (!isset($this->containerType)) {
-            $this->containerType = $this->config->getAppValue('electronicsignatures', 'container_type');
+            $this->containerType = $this->config->getAppValue('electronicsignatures', 'container_type', self::CONTAINER_TYPE_PDF);
         }
 
         return $this->containerType;
