@@ -1006,23 +1006,22 @@
   dependencies:
     chalk "^4.0.0"
 
-"@eid-easy/eideasy-js-sdk@^0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@eid-easy/eideasy-js-sdk/-/eideasy-js-sdk-0.13.0.tgz#c0459e43024c36a61d39a49b29bc7c6b4b617ce2"
-  integrity sha512-/NDMwXB7eusYem2DVMDyQwohOZiPNQ+t5WcPraRDmWszvmaBSTqUGUiTNFrP9PG8hRLLzHsE2BlfVsVcP/J0IA==
+"@eid-easy/eideasy-browser-client@2.12.0":
+  version "2.12.0"
+  resolved "https://registry.yarnpkg.com/@eid-easy/eideasy-browser-client/-/eideasy-browser-client-2.12.0.tgz#f7d84c82d1ea5e105675f8647a115d585a7b6b88"
+  integrity sha512-zc24oBCo9MQOb4yQ4apSHYLJs3oU3+5Wr3nHIw32YDObmxcAPmI5dWdPR9tMqFhn6z8s9bb4GBXrRotcORtSZA==
   dependencies:
     axios "^0.21.1"
+    lodash "^4.17.21"
 
-"@eid-easy/eideasy-signing-widget@0.1.0-alpha.13":
-  version "0.1.0-alpha.13"
-  resolved "https://registry.yarnpkg.com/@eid-easy/eideasy-signing-widget/-/eideasy-signing-widget-0.1.0-alpha.13.tgz#8d46e3720a76e57861954d4cbda02bd0cde8d2c4"
-  integrity sha512-D1N9w0UfBSvOwsrXBI14fxHsAedkx3yOT19fELfyjd6eh7GkzA2DtqiI1j2JLkhQoMmCvsldIrkW0jJumF9U+Q==
+"@eid-easy/eideasy-widget@2.8.0":
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/@eid-easy/eideasy-widget/-/eideasy-widget-2.8.0.tgz#d753b0b13ec201234a33a22379aa792f3d3bc966"
+  integrity sha512-duVgTeNhCBMHkVs2Jo1/pthEShm5UsV4ZOVeXYyiNfc08NWTH98aT7KckLf8z2kxnVYouZoaIDJY1VnjH42C7w==
   dependencies:
-    "@eid-easy/eideasy-js-sdk" "^0.13.0"
-    axios "^0.21.1"
+    "@eid-easy/eideasy-browser-client" "2.12.0"
     core-js "^3.6.5"
     i18n-iso-countries "^6.7.0"
-    lodash "^4.17.21"
     lodash.defaultsdeep "^4.6.1"
     vue "^2.6.11"
     vue-custom-element "^3.2.14"
