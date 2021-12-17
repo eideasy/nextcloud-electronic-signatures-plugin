@@ -2,10 +2,8 @@
 
 namespace OCA\ElectronicSignatures\Controller;
 
-use Exception;
 use JsonSchema\Exception\ValidationException;
 use OC\User\NoUserException;
-use OCA\ElectronicSignatures\AppInfo\Application;
 use OCA\ElectronicSignatures\Commands\FetchSignedFile;
 use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Exceptions\EidEasyException;
@@ -39,9 +37,6 @@ class SignApiController extends OCSController
     /** @var SigningLinkService */
     private $signingLinkService;
 
-    /** @var IConfig */
-    private $iConfig;
-
     /** @var Config */
     private $config;
 
@@ -52,7 +47,6 @@ class SignApiController extends OCSController
         SigningLinkService $signingLinkService,
         Pades $pades,
         LoggerInterface $logger,
-        IConfig $iConfig,
         Config $config,
         $UserId
     )
@@ -61,7 +55,6 @@ class SignApiController extends OCSController
         $this->userId = $UserId;
         $this->fetchFileCommand = $fetchSignedFile;
         $this->signingLinkService = $signingLinkService;
-        $this->iConfig = $iConfig;
         $this->config = $config;
         $this->pades = $pades;
         $this->logger = $logger;
@@ -76,7 +69,7 @@ class SignApiController extends OCSController
             $this->checkCredentials();
 
             $path = $this->request->getParam('path');
-            $containerType = $this->iConfig->getAppValue(Application::APP_ID, 'container_type');
+            $containerType = $this->config->getContainerType();
             $emailsInput = $this->request->getParam('emails');
             $emails = $this->signingLinkService->validateEmails($emailsInput);
 
@@ -116,33 +109,13 @@ class SignApiController extends OCSController
             $this->signingLinkService->sendSignLinkToEmail($userId, $path, $containerType, $emails);
         } catch (NoUserException | NotPermittedException | NotPermittedException | InvalidPathException $e) {
             $this->logger->alert($e->getMessage() . "\n" . $e->getTraceAsString());
-            throw new EidEasyException('Failed to create event for activity.' . $e->getMessage() . ' trace ' . $e->getTraceAsString());
+            return new JSONResponse(['message' => "Failed to add activity: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);
         } catch (\Throwable $e) {
             $this->logger->alert($e->getMessage() . "\n" . $e->getTraceAsString());
             return new JSONResponse(['message' => "Failed to get link: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);
         }
 
         return new JSONResponse(['message' => 'Fetched successfully!']);
-    }
-
-    private function getContainerType(string $path)
-    {
-        $containerType = $this->request->getParam('container_type', Config::CONTAINER_TYPE_ASICE);
-
-        $parts = explode('.', $path);
-        $extension = strtolower($parts[count($parts) - 1]);
-
-        // If file is not pdf, but container type is, then throw exception.
-        if ($extension !== 'pdf' && $containerType === Config::CONTAINER_TYPE_PDF) {
-            throw new Exception('Container type is PDF, but file type is not.');
-        }
-
-        // If container type is not recognized, then throw exception.
-        if (!in_array($containerType, [Config::CONTAINER_TYPE_PDF, Config::CONTAINER_TYPE_ASICE])) {
-            throw new Exception('Unknown container type.');
-        }
-
-        return $containerType;
     }
 
     private function checkCredentials(): void

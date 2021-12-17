@@ -50,6 +50,8 @@ class SigningLinkService
      * @throws NotFoundException
      * @throws \OCA\ElectronicSignatures\Exceptions\EidEasyException
      * @throws \OCP\DB\Exception
+     * @throws \OCP\Files\NotFoundException
+     * @throws \Exception
      */
     public function sendSignLinkToEmail(
         string $userId,

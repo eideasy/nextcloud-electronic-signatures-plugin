@@ -14,7 +14,8 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 use EidEasy\Api\EidEasyApi;
 
-class GetSignLinkRemote extends Controller {
+class GetSignLinkRemote extends Controller
+{
     use GetsFile;
     use SavesSession;
 
@@ -38,7 +39,8 @@ class GetSignLinkRemote extends Controller {
     /** @var IURLGenerator */
     private $urlGenerator;
 
-    public function __construct(IRootFolder $storage, SessionMapper $mapper, LoggerInterface $logger, Config $config, IURLGenerator $urlGenerator, $UserId) {
+    public function __construct(IRootFolder $storage, SessionMapper $mapper, LoggerInterface $logger, Config $config, IURLGenerator $urlGenerator, $UserId)
+    {
         $this->userId = $UserId;
         $this->storage = $storage;
         $this->mapper = $mapper;
@@ -48,7 +50,18 @@ class GetSignLinkRemote extends Controller {
         $this->urlGenerator = $urlGenerator;
     }
 
-    public function getSignLink(string $userId, string $path, string $containerType, string $signerEmails, string $email): string {
+    /**
+     * @throws EidEasyException
+     * @throws \OCP\Files\NotFoundException
+     */
+    public function getSignLink(
+        string $userId,
+        string $path,
+        string $containerType,
+        string $signerEmails,
+        string $email
+    ): string
+    {
         list($mimeType, $contents) = $this->getFile($path, $userId);
         $base64 = base64_encode($contents);
 
@@ -70,7 +83,15 @@ class GetSignLinkRemote extends Controller {
         return $this->config->getApiUrl("/sign_contract_external?client_id={$this->config->getClientId()}&doc_id=$docId&lang=en");
     }
 
-    private function startSigningSession(string $path, string $fileContentBase64, string $mimeType, string $email, string $containerType, string $token): array {
+    private function startSigningSession(
+        string $path,
+        string $fileContentBase64,
+        string $mimeType,
+        string $email,
+        string $containerType,
+        string $token
+    ): array
+    {
         // Send file to eID Easy server.
         $files = [
             [
@@ -88,8 +109,8 @@ class GetSignLinkRemote extends Controller {
             'signature_redirect' => $this->urlGenerator->linkToRouteAbsolute('electronicsignatures.sign.showSuccessPage', ['token' => $token]),
         ];
 
-        if ($this->config->isOtpEnabled() && $containerType === 'pdf') {
-			$params['signer'] = [
+        if ($this->config->isOtpEnabled()) {
+            $params['signer'] = [
                 'send_now' => true,
                 'contacts' => [
                     [
@@ -100,7 +121,14 @@ class GetSignLinkRemote extends Controller {
             ];
         }
 
-        $responseBody = $this->eidEasyApi->prepareFiles($files, $params);
+        $parts = explode('.', $path);
+        $extension = strtolower($parts[count($parts) - 1]);
+        if ($extension === 'asice') {
+            $params['filename'] = basename($path);
+            $responseBody = $this->eidEasyApi->prepareAsiceForSigning($fileContentBase64, $params);
+        } else {
+            $responseBody = $this->eidEasyApi->prepareFiles($files, $params);
+        }
 
         if ($responseBody['status'] !== 'OK') {
             $this->logger->alert(json_encode($responseBody));

@@ -49,12 +49,12 @@ class GetSignLinkLocal extends Controller
     private $padesApi;
 
     public function __construct(
-        IRootFolder $storage,
-        IURLGenerator $urlGenerator,
-        SessionMapper $mapper,
-        Config $config,
+        IRootFolder     $storage,
+        IURLGenerator   $urlGenerator,
+        SessionMapper   $mapper,
+        Config          $config,
         LoggerInterface $logger,
-        $UserId
+                        $UserId
     )
     {
         $this->userId = $UserId;
@@ -67,7 +67,17 @@ class GetSignLinkLocal extends Controller
         $this->logger = $logger;
     }
 
-    public function getSignLink(string $userId, string $path, string $containerType, ?string $signerEmails)
+    /**
+     * @throws EidEasyException
+     * @throws \OCP\Files\NotFoundException
+     * @throws Exception
+     */
+    public function getSignLink(
+        string  $userId,
+        string  $path,
+        string  $containerType,
+        ?string $signerEmails
+    )
     {
         list($mimeType, $fileContent, $fileName) = $this->getFile($path, $userId);
 
@@ -113,7 +123,14 @@ class GetSignLinkLocal extends Controller
             ],
         ];
 
-        $data = $this->eidEasyApi->prepareFiles($sourceFiles, $prepareParams);
+        $parts = explode('.', $path);
+        $extension = strtolower($parts[count($parts) - 1]);
+        if ($extension === 'asice') {
+            $params['filename'] = basename($path);
+            $data = $this->eidEasyApi->prepareAsiceForSigning($fileContent, $params);
+        } else {
+            $data = $this->eidEasyApi->prepareFiles($sourceFiles, $prepareParams);
+        }
 
         if (!isset($data['status']) || $data['status'] !== 'OK') {
             $this->logger->alert(json_encode($data));
@@ -125,7 +142,7 @@ class GetSignLinkLocal extends Controller
 
         $docId = $data['doc_id'];
 
-        $this->saveSession($docId, $path, $userId, $containerType, null, $signerEmails,true, $signatureTime);
+        $this->saveSession($docId, $path, $userId, $containerType, null, $signerEmails, true, $signatureTime);
 
         return $this->urlGenerator->linkToRouteAbsolute('electronicsignatures.sign.showSigningPage', ['doc_id' => $docId]);
     }
