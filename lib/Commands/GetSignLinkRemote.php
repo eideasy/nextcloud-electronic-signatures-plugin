@@ -107,10 +107,7 @@ class GetSignLinkRemote extends Controller
             'secret' => $this->config->getSecret(),
             'lang' => 'en',
             'signature_redirect' => $this->urlGenerator->linkToRouteAbsolute('electronicsignatures.sign.showSuccessPage', ['token' => $token]),
-        ];
-
-        if ($this->config->isOtpEnabled()) {
-            $params['signer'] = [
+            'signer' => [
                 'send_now' => true,
                 'contacts' => [
                     [
@@ -118,8 +115,8 @@ class GetSignLinkRemote extends Controller
                         'value' => $email,
                     ]
                 ],
-            ];
-        }
+            ],
+        ];
 
         $parts = explode('.', $path);
         $extension = strtolower($parts[count($parts) - 1]);
