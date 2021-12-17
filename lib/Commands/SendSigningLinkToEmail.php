@@ -26,6 +26,12 @@ class SendSigningLinkToEmail {
         $this->config = $config;
     }
 
+    /**
+     * @param string $containerType
+     * @param string $email
+     * @param string $link
+     * @throws \Exception
+     */
     public function sendIfNecessary(string $containerType, string $email, string $link): void {
         // We do not need to send the e-mail if OTP is enabled, because in
         // this case, eID Easy will be sending the e-mail instead of us.
