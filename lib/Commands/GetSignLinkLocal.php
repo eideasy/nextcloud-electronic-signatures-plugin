@@ -125,10 +125,14 @@ class GetSignLinkLocal extends Controller
 
         $parts = explode('.', $path);
         $extension = strtolower($parts[count($parts) - 1]);
-        if ($extension === 'asice') {
-            $params['filename'] = basename($path);
-            $data = $this->eidEasyApi->prepareAsiceForSigning($fileContent, $params);
+
+        if ($extension === 'pdf') {
+            $data = $this->eidEasyApi->prepareFiles($sourceFiles, $prepareParams);
+        } else if ($extension === 'asice') {
+            $prepareParams['filename'] = basename($path);
+            $data = $this->eidEasyApi->prepareAsiceForSigning($fileContent, $prepareParams);
         } else {
+            $prepareParams['container_type'] = 'asice';
             $data = $this->eidEasyApi->prepareFiles($sourceFiles, $prepareParams);
         }
 
