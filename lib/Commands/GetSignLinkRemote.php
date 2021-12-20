@@ -109,7 +109,8 @@ class GetSignLinkRemote extends Controller
             'signature_redirect' => $this->urlGenerator->linkToRouteAbsolute('electronicsignatures.sign.showSuccessPage', ['token' => $token]),
         ];
 
-        if ($this->config->isOtpEnabled()) {
+        $isAsice = $containerType === Config::CONTAINER_TYPE_ASICE;
+        if ($this->config->isOtpEnabled() && !$isAsice) {
             $params['signer'] = [
                 'send_now' => true,
                 'contacts' => [
@@ -123,14 +124,12 @@ class GetSignLinkRemote extends Controller
 
         $parts = explode('.', $path);
         $extension = strtolower($parts[count($parts) - 1]);
+        $isAddSignature = $containerType === Config::CONTAINER_TYPE_ASICE && $extension === Config::CONTAINER_TYPE_ASICE;
 
-        if ($extension === 'pdf') {
-            $responseBody = $this->eidEasyApi->prepareFiles($files, $params);
-        } else if ($extension === 'asice') {
+        if ($isAddSignature) {
             $params['filename'] = basename($path);
             $responseBody = $this->eidEasyApi->prepareAsiceForSigning($fileContentBase64, $params);
         } else {
-            $params['container_type'] = 'asice';
             $responseBody = $this->eidEasyApi->prepareFiles($files, $params);
         }
 

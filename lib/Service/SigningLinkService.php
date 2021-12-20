@@ -56,11 +56,15 @@ class SigningLinkService
     public function sendSignLinkToEmail(
         string $userId,
         string $path,
-        string $containerType,
+        string $pdfContainerType,
         string $emails
     ): void
     {
         [$email, $nextSignerEmails] = $this->checkForNextEmail($emails);
+
+        $parts = explode('.', $path);
+        $extension = strtolower($parts[count($parts) - 1]);
+        $containerType = $extension === Config::CONTAINER_TYPE_PDF ? $pdfContainerType : Config::CONTAINER_TYPE_ASICE;
 
         if ($this->config->isSigningLocal()) {
             $link = $this->getSignLinkLocalCommand->getSignLink($userId, $path, $containerType, $nextSignerEmails);
@@ -68,7 +72,10 @@ class SigningLinkService
             $link = $this->getSignLinkRemoteCommand->getSignLink($userId, $path, $containerType, $nextSignerEmails, $email);
         }
 
-        $this->sendSigningLinkToEmail->sendIfNecessary($containerType, $email, $link);
+        $isAsice = $containerType === Config::CONTAINER_TYPE_ASICE;
+        if ($isAsice || !$this->config->isOtpEnabled() || $this->config->isSigningLocal()) {
+            $this->sendSigningLinkToEmail->sendEmail($email, $link);
+        }
     }
 
     /**
