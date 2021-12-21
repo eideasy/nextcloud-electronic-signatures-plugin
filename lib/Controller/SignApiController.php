@@ -99,17 +99,8 @@ class SignApiController extends OCSController
     {
         try {
             $docId = $this->request->getParam('doc_id');
-            $session = $this->fetchFileCommand->fetchByDocId($docId);
 
-            $path = $session->getSignedPath();
-            $emails = $session->getSignerEmails();
-            $containerType = $session->getContainerType();
-            $userId = $session->getUserId();
-
-            $this->signingLinkService->sendSignLinkToEmail($userId, $path, $containerType, $emails);
-        } catch (NoUserException | NotPermittedException | NotPermittedException | InvalidPathException $e) {
-            $this->logger->alert($e->getMessage() . "\n" . $e->getTraceAsString());
-            return new JSONResponse(['message' => "Failed to add activity: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);
+            $this->fetchFileCommand->fetchByDocId($docId);
         } catch (\Throwable $e) {
             $this->logger->alert($e->getMessage() . "\n" . $e->getTraceAsString());
             return new JSONResponse(['message' => "Failed to get link: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);

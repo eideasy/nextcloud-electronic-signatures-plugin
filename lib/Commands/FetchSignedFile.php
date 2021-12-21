@@ -6,6 +6,7 @@ use OCA\ElectronicSignatures\Activity\ActivityManager;
 use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Db\Session;
 use OCA\ElectronicSignatures\Db\SessionMapper;
+use OCA\ElectronicSignatures\Service\SigningLinkService;
 use OCP\Files\IRootFolder;
 use OCP\AppFramework\Controller;
 
@@ -25,6 +26,9 @@ class FetchSignedFile extends Controller
     /** @var ActivityManager */
     private $activityManager;
 
+    /** @var SigningLinkService */
+    private $signingLinkService;
+
     /** @var SessionMapper */
     private $mapper;
 
@@ -35,14 +39,16 @@ class FetchSignedFile extends Controller
     private $padesApi;
 
     public function __construct(
-        IRootFolder $storage,
-        ActivityManager $activityManager,
-        SessionMapper $mapper,
-        Config $config
+        IRootFolder        $storage,
+        ActivityManager    $activityManager,
+        SessionMapper      $mapper,
+        SigningLinkService $signingLinkService,
+        Config             $config
     )
     {
         $this->storage = $storage;
         $this->activityManager = $activityManager;
+        $this->signingLinkService = $signingLinkService;
         $this->mapper = $mapper;
         $this->padesApi = $config->getPadesApi();
         $this->eidEasyApi = $config->getApi();
@@ -53,20 +59,18 @@ class FetchSignedFile extends Controller
         /** @var Session $session */
         $session = $this->mapper->findByToken($token);
 
-        $this->fetch($session);
+        $this->fetchFileAndSendNextEmail($session);
     }
 
-    public function fetchByDocId(string $docId): Session
+    public function fetchByDocId(string $docId): void
     {
         /** @var Session $session */
         $session = $this->mapper->findByDocId($docId);
 
-        $this->fetch($session);
-
-        return $session;
+        $this->fetchFileAndSendNextEmail($session);
     }
 
-    public function fetch(Session $session): void
+    public function fetchFileAndSendNextEmail(Session $session): void
     {
         if ((bool)$session->getIsDownloaded()) {
             return;
@@ -115,6 +119,13 @@ class FetchSignedFile extends Controller
         $this->mapper->update($session);
 
         $this->activityManager->createAndTriggerEvent($session, $data);
+
+        // Send email next in queue
+        $emails = $session->getSignerEmails();
+        $userId = $session->getUserId();
+        if ($emails !== '') {
+            $this->signingLinkService->sendSignLinkToEmail($userId, $containerPath, $containerType, $emails);
+        }
     }
 
     /**
@@ -156,9 +167,9 @@ class FetchSignedFile extends Controller
         // Add date
         if (!str_contains($fileName, '_eidSignedAt-')) {
             $dateTime = (new \DateTime)->format('Ymd-His');
-            $fileName = $fileName.'_eidSignedAt-'.$dateTime;
+            $fileName = $fileName . '_eidSignedAt-' . $dateTime;
         }
 
-        return $fileName.'.'.$session->getContainerType();
+        return $fileName . '.' . $session->getContainerType();
     }
 }
