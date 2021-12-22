@@ -112,20 +112,24 @@ class FetchSignedFile extends Controller
             $signedFileContents = $asice->addSignatureAsice($unsignedContainer, base64_decode($signedFileContents));
         }
 
-        $containerPath = $this->getContainerPath($session);
-        $this->saveContainer($session, $signedFileContents, $containerPath);
-
-        $session->setSignedPath($containerPath);
+        $session->setIsDocumentSigned(true);
         $this->mapper->update($session);
+
+        $emails = $session->getSignerEmails();
+        $userId = $session->getUserId();
+        $signedPath = $session->getSignedPath();
+
+        $this->signingLinkService->createFile(
+            $userId,
+            $signedPath,
+            $containerType,
+            $signedFileContents
+        );
 
         $this->activityManager->createAndTriggerEvent($session, $data);
 
         // Send email next in queue
-        $emails = $session->getSignerEmails();
-        $userId = $session->getUserId();
-        if ($emails !== '') {
-            $this->signingLinkService->sendSignLinkToEmail($userId, $containerPath, $containerType, $emails);
-        }
+        $this->signingLinkService->sendSignLinkToEmail($userId, $signedPath, $signedPath, $containerType, $emails);
     }
 
     /**
@@ -145,31 +149,5 @@ class FetchSignedFile extends Controller
 
         $asice = new Asice();
         return $asice->createAsiceContainer($sourceFiles);
-    }
-
-    private function saveContainer(Session $session, string $contents, string $containerPath): void
-    {
-        $userFolder = $this->storage->getUserFolder($session->getUserId());
-
-        $userFolder->touch($containerPath);
-        $userFolder->newFile($containerPath, $contents);
-    }
-
-    private function getContainerPath(Session $session): string
-    {
-        $originalPath = $session->getPath();
-        $originalParts = explode('.', $originalPath);
-
-        // Remove file extension.
-        array_pop($originalParts);
-        $fileName = implode('.', $originalParts);
-
-        // Add date
-        if (!str_contains($fileName, '_eidSignedAt-')) {
-            $dateTime = (new \DateTime)->format('Ymd-His');
-            $fileName = $fileName . '_eidSignedAt-' . $dateTime;
-        }
-
-        return $fileName . '.' . $session->getContainerType();
     }
 }

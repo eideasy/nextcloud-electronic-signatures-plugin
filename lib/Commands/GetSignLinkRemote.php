@@ -57,6 +57,7 @@ class GetSignLinkRemote extends Controller
     public function getSignLink(
         string $userId,
         string $path,
+        string $signedPath,
         string $containerType,
         string $signerEmails,
         string $email
@@ -78,7 +79,7 @@ class GetSignLinkRemote extends Controller
         // Return eID Easy server link
         $docId = $responseBody['doc_id'];
 
-        $this->saveSession($docId, $path, $userId, $containerType, $token, $signerEmails);
+        $this->saveSession($docId, $path, $signedPath, $userId, $containerType, $token, $signerEmails, $email);
 
         return $this->config->getApiUrl("/sign_contract_external?client_id={$this->config->getClientId()}&doc_id=$docId&lang=en");
     }

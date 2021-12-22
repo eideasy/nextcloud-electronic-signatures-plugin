@@ -75,8 +75,10 @@ class GetSignLinkLocal extends Controller
     public function getSignLink(
         string  $userId,
         string  $path,
+        string $signedPath,
         string  $containerType,
-        ?string $signerEmails
+        ?string $signerEmails,
+        string $email
     )
     {
         list($mimeType, $fileContent, $fileName) = $this->getFile($path, $userId);
@@ -144,7 +146,7 @@ class GetSignLinkLocal extends Controller
 
         $docId = $data['doc_id'];
 
-        $this->saveSession($docId, $path, $userId, $containerType, null, $signerEmails, true, $signatureTime);
+        $this->saveSession($docId, $path, $signedPath, $userId, $containerType, null, $signerEmails, $email,true, $signatureTime);
 
         return $this->urlGenerator->linkToRouteAbsolute('electronicsignatures.sign.showSigningPage', ['doc_id' => $docId]);
     }

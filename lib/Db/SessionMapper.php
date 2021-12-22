@@ -33,4 +33,28 @@ class SessionMapper extends QBMapper {
 
         return $this->findEntity($qb);
     }
+
+    /**
+     * @param string $userId
+     * @param string $path
+     * @return array|\OCP\AppFramework\Db\Entity[]
+     * @throws \OCP\DB\Exception
+     */
+    public function findByPath(
+        string $userId,
+        string $signedPath
+    ): array
+    {
+        $qb = $this->db->getQueryBuilder();
+
+        $qb->select('*')
+            ->from($this->getTableName())
+            ->where(
+                $qb->expr()->eq('user_id', $qb->createNamedParameter($userId))
+            )->andWhere(
+                $qb->expr()->eq('signed_path', $qb->createNamedParameter($signedPath))
+            );
+
+        return $this->findEntities($qb);
+    }
 }

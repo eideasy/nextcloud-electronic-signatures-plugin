@@ -8,10 +8,14 @@ use OCA\ElectronicSignatures\Commands\GetSignLinkRemote;
 use OCA\ElectronicSignatures\Commands\SendSigningLinkToEmail;
 use OCA\ElectronicSignatures\Config;
 use OCA\Files_External\NotFoundException;
+use OCP\Files\IRootFolder;
 use OCP\Mail\IMailer;
 
 class SigningLinkService
 {
+    /** @var IRootFolder */
+    private $storage;
+
     /** @var GetSignLinkRemote */
     private $getSignLinkRemoteCommand;
 
@@ -28,6 +32,7 @@ class SigningLinkService
     private $config;
 
     public function __construct(
+        IRootFolder            $storage,
         GetSignLinkRemote      $getSignLinkRemote,
         GetSignLinkLocal       $getSignLinkLocal,
         SendSigningLinkToEmail $sendSigningLinkToEmail,
@@ -35,6 +40,7 @@ class SigningLinkService
         Config                 $config
     )
     {
+        $this->storage = $storage;
         $this->getSignLinkRemoteCommand = $getSignLinkRemote;
         $this->getSignLinkLocalCommand = $getSignLinkLocal;
         $this->sendSigningLinkToEmail = $sendSigningLinkToEmail;
@@ -56,20 +62,20 @@ class SigningLinkService
     public function sendSignLinkToEmail(
         string $userId,
         string $path,
-        string $pdfContainerType,
+        string $signedPath,
+        string $containerType,
         string $emails
     ): void
     {
         [$email, $nextSignerEmails] = $this->checkForNextEmail($emails);
-
-        $parts = explode('.', $path);
-        $extension = strtolower($parts[count($parts) - 1]);
-        $containerType = $extension === Config::CONTAINER_TYPE_PDF ? $pdfContainerType : Config::CONTAINER_TYPE_ASICE;
+        if (empty($email)) {
+            return;
+        }
 
         if ($this->config->isSigningLocal()) {
-            $link = $this->getSignLinkLocalCommand->getSignLink($userId, $path, $containerType, $nextSignerEmails);
+            $link = $this->getSignLinkLocalCommand->getSignLink($userId, $path, $signedPath, $containerType, $nextSignerEmails, $email);
         } else {
-            $link = $this->getSignLinkRemoteCommand->getSignLink($userId, $path, $containerType, $nextSignerEmails, $email);
+            $link = $this->getSignLinkRemoteCommand->getSignLink($userId, $path, $signedPath, $containerType, $nextSignerEmails, $email);
         }
 
         $isAsice = $containerType === Config::CONTAINER_TYPE_ASICE;
@@ -79,16 +85,18 @@ class SigningLinkService
     }
 
     /**
-     * @throws NotFoundException|\OCP\DB\Exception
+     * @param string $emails
+     * @return array
      */
     private function checkForNextEmail(string $emails): array
     {
         $emails = explode(',', $emails);
 
         if (!isset($emails[0]) && $emails[0] !== '') {
-            throw new NotFoundException('All have signed');
+            $sendMailTo = null;
+        } else {
+            $sendMailTo = $emails[0];
         }
-        $sendMailTo = $emails[0];
         array_shift($emails);
         $nextSigners = implode(',', $emails);
 
@@ -97,11 +105,17 @@ class SigningLinkService
 
     /**
      * @param array|null $emails
+     * @param bool|null $isEmptyAllowed
      * @return string
      */
-    public function validateEmails(?array $emails): string
+    public function validateEmails(
+        ?array $emails,
+        ?bool  $isEmptyAllowed = false
+    ): string
     {
-        if (empty($emails)) {
+        if (empty($emails) && $isEmptyAllowed) {
+            return "";
+        } else if (empty($emails)) {
             throw new ValidationException("no emails submitted");
         }
 
@@ -112,5 +126,51 @@ class SigningLinkService
         }
 
         return implode(',', $emails);
+    }
+
+    public function createFile(
+        string $userId,
+        string $path,
+        string $containerType,
+        string $contents
+    ): string
+    {
+        $containerPath = $this->getContainerPath($path, $containerType);
+        $this->saveContainer($userId, $contents, $containerPath);
+
+        return $containerPath;
+    }
+
+
+    public function getContainerPath(
+        string $originalPath,
+        string $containerType
+    ): string
+    {
+        $originalParts = explode('.', $originalPath);
+
+        // Remove file extension.
+        array_pop($originalParts);
+        $fileName = implode('.', $originalParts);
+
+        // Add date
+        if (!str_contains($fileName, '_eidSignedAt-')) {
+            $dateTime = (new \DateTime)->format('Ymd-His');
+            $fileName = $fileName . '_eidSignedAt-' . $dateTime;
+        }
+
+        return $fileName . '.' . $containerType;
+    }
+
+    public function saveContainer(
+        string $userId,
+        string $contents,
+        string $containerPath
+    ): void
+    {
+        $userFolder = $this->storage->getUserFolder($userId);
+
+        $userFolder->touch($containerPath);
+        $userFolder->newFile($containerPath, $contents);
     }
 }
