@@ -90,7 +90,7 @@ class SignApiController extends OCSController
             $extension = strtolower($parts[count($parts) - 1]);
             $containerType = $extension === Config::CONTAINER_TYPE_PDF ? $pdfContainerType : Config::CONTAINER_TYPE_ASICE;
 
-            $signedPath = $this->signingLinkService->createFile($this->userId, $path, $containerType, '');
+            $signedPath = $this->signingLinkService->createFile($this->userId, $path, $containerType, '', true);
             $this->signingLinkService->sendSignLinkToEmail($this->userId, $path, $signedPath, $containerType, $emails);
         } catch (ValidationException $e) {
             return new JSONResponse([

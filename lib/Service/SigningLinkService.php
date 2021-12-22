@@ -132,10 +132,11 @@ class SigningLinkService
         string $userId,
         string $path,
         string $containerType,
-        string $contents
+        string $contents,
+        bool $isAddDate = false
     ): string
     {
-        $containerPath = $this->getContainerPath($path, $containerType);
+        $containerPath = $this->getContainerPath($path, $containerType, $isAddDate);
         $this->saveContainer($userId, $contents, $containerPath);
 
         return $containerPath;
@@ -144,7 +145,8 @@ class SigningLinkService
 
     public function getContainerPath(
         string $originalPath,
-        string $containerType
+        string $containerType,
+        bool $isAddDate
     ): string
     {
         $originalParts = explode('.', $originalPath);
@@ -154,7 +156,7 @@ class SigningLinkService
         $fileName = implode('.', $originalParts);
 
         // Add date
-        if (!str_contains($fileName, '_eidSignedAt-')) {
+        if ($isAddDate || !str_contains($fileName, '_eidSignedAt-')) {
             $dateTime = (new \DateTime)->format('Ymd-His');
             $fileName = $fileName . '_eidSignedAt-' . $dateTime;
         }
