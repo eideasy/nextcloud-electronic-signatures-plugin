@@ -71,6 +71,8 @@ export default {
 
 .actionItem_main {
   padding-right: 20px;
+  width: 100%;
+  min-width: 0;
 }
 
 .actionItem_actions {
