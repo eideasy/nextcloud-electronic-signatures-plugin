@@ -3,8 +3,8 @@
 namespace OCA\ElectronicSignatures\Controller;
 
 use JsonSchema\Exception\ValidationException;
-use OC\User\NoUserException;
 use OCA\ElectronicSignatures\Commands\FetchSignedFile;
+use OCA\ElectronicSignatures\Commands\GetsFile;
 use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Db\SessionMapper;
 use OCA\ElectronicSignatures\Exceptions\EidEasyException;
@@ -14,9 +14,7 @@ use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\OCSController;
-use OCP\Files\InvalidPathException;
-use OCP\Files\NotPermittedException;
-use OCP\IConfig;
+use OCP\Files\IRootFolder;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
@@ -26,7 +24,12 @@ use EidEasy\Signatures\Pades;
 
 class SignApiController extends OCSController
 {
+    use GetsFile;
+
     private $userId;
+
+    /** @var IRootFolder */
+    private $storage;
 
     /** @var FetchSignedFile */
     private $fetchFileCommand;
@@ -52,6 +55,7 @@ class SignApiController extends OCSController
     public function __construct(
         $AppName,
         IRequest $request,
+        IRootFolder $storage,
         FetchSignedFile $fetchSignedFile,
         SigningLinkService $signingLinkService,
         Pades $pades,
@@ -64,6 +68,7 @@ class SignApiController extends OCSController
     {
         parent::__construct($AppName, $request);
         $this->userId = $UserId;
+        $this->storage = $storage;
         $this->fetchFileCommand = $fetchSignedFile;
         $this->signingLinkService = $signingLinkService;
         $this->sessionMapper = $sessionMapper;
@@ -76,11 +81,12 @@ class SignApiController extends OCSController
     /**
      * @NoAdminRequired
      */
-    public function sendSignLinkByEmail()
+    public function createSigningQueue()
     {
         try {
             $this->checkCredentials();
 
+            $userId = $this->userId;
             $path = $this->request->getParam('path');
             $pdfContainerType = $this->config->getContainerType();
             $emailsInput = $this->request->getParam('emails');
@@ -90,8 +96,10 @@ class SignApiController extends OCSController
             $extension = strtolower($parts[count($parts) - 1]);
             $containerType = $extension === Config::CONTAINER_TYPE_PDF ? $pdfContainerType : Config::CONTAINER_TYPE_ASICE;
 
-            $signedPath = $this->signingLinkService->createFile($this->userId, $path, $containerType, '', true);
-            $this->signingLinkService->sendSignLinkToEmail($this->userId, $path, $signedPath, $containerType, $emails);
+            list($mimeType, $fileContent) = $this->getFile($path, $userId);
+            $signedPath = $this->signingLinkService->createFile($userId, $path, $containerType, $fileContent, true);
+
+            $this->signingLinkService->sendSignLinkToEmail($userId, $path, $signedPath, $containerType, $emails);
         } catch (ValidationException $e) {
             return new JSONResponse([
                 'message' => 'Provided email address is not valid',
@@ -166,8 +174,23 @@ class SignApiController extends OCSController
 
             /** @var Entity $latestSession */
             $latestSession = $sessions[count($sessions) - 1];
-            $latestSession->setSignerEmails($emails);
-            $this->sessionMapper->update($latestSession);
+            $signerEmails = $latestSession->getSignerEmails();
+            $signerEmailsArray = explode(",", $signerEmails);
+            $isSigningQueueEmpty = !isset($signerEmailsArray[0]) || empty($signerEmailsArray[0]);
+            $isDocumentSigned = $latestSession->getIsDocumentSigned();
+
+            if ($isSigningQueueEmpty && $isDocumentSigned) {
+                $this->signingLinkService->sendSignLinkToEmail(
+                    $this->userId,
+                    $latestSession->getSignedPath(),
+                    $latestSession->getSignedPath(),
+                    $latestSession->getContainerType(),
+                    $emails
+                );
+            } else {
+                $latestSession->setSignerEmails($emails);
+                $this->sessionMapper->update($latestSession);
+            }
 
             $sessions = $this->sessionMapper->findByPath($this->userId, $path);
         } catch (ValidationException $e) {

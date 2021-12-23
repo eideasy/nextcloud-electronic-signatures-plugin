@@ -62,6 +62,13 @@ class ActivityProvider implements IProvider
             $signer .= $params['signer_idcode'] . ' ';
         }
 
+        if (isset($otpSigner['email']) && !empty($otpSigner['email'])) {
+            return $otpSigner['email'];
+        }
+        if (isset($otpSigner['phone_number']) && !empty($otpSigner['phone_number'])) {
+            return $otpSigner['phone_number'];
+        }
+
         return $signer;
     }
 

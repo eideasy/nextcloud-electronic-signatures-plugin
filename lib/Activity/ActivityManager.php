@@ -63,6 +63,8 @@ class ActivityManager
             'signer_idcode' => $fileData['signer_idcode'],
             'signer_firstname' => $fileData['signer_firstname'],
             'signer_lastname' => $fileData['signer_lastname'],
+            'email' => $fileData['email'] ?? null,
+            'phone_number' => $fileData['phone_number'] ?? null
         ];
 
         $event = $this->manager->generateEvent();

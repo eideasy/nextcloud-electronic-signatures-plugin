@@ -2,8 +2,6 @@
 
 namespace OCA\ElectronicSignatures\Normalizers;
 
-use OCP\AppFramework\Db\Entity;
-
 class SigningQueueNormalizer
 {
     public const STATUS_DOCUMENT_SIGNED = "document_signed";
@@ -14,7 +12,7 @@ class SigningQueueNormalizer
     {
         $data = ["signersQueue" => []];
 
-        foreach ($sessions as $key => $session) {
+        foreach ($sessions as $session) {
             $currentSignerEmail = $session->getCurrentSignerEmail();
 
             $data["signersQueue"][] = [

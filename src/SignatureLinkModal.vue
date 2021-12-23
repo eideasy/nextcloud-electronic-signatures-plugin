@@ -75,7 +75,9 @@ export default {
   methods: {
     removeSignerFromQueue(index) {
       const emails = this.signatureQueue.reduce((acc, item, itemIndex) => {
-        if (itemIndex !== index && item.status !== SigningStatus.EMAIL_SENT) {
+        if (itemIndex !== index
+            && item.status !== SigningStatus.EMAIL_SENT
+            && item.status !== SigningStatus.DOCUMENT_SIGNED) {
           acc.push(item.email);
         }
         return acc;
@@ -177,7 +179,7 @@ export default {
           });
     },
     getModifiableSigners() {
-      return this.signatureQueue.filter(item => item.status !== SigningStatus.EMAIL_SENT);
+      return this.signatureQueue.filter(item => item.status === SigningStatus.EMAIL_PENDING);
     },
     addToSigningQueue(emails) {
       const queueEmails = this.getModifiableSigners().map(item => item.email);
@@ -205,7 +207,7 @@ export default {
 
       axios({
         method: 'post',
-        url: generateUrl('/apps/electronicsignatures/send_sign_link_by_email'),
+        url: generateUrl('/apps/electronicsignatures/create_signing_queue'),
         responseType: 'json',
         headers: {
           requesttoken: OC.requestToken,

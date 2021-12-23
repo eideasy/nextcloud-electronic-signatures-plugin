@@ -14,14 +14,16 @@ export default {
     },
   },
   methods: {
-    emailSent(status) {
-      return status === SigningStatus.EMAIL_SENT;
+    isModifiableSigners(status) {
+      return status === SigningStatus.EMAIL_PENDING;
     },
     statusText(status) {
       if (status === SigningStatus.EMAIL_SENT) {
         return this.$t(this.$globalConfig.appId, 'Email sent');
       } else if (status === SigningStatus.EMAIL_PENDING) {
         return this.$t(this.$globalConfig.appId, 'Waiting');
+      } else if (status === SigningStatus.DOCUMENT_SIGNED) {
+          return this.$t(this.$globalConfig.appId, 'Document signed');
       }
     },
   },
@@ -44,7 +46,7 @@ export default {
       </div>
       <div class="actionItem_actions">
         <button
-            v-if="!emailSent(item.status)"
+            v-if="isModifiableSigners(item.status)"
             @click.prevent="onRemoveItemClick(index)">
           {{ $t($globalConfig.appId, 'Remove') }}
         </button>
