@@ -6,6 +6,8 @@ import { generateUrl } from '@nextcloud/router';
 import queryString from 'query-string';
 import OC from './OC';
 import fetchAdminSettings from './fetchAdminSettings';
+import SigningQueue from './SigningQueue';
+import SignatureQueue from './SignatureQueue';
 
 const EMAIL_FIELD_TEMPLATE = {
   type: 'email',
@@ -20,9 +22,11 @@ export default {
   name: 'SignatureLinkModal',
   components: {
     Modal,
+    SignatureQueue,
   },
   data() {
     return {
+      SigningQueue: new SigningQueue(),
       modal: false,
       errorMessage: null,
       successMessage: null,
@@ -36,6 +40,8 @@ export default {
       ],
       email: '',
       filename: '',
+      isLoadingQueue: false,
+      signatureQueue: [],
     };
   },
   computed: {
@@ -61,11 +67,14 @@ export default {
   mounted() {
     const _self = this;
     EventBus.$on('SIGNATURES_CLICK', function(payload) {
-      _self.showModal();
       _self.filename = payload.filename;
+      _self.showModal();
     });
   },
   methods: {
+    removeSignerFromQueue(index) {
+      console.log(index);
+    },
     addEmailRow() {
       this.signeeFormSchema.push({
         ...EMAIL_FIELD_TEMPLATE,
@@ -82,8 +91,9 @@ export default {
     },
     showModal() {
       if (!this.adminSettings) {
-        this.fetchAdminSettings();
+        this.getAdminSettings();
       }
+      this.getSigningQueue();
       this.setErrorMessage(null);
       this.setSuccessMessage(null);
       this.modal = true;
@@ -114,7 +124,7 @@ export default {
     setAdminSettings(settings) {
       this.adminSettings = settings;
     },
-    fetchAdminSettings() {
+    getAdminSettings() {
       const _self = this;
       _self.isLoadingSettings = true;
       fetchAdminSettings()
@@ -127,6 +137,21 @@ export default {
           })
           .then(function() {
             _self.isLoadingSettings = false;
+          });
+    },
+    getSigningQueue() {
+      const _self = this;
+      _self.isLoadingQueue = true;
+      this.SigningQueue.getQueue(this.getFilePath())
+          .then(function(response) {
+            _self.signatureQueue = response.data.signersQueue || [];
+          })
+          .catch(function(error) {
+            console.error(error);
+            _self.setErrorMessage(_self.$t(_self.$globalConfig.appId, 'Failed to fetch the signing queue'));
+          })
+          .then(function() {
+            _self.isLoadingQueue = false;
           });
     },
     onSubmit() {
@@ -175,12 +200,22 @@ export default {
       <div
           class="modal__content">
         <div
-            v-if="isLoading || isLoadingSettings"
+            v-if="isLoading || isLoadingSettings || isLoadingQueue"
             class="loader">
           <div class="icon-loading spinner" />
         </div>
         <div v-if="!isLoadingSettings" class="contentWrap">
-          <h3>
+          <div
+              v-if="signatureQueue.length"
+              class="siqQueue">
+            <h3>
+              {{ $t($globalConfig.appId, 'Signature queue') }}
+            </h3>
+            <SignatureQueue
+                :signature-queue="signatureQueue"
+                :on-remove-item-click="removeSignerFromQueue" />
+          </div>
+          <h3 v-else>
             {{ $t($globalConfig.appId, 'Request a signature via email') }}
           </h3>
 
@@ -213,7 +248,7 @@ export default {
               <label
                   class="label"
                   for="signingLinkEmail">
-                {{ $t($globalConfig.appId, 'Email addresses') }}
+                {{ $t($globalConfig.appId, 'Add signers') }}
               </label>
 
               <div
@@ -237,9 +272,11 @@ export default {
               <button @click.prevent="addEmailRow">
                 + {{ $t($globalConfig.appId, 'Add') }}
               </button>
-              <div style="margin-bottom: 20px; margin-top: 20px">
+              <div
+                  v-if="!signatureQueue.length"
+                  style="margin-bottom: 20px; margin-top: 20px">
                 {{
-                  $t($globalConfig.appId, 'An email with a link to the signing page will be sent to the entered emails.')
+                  $t($globalConfig.appId, 'An email with an invitation to sign this document will be sent to the first signer. After the first signer has signed the document, next singer in the list will get the invitation email and so on until everyone has signed.')
                 }}
               </div>
               <div
@@ -250,14 +287,22 @@ export default {
                 }}
               </div>
 
+              <div />
+
               <button
+                  v-if="signatureQueue.length"
+                  type="submit"
+                  class="submitButton">
+                {{ $t($globalConfig.appId, 'Add to queue') }}
+              </button>
+              <button
+                  v-else
                   type="submit"
                   class="submitButton">
                 {{ $t($globalConfig.appId, 'Request signature') }}
               </button>
             </form>
           </div>
-
         </div>
       </div>
     </modal>
@@ -296,6 +341,7 @@ export default {
 
 .contentWrap {
   position: relative;
+  padding-bottom: 30px;
 }
 
 .error {
@@ -376,5 +422,14 @@ a {
   .modal__content {
     padding: 2rem;
   }
+}
+
+.queueTitle {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.siqQueue {
+  margin-bottom: 20px;
 }
 </style>

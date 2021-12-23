@@ -5,11 +5,6 @@ import SettingsGroup from './SettingsGroup';
 import SettingsTextInput from './SettingsTextInput';
 import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch';
 
-const CONTAINER_TYPE = {
-  asice: 'asice',
-  pdf: 'pdf',
-};
-
 export default {
   name: 'AppAdmin',
   components: {
