@@ -18,6 +18,21 @@ class SigningQueue {
     });
   }
 
+  setQueue(filePath, emails) {
+    return axios({
+      method: 'post',
+      url: generateUrl('/apps/electronicsignatures/signing_queue'),
+      responseType: 'json',
+      headers: {
+        requesttoken: OC.requestToken,
+      },
+      data: {
+        path: filePath,
+        emails,
+      },
+    });
+  }
+
 }
 
 export default SigningQueue;

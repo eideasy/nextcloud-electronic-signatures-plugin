@@ -8,6 +8,7 @@ import OC from './OC';
 import fetchAdminSettings from './fetchAdminSettings';
 import SigningQueue from './SigningQueue';
 import SignatureQueue from './SignatureQueue';
+import SigningStatus from './SigningStatus';
 
 const EMAIL_FIELD_TEMPLATE = {
   type: 'email',
@@ -73,7 +74,13 @@ export default {
   },
   methods: {
     removeSignerFromQueue(index) {
-      console.log(index);
+      const emails = this.signatureQueue.reduce((acc, item, itemIndex) => {
+        if (itemIndex !== index && item.status !== SigningStatus.EMAIL_SENT) {
+          acc.push(item.email);
+        }
+        return acc;
+      }, []);
+      this.setSigningQueue(emails);
     },
     addEmailRow() {
       this.signeeFormSchema.push({
@@ -154,11 +161,47 @@ export default {
             _self.isLoadingQueue = false;
           });
     },
+    setSigningQueue(emails) {
+      const _self = this;
+      _self.isLoading = true;
+      this.SigningQueue.setQueue(this.getFilePath(), emails)
+          .then(function(response) {
+            _self.signatureQueue = response.data.signersQueue || [];
+          })
+          .catch(function(error) {
+            console.error(error);
+            _self.setErrorMessage(_self.$t(_self.$globalConfig.appId, 'Failed to modify the signing queue'));
+          })
+          .then(function() {
+            _self.isLoading = false;
+          });
+    },
+    getModifiableSigners() {
+      return this.signatureQueue.filter(item => item.status !== SigningStatus.EMAIL_SENT);
+    },
+    addToSigningQueue(emails) {
+      const queueEmails = this.getModifiableSigners().map(item => item.email);
+      this.setSigningQueue([...queueEmails, ...emails]);
+    },
+    clearSigneeForm() {
+      this.signeeFormSchema = [
+        {
+          ...EMAIL_FIELD_TEMPLATE,
+        },
+      ];
+    },
     onSubmit() {
       const _self = this;
       this.isLoading = true;
       this.setErrorMessage(null);
       this.setSuccessMessage(null);
+      const emails = this.signeeFormSchema.map(field => field.value);
+
+      if (this.signatureQueue.length) {
+        this.addToSigningQueue(emails);
+        this.clearSigneeForm();
+        return;
+      }
 
       axios({
         method: 'post',
@@ -169,17 +212,13 @@ export default {
         },
         data: {
           path: this.getFilePath(),
-          emails: this.signeeFormSchema.map(field => field.value),
+          emails,
         },
       })
           .then(function() {
             _self.setSuccessMessage(_self.$t(_self.$globalConfig.appId, 'Email successfully sent!'));
             // reset the email fields after successful submit
-            _self.signeeFormSchema = [
-              {
-                ...EMAIL_FIELD_TEMPLATE,
-              },
-            ];
+            _self.clearSigneeForm();
           })
           .catch(function(error) {
             _self.setErrorMessage(error.response && error.response.data && error.response.data.message);
@@ -269,14 +308,16 @@ export default {
                   {{ $t($globalConfig.appId, 'Remove') }}
                 </button>
               </div>
-              <button @click.prevent="addEmailRow">
+              <button
+                  v-if="!signatureQueue.length"
+                  @click.prevent="addEmailRow">
                 + {{ $t($globalConfig.appId, 'Add') }}
               </button>
               <div
                   v-if="!signatureQueue.length"
                   style="margin-bottom: 20px; margin-top: 20px">
                 {{
-                  $t($globalConfig.appId, 'An email with an invitation to sign this document will be sent to the first signer. After the first signer has signed the document, next singer in the list will get the invitation email and so on until everyone has signed.')
+                  $t($globalConfig.appId, 'After you click "Request signature" a copy of this document will be created. An email with an invitation to sign this newly created copy will be sent to the first signer. After the first signer has signed the document, next singer in the list will get the invitation email and so on until everyone has signed.')
                 }}
               </div>
               <div
