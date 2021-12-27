@@ -60,7 +60,7 @@ class SigningQueueService
     {
         $emails = $this->signingLinkService->validateEmails($emailsInput, true);
 
-        $sessions = $this->sessionMapper->findByPath($userId, $path);
+        $sessions = $this->sessionMapper->findBySignedPath($userId, $path);
         if (empty($sessions)) {
             return [];
         }
@@ -79,7 +79,7 @@ class SigningQueueService
         string $path
     ): array
     {
-        $sessions = $this->sessionMapper->findByPath($userId, $path);
+        $sessions = $this->sessionMapper->findBySignedPath($userId, $path);
 
         if (empty($sessions)) {
             return [];

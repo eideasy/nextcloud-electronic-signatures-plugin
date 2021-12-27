@@ -8,6 +8,7 @@ use OCA\ElectronicSignatures\Commands\GetSignLinkLocal;
 use OCA\ElectronicSignatures\Commands\GetSignLinkRemote;
 use OCA\ElectronicSignatures\Commands\SendSigningLinkToEmail;
 use OCA\ElectronicSignatures\Config;
+use OCA\ElectronicSignatures\Db\SessionMapper;
 use OCA\ElectronicSignatures\Exceptions\EidEasyException;
 use OCP\Files\IRootFolder;
 use OCP\Mail\IMailer;
@@ -28,6 +29,9 @@ class SigningLinkService
     /** @var SendSigningLinkToEmail */
     private $sendSigningLinkToEmail;
 
+    /** @var SessionMapper */
+    private $sessionMapper;
+
     /** @var IMailer */
     private $mailer;
 
@@ -39,6 +43,7 @@ class SigningLinkService
         GetSignLinkRemote      $getSignLinkRemote,
         GetSignLinkLocal       $getSignLinkLocal,
         SendSigningLinkToEmail $sendSigningLinkToEmail,
+        SessionMapper          $sessionMapper,
         IMailer                $mailer,
         Config                 $config
     )
@@ -47,6 +52,7 @@ class SigningLinkService
         $this->getSignLinkRemoteCommand = $getSignLinkRemote;
         $this->getSignLinkLocalCommand = $getSignLinkLocal;
         $this->sendSigningLinkToEmail = $sendSigningLinkToEmail;
+        $this->sessionMapper = $sessionMapper;
         $this->mailer = $mailer;
         $this->config = $config;
     }
@@ -59,12 +65,14 @@ class SigningLinkService
      * @param string|null $emails
      * @throws EidEasyException
      * @throws \OCP\Files\NotFoundException
+     * @throws \OCP\DB\Exception
+     * @throws \Exception
      */
     public function sendSignLinkToEmail(
-        string $userId,
-        string $path,
-        string $signedPath,
-        string $containerType,
+        string  $userId,
+        string  $path,
+        string  $signedPath,
+        string  $containerType,
         ?string $emails
     ): void
     {
@@ -81,7 +89,9 @@ class SigningLinkService
 
         $isAsice = $containerType === Config::CONTAINER_TYPE_ASICE;
         if ($isAsice || !$this->config->isOtpEnabled() || $this->config->isSigningLocal()) {
-            $this->sendSigningLinkToEmail->sendEmail($email, $link);
+            $documentName = $this->getOriginalFilePath($userId, $signedPath, $path);
+
+            $this->sendSigningLinkToEmail->sendEmail($email, $link, $documentName);
         }
     }
 
@@ -204,5 +214,18 @@ class SigningLinkService
         if (!$this->config->getClientId() || !$this->config->getSecret()) {
             throw new EidEasyException('Please specify your eID Easy Client ID and secret under Settings -> Electronic Signatures.');
         }
+    }
+
+    public function getOriginalFilePath(
+        string $userId,
+        string $signedPath,
+        string $defaultPath
+    ): string
+    {
+        $sessions = $this->sessionMapper->findBySignedPath($userId, $signedPath);
+
+        return isset($sessions[0]) && !empty($sessions[0])
+            ? $sessions[0]->getPath()
+            : $defaultPath;
     }
 }
