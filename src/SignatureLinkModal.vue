@@ -319,7 +319,7 @@ export default {
                   v-if="!signatureQueue.length"
                   style="margin-bottom: 20px; margin-top: 20px">
                 {{
-                  $t($globalConfig.appId, 'After you click "Request signature" a copy of this document will be created. An email with an invitation to sign this newly created copy will be sent to the first signer. After the first signer has signed the document, next singer in the list will get the invitation email and so on until everyone has signed.')
+                  $t($globalConfig.appId, 'After you click "Request signature" a copy of this document will be created. An email with an invitation to sign this newly created copy will be sent to the first signer. After the first signer has signed the document, next signer in the list will get the invitation email and so on until everyone has signed.')
                 }}
               </div>
               <div
