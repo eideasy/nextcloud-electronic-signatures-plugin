@@ -89,7 +89,7 @@ class SigningLinkService
 
         $isAsice = $containerType === Config::CONTAINER_TYPE_ASICE;
         if ($isAsice || !$this->config->isOtpEnabled() || $this->config->isSigningLocal()) {
-            $documentName = $this->getOriginalFilePath($userId, $signedPath, $path);
+            $documentName = $this->getOriginalDocumentName($userId, $signedPath, $path);
 
             $this->sendSigningLinkToEmail->sendEmail($email, $link, $documentName);
         }
@@ -216,7 +216,7 @@ class SigningLinkService
         }
     }
 
-    public function getOriginalFilePath(
+    public function getOriginalDocumentName(
         string $userId,
         string $signedPath,
         string $defaultPath
@@ -224,8 +224,12 @@ class SigningLinkService
     {
         $sessions = $this->sessionMapper->findBySignedPath($userId, $signedPath);
 
-        return isset($sessions[0]) && !empty($sessions[0])
+        $documentPath = isset($sessions[0]) && !empty($sessions[0])
             ? $sessions[0]->getPath()
             : $defaultPath;
+
+        $pathParts = explode("/", $documentPath);
+
+        return $pathParts[array_key_last($pathParts)];
     }
 }
