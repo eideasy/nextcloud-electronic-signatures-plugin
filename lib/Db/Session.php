@@ -14,6 +14,10 @@ class Session extends Entity {
     protected $signatureTime;
     protected $isDownloaded;
     protected $signedPath;
+    protected $signerEmails;
+    protected $emailSent;
+    protected $currentSignerEmail;
+    protected $isDocumentSigned;
 
     public function __construct() {
         $this->addType('id','integer');

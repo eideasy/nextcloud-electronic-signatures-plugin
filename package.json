@@ -20,10 +20,10 @@
 		"stylelint:fix": "stylelint src --fix"
 	},
 	"dependencies": {
-		"@eid-easy/eideasy-signing-widget": "0.1.0-alpha.13",
+		"@eid-easy/eideasy-widget": "2.8.0",
 		"@nextcloud/l10n": "^1.4.1",
 		"@nextcloud/router": "^2.0.0",
-		"@nextcloud/vue": "^4.0.2",
+		"@nextcloud/vue": "4.3.0",
 		"@vue/composition-api": "^1.0.0-rc.12",
 		"axios": "^0.21.1",
 		"copy-to-clipboard": "^3.3.1",

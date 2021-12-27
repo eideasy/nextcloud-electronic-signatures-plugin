@@ -9,9 +9,12 @@ trait SavesSession
     private function saveSession(
         string $docId,
         string $path,
+        string $signedPath,
         string $userId,
         string $containerType,
         ?string $token = null,
+        ?string $signerEmails = null,
+        ?string $currentSignerEmail = null,
         bool $isHashBased = false,
         ?string $signatureTime = null
     ): void
@@ -26,11 +29,14 @@ trait SavesSession
         $session->setDocId($docId);
         $session->setUserId($userId);
         $session->setPath($path);
+        $session->setSignedPath($signedPath);
         $session->setIsHashBased((int)$isHashBased);
         $session->setContainerType($containerType);
         if ($signatureTime) {
             $session->setSignatureTime($signatureTime);
         }
+        $session->setSignerEmails($signerEmails);
+        $session->setCurrentSignerEmail($currentSignerEmail);
         $this->mapper->insert($session);
     }
 

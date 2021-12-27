@@ -35,6 +35,7 @@ class SettingsApiController extends Controller {
      */
 	public function getSettings() {
         return new JSONResponse([
+            'container_type' => $this->config->getContainerType(),
             'enable_otp' => $this->config->isOtpEnabled(),
             'enable_local' => $this->config->isSigningLocal(),
             'client_id_provided' => !empty($this->config->getClientId()),
@@ -79,6 +80,11 @@ class SettingsApiController extends Controller {
             $padesApiUrl = $this->request->getParam('pades_url', null);
             if ($padesApiUrl !== null) {
                 $this->iConfig->setAppValue('electronicsignatures', 'pades_url', $padesApiUrl);
+            }
+
+            $containerType = $this->request->getParam('container_type', null);
+            if ($containerType !== null) {
+                $this->iConfig->setAppValue('electronicsignatures', 'container_type', $containerType);
             }
 
             return new JSONResponse(['message' => 'Settings updated!']);

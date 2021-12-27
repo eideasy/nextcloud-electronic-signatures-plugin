@@ -1,5 +1,5 @@
 <script>
-import '@eid-easy/eideasy-signing-widget';
+import '@eid-easy/eideasy-widget';
 import { imagePath } from '@nextcloud/router';
 import FilePreview from './FilePreview';
 import generateAppUrl from './generateAppUrl';
@@ -24,9 +24,14 @@ export default {
       fileName: this.$parent.fileName,
       clientId: this.$parent.clientId,
       fileUrl: this.$parent.fileUrl,
-      apiUrl: this.$parent.apiUrl,
       signedContainerUrl: null,
       enableSandbox: !!this.$parent.enableSandbox,
+      apiEndpoints: {
+        base: () => this.$parent.apiUrl,
+      },
+      enabledMethods: {
+        signature: ['id-signature', 'be-id-signature', 'lt-id-signature', 'lv-id-signature', 'fi-id-signature', 'pt-id-signature'],
+      },
     };
   },
   computed: {
@@ -70,7 +75,7 @@ export default {
         2. {{ $t($globalConfig.appId, 'Sign:') }}
       </h2>
       <div
-        v-if="signedContainerUrl">
+          v-if="signedContainerUrl">
         <span class="alert alert-success">
           {{ $t($globalConfig.appId, 'File successfully signed!') }}
         </span>
@@ -89,14 +94,15 @@ export default {
       <div
           v-else
           class="widgetHolder">
-        <eideasy-signing-widget
-            :doc-id="docId"
-            :client-id="clientId"
-            :id-host="apiUrl"
+        <eideasy-widget
             country-code="EE"
             language="en"
-            :on-success.prop="handleSigningSuccess"
-            :sandbox="enableSandbox" />
+            :sandbox="enableSandbox"
+            :doc-id="docId"
+            :client-id="clientId"
+            :enabled-methods.prop="enabledMethods"
+            :api-endpoints.prop="apiEndpoints"
+            :on-success.prop="handleSigningSuccess" />
       </div>
     </div>
   </div>

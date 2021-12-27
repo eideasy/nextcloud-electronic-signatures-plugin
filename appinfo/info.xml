@@ -56,4 +56,9 @@ Are you not seeing your preferred signature card / signing app / other QES metho
         <admin-section>OCA\ElectronicSignatures\Settings\AdminSection</admin-section>
         <admin>OCA\ElectronicSignatures\Settings\Admin</admin>
     </settings>
+    <activity>
+        <providers>
+            <provider>OCA\ElectronicSignatures\Activity\ActivityProvider</provider>
+        </providers>
+    </activity>
 </info>

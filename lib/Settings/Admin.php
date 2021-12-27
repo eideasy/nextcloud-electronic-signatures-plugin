@@ -40,6 +40,7 @@ class Admin implements ISettings {
             'enable_sandbox' => $this->currentConfig->isSandboxEnabled(),
             'enable_local_signing' => $this->currentConfig->isSigningLocal(),
             'pades_url' => $this->currentConfig->getPadesApiUrl(),
+            'container_type' => $this->currentConfig->getContainerType(),
         ], 'blank');
     }
 
