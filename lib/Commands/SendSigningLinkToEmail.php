@@ -33,16 +33,20 @@ class SendSigningLinkToEmail
      * @param string $link
      * @throws \Exception
      */
-    public function sendEmail(string $email, string $link): void
+    public function sendEmail(
+        string $email,
+        string $link,
+        string $documentName
+    ): void
     {
         $emailTemplate = $this->mailer->createEMailTemplate('calendar.PublicShareNotification', [
             'link' => $link,
         ]);
 
-        $emailTemplate->setSubject('A document awaits your signature');
+        $emailTemplate->setSubject('Please sign "' . $documentName . '"');
 
         $emailTemplate->addHeader();
-        $emailTemplate->addHeading("You have been sent a document for signing.");
+        $emailTemplate->addHeading('You have been sent "' . $documentName . '" for signing.');
         $emailTemplate->addBodyText('By clicking the button below, you can review it and sign it.');
         $emailTemplate->addBodyButton('Review document', $link);
         $emailTemplate->addFooter();

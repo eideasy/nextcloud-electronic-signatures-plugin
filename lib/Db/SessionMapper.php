@@ -36,11 +36,11 @@ class SessionMapper extends QBMapper {
 
     /**
      * @param string $userId
-     * @param string $path
-     * @return array|\OCP\AppFramework\Db\Entity[]
+     * @param string $signedPath
+     * @return array
      * @throws \OCP\DB\Exception
      */
-    public function findByPath(
+    public function findBySignedPath(
         string $userId,
         string $signedPath
     ): array
