@@ -3,16 +3,19 @@
 namespace OCA\ElectronicSignatures\Service;
 
 use JsonSchema\Exception\ValidationException;
+use OCA\ElectronicSignatures\Commands\GetsFile;
 use OCA\ElectronicSignatures\Commands\GetSignLinkLocal;
 use OCA\ElectronicSignatures\Commands\GetSignLinkRemote;
 use OCA\ElectronicSignatures\Commands\SendSigningLinkToEmail;
 use OCA\ElectronicSignatures\Config;
-use OCA\Files_External\NotFoundException;
+use OCA\ElectronicSignatures\Exceptions\EidEasyException;
 use OCP\Files\IRootFolder;
 use OCP\Mail\IMailer;
 
 class SigningLinkService
 {
+    use GetsFile;
+
     /** @var IRootFolder */
     private $storage;
 
@@ -51,20 +54,18 @@ class SigningLinkService
     /**
      * @param string $userId
      * @param string $path
+     * @param string $signedPath
      * @param string $containerType
-     * @param string $emails
-     * @throws NotFoundException
-     * @throws \OCA\ElectronicSignatures\Exceptions\EidEasyException
-     * @throws \OCP\DB\Exception
+     * @param string|null $emails
+     * @throws EidEasyException
      * @throws \OCP\Files\NotFoundException
-     * @throws \Exception
      */
     public function sendSignLinkToEmail(
         string $userId,
         string $path,
         string $signedPath,
         string $containerType,
-        string $emails
+        ?string $emails
     ): void
     {
         [$email, $nextSignerEmails] = $this->checkForNextEmail($emails);
@@ -85,10 +86,10 @@ class SigningLinkService
     }
 
     /**
-     * @param string $emails
+     * @param string|null $emails
      * @return array
      */
-    private function checkForNextEmail(string $emails): array
+    private function checkForNextEmail(?string $emails): array
     {
         $emails = explode(',', $emails);
 
@@ -128,12 +129,35 @@ class SigningLinkService
         return implode(',', $emails);
     }
 
+    /**
+     * @param string $userId
+     * @param string $path
+     * @return array
+     * @throws \OCP\Files\NotFoundException
+     */
+    public function createFileCopy(
+        string $userId,
+        string $path
+    ): array
+    {
+        $pdfContainerType = $this->config->getContainerType();
+
+        $parts = explode('.', $path);
+        $extension = strtolower($parts[count($parts) - 1]);
+        $containerType = $extension === Config::CONTAINER_TYPE_PDF ? $pdfContainerType : Config::CONTAINER_TYPE_ASICE;
+
+        list($mimeType, $fileContent) = $this->getFile($path, $userId);
+        $signedPath = $this->createFile($userId, $path, $containerType, $fileContent, true);
+
+        return [$signedPath, $containerType];
+    }
+
     public function createFile(
         string $userId,
         string $path,
         string $containerType,
         string $contents,
-        bool $isAddDate = false
+        bool   $isAddDate = false
     ): string
     {
         $containerPath = $this->getContainerPath($path, $containerType, $isAddDate);
@@ -142,11 +166,10 @@ class SigningLinkService
         return $containerPath;
     }
 
-
     public function getContainerPath(
         string $originalPath,
         string $containerType,
-        bool $isAddDate
+        bool   $isAddDate
     ): string
     {
         $originalParts = explode('.', $originalPath);
@@ -156,9 +179,9 @@ class SigningLinkService
         $fileName = implode('.', $originalParts);
 
         // Add date
-        if ($isAddDate || !str_contains($fileName, '_eidSignedAt-')) {
+        if ($isAddDate) {
             $dateTime = (new \DateTime)->format('Ymd-His');
-            $fileName = $fileName . '_eidSignedAt-' . $dateTime;
+            $fileName = $fileName . '_' . $dateTime;
         }
 
         return $fileName . '.' . $containerType;
@@ -174,5 +197,12 @@ class SigningLinkService
 
         $userFolder->touch($containerPath);
         $userFolder->newFile($containerPath, $contents);
+    }
+
+    public function checkCredentials(): void
+    {
+        if (!$this->config->getClientId() || !$this->config->getSecret()) {
+            throw new EidEasyException('Please specify your eID Easy Client ID and secret under Settings -> Electronic Signatures.');
+        }
     }
 }

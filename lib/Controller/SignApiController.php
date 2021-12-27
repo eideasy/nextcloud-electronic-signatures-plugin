@@ -4,17 +4,10 @@ namespace OCA\ElectronicSignatures\Controller;
 
 use JsonSchema\Exception\ValidationException;
 use OCA\ElectronicSignatures\Commands\FetchSignedFile;
-use OCA\ElectronicSignatures\Commands\GetsFile;
-use OCA\ElectronicSignatures\Config;
-use OCA\ElectronicSignatures\Db\SessionMapper;
-use OCA\ElectronicSignatures\Exceptions\EidEasyException;
-use OCA\ElectronicSignatures\Normalizers\SigningQueueNormalizer;
-use OCA\ElectronicSignatures\Service\SigningLinkService;
-use OCP\AppFramework\Db\Entity;
+use OCA\ElectronicSignatures\Service\SigningQueueService;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\OCSController;
-use OCP\Files\IRootFolder;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
@@ -24,12 +17,7 @@ use EidEasy\Signatures\Pades;
 
 class SignApiController extends OCSController
 {
-    use GetsFile;
-
     private $userId;
-
-    /** @var IRootFolder */
-    private $storage;
 
     /** @var FetchSignedFile */
     private $fetchFileCommand;
@@ -40,40 +28,23 @@ class SignApiController extends OCSController
     /** @var LoggerInterface */
     private $logger;
 
-    /** @var SessionMapper */
-    private $sessionMapper;
-
-    /** @var SigningLinkService */
-    private $signingLinkService;
-
-    /** @var SigningQueueNormalizer */
-    private $signingQueueNormalizer;
-
-    /** @var Config */
-    private $config;
+    /** @var SigningQueueService */
+    private $signingQueueService;
 
     public function __construct(
         $AppName,
         IRequest $request,
-        IRootFolder $storage,
         FetchSignedFile $fetchSignedFile,
-        SigningLinkService $signingLinkService,
         Pades $pades,
         LoggerInterface $logger,
-        SessionMapper $sessionMapper,
-        SigningQueueNormalizer $signingQueueNormalizer,
-        Config $config,
+        SigningQueueService $signingQueueService,
         $UserId
     )
     {
         parent::__construct($AppName, $request);
         $this->userId = $UserId;
-        $this->storage = $storage;
         $this->fetchFileCommand = $fetchSignedFile;
-        $this->signingLinkService = $signingLinkService;
-        $this->sessionMapper = $sessionMapper;
-        $this->signingQueueNormalizer = $signingQueueNormalizer;
-        $this->config = $config;
+        $this->signingQueueService = $signingQueueService;
         $this->pades = $pades;
         $this->logger = $logger;
     }
@@ -81,25 +52,20 @@ class SignApiController extends OCSController
     /**
      * @NoAdminRequired
      */
-    public function createSigningQueue()
+    public function createSigningQueue(): JSONResponse
     {
         try {
-            $this->checkCredentials();
-
             $userId = $this->userId;
             $path = $this->request->getParam('path');
-            $pdfContainerType = $this->config->getContainerType();
             $emailsInput = $this->request->getParam('emails');
-            $emails = $this->signingLinkService->validateEmails($emailsInput);
 
-            $parts = explode('.', $path);
-            $extension = strtolower($parts[count($parts) - 1]);
-            $containerType = $extension === Config::CONTAINER_TYPE_PDF ? $pdfContainerType : Config::CONTAINER_TYPE_ASICE;
+            $this->signingQueueService->createSigningQueue(
+                $userId,
+                $path,
+                $emailsInput
+            );
 
-            list($mimeType, $fileContent) = $this->getFile($path, $userId);
-            $signedPath = $this->signingLinkService->createFile($userId, $path, $containerType, $fileContent, true);
-
-            $this->signingLinkService->sendSignLinkToEmail($userId, $path, $signedPath, $containerType, $emails);
+            return new JSONResponse(['message' => 'E-mail sent!']);
         } catch (ValidationException $e) {
             return new JSONResponse([
                 'message' => 'Provided email address is not valid',
@@ -110,8 +76,40 @@ class SignApiController extends OCSController
                 'message' => "Failed to send email: {$e->getMessage()}"
             ], Http::STATUS_INTERNAL_SERVER_ERROR);
         }
+    }
 
-        return new JSONResponse(['message' => 'E-mail sent!']);
+    public function getSigningQueue(): JSONResponse
+    {
+        try {
+            $path = $this->request->getParam('path');
+            $signingQueue = $this->signingQueueService->getQueueByPath($this->userId, $path);
+
+            return new JSONResponse($signingQueue,  Http::STATUS_OK);
+        } catch (\Throwable $e) {
+            $this->logger->alert($e->getMessage() . "\n" . $e->getTraceAsString());
+            return new JSONResponse(['message' => "Failed to fetch signing queue: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function updateSigningQueue(): JSONResponse
+    {
+        try {
+            $path = $this->request->getParam('path');
+            $emailsInput = $this->request->getParam('emails');
+
+            $signingQueue = $this->signingQueueService->updateSigningQueue(
+              $this->userId,
+              $path,
+              $emailsInput
+            );
+
+            return new JSONResponse($signingQueue,  Http::STATUS_OK);
+        } catch (ValidationException $e) {
+            return new JSONResponse(['message' => 'Provided email address is not valid',], Http::STATUS_BAD_REQUEST);
+        } catch (\Throwable $e) {
+            $this->logger->alert($e->getMessage() . "\n" . $e->getTraceAsString());
+            return new JSONResponse(['message' => "Failed to update signing queue: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -121,85 +119,16 @@ class SignApiController extends OCSController
      * @NoCSRFRequired
      * @PublicPage
      */
-    public function fetchSignedFile()
+    public function fetchSignedFile(): JSONResponse
     {
         try {
             $docId = $this->request->getParam('doc_id');
-
             $this->fetchFileCommand->fetchByDocId($docId);
+
+            return new JSONResponse(['message' => 'Fetched successfully!']);
         } catch (\Throwable $e) {
             $this->logger->alert($e->getMessage() . "\n" . $e->getTraceAsString());
             return new JSONResponse(['message' => "Failed to get link: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);
         }
-
-        return new JSONResponse(['message' => 'Fetched successfully!']);
-    }
-
-    private function checkCredentials(): void
-    {
-        if (!$this->config->getClientId() || !$this->config->getSecret()) {
-            throw new EidEasyException('Please specify your eID Easy Client ID and secret under Settings -> Electronic Signatures.');
-        }
-    }
-
-    public function getSigningQueue()
-    {
-        try {
-            $path = $this->request->getParam('path');
-            $sessions = $this->sessionMapper->findByPath($this->userId, $path);
-
-            if (empty($sessions)) {
-                return new JSONResponse([]);
-            }
-        } catch (\Throwable $e) {
-            $this->logger->alert($e->getMessage() . "\n" . $e->getTraceAsString());
-            return new JSONResponse(['message' => "Failed to fetch signing queue: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);
-        }
-
-        return new JSONResponse($this->signingQueueNormalizer->normalize($sessions));
-    }
-
-    public function updateSigningQueue()
-    {
-        try {
-            $path = $this->request->getParam('path');
-            $emailsInput = $this->request->getParam('emails');
-            $emails = $this->signingLinkService->validateEmails($emailsInput, true);
-
-            $sessions = $this->sessionMapper->findByPath($this->userId, $path);
-
-            if (empty($sessions)) {
-                return new JSONResponse([]);
-            }
-
-            /** @var Entity $latestSession */
-            $latestSession = $sessions[count($sessions) - 1];
-            $signerEmails = $latestSession->getSignerEmails();
-            $signerEmailsArray = explode(",", $signerEmails);
-            $isSigningQueueEmpty = !isset($signerEmailsArray[0]) || empty($signerEmailsArray[0]);
-            $isDocumentSigned = $latestSession->getIsDocumentSigned();
-
-            if ($isSigningQueueEmpty && $isDocumentSigned) {
-                $this->signingLinkService->sendSignLinkToEmail(
-                    $this->userId,
-                    $latestSession->getSignedPath(),
-                    $latestSession->getSignedPath(),
-                    $latestSession->getContainerType(),
-                    $emails
-                );
-            } else {
-                $latestSession->setSignerEmails($emails);
-                $this->sessionMapper->update($latestSession);
-            }
-
-            $sessions = $this->sessionMapper->findByPath($this->userId, $path);
-        } catch (ValidationException $e) {
-            return new JSONResponse(['message' => 'Provided email address is not valid',], Http::STATUS_BAD_REQUEST);
-        } catch (\Throwable $e) {
-            $this->logger->alert($e->getMessage() . "\n" . $e->getTraceAsString());
-            return new JSONResponse(['message' => "Failed to update signing queue: {$e->getMessage()}"], Http::STATUS_INTERNAL_SERVER_ERROR);
-        }
-
-        return new JSONResponse($this->signingQueueNormalizer->normalize($sessions));
     }
 }
