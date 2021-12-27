@@ -181,6 +181,6 @@ class SigningQueueService
 
         $isDocumentSigned = $latestSession->getIsDocumentSigned();
 
-        return !$isSigningQueueEmpty && !$isDocumentSigned;
+        return !$isSigningQueueEmpty || !$isDocumentSigned;
     }
 }
