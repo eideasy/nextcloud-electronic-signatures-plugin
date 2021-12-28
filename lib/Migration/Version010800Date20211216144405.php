@@ -30,7 +30,8 @@ class Version010800Date20211216144405 extends SimpleMigrationStep {
         $table = $schema->getTable('esignature_sessions');
         if (!$table->hasColumn('signer_emails')) {
             $table->addColumn('signer_emails', Types::TEXT, [
-                'notnull' => true,
+                'default' => null,
+                'notnull' => false,
             ]);
         }
         return $schema;
