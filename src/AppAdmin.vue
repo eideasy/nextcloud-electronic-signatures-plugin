@@ -3,7 +3,9 @@ import { generateUrl } from '@nextcloud/router';
 import SettingsSection from './SettingsSection';
 import SettingsGroup from './SettingsGroup';
 import SettingsTextInput from './SettingsTextInput';
+import Multiselect from '@nextcloud/vue/dist/Components/Multiselect';
 import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch';
+import isoLanguages from './isoLanguages';
 
 export default {
   name: 'AppAdmin',
@@ -12,6 +14,7 @@ export default {
     SettingsGroup,
     SettingsTextInput,
     CheckboxRadioSwitch,
+    Multiselect,
   },
   data() {
     return {
@@ -25,6 +28,8 @@ export default {
       enableSandbox: !!this.$parent.enableSandbox,
       containerType: this.$parent.containerType,
       showAdvancedSettings: false,
+      apiLanguage: isoLanguages.getByCode(this.$parent.apiLanguage),
+      apiLanguageOptions: isoLanguages.getAll(),
     };
   },
   computed: {
@@ -135,6 +140,25 @@ export default {
       <button @click.prevent="showAdvancedSettings = !showAdvancedSettings">
         {{ buttonTextShowAdvanced }}
       </button>
+    </SettingsSection>
+
+    <SettingsSection v-if="showAdvancedSettings" :title="$t($globalConfig.appId, 'eID Easy service language')">
+      <template #settingsHint>
+        <p>
+          {{ $t($globalConfig.appId, 'Choose the language for eID Easy signing views and emails that the end users receive.') }}
+        </p>
+      </template>
+
+      <SettingsGroup>
+        <template v-slot:default="slotProps">
+          <Multiselect
+              v-model="apiLanguage"
+              :options="apiLanguageOptions"
+              track-by="code"
+              label="name"
+              @change="(option) => slotProps.saveSetting({api_language: option.code})" />
+        </template>
+      </SettingsGroup>
     </SettingsSection>
 
     <SettingsSection v-if="showAdvancedSettings" :title="$t($globalConfig.appId, 'Output file type for pdf')">

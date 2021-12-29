@@ -78,7 +78,8 @@ class GetSignLinkLocal extends Controller
         string $signedPath,
         string  $containerType,
         ?string $signerEmails,
-        string $email
+        string $email,
+        string $apiLang
     )
     {
         list($mimeType, $fileContent, $fileName) = $this->getFile($path, $userId);
@@ -118,6 +119,7 @@ class GetSignLinkLocal extends Controller
         ];
 
         $prepareParams = [
+            'lang' => $apiLang,
             'container_type' => $signatureContainer,
             'baseline' => 'LT',
             'notification_state' => [

@@ -14,5 +14,6 @@ OCP\Util::addscript($appId, 'electronic-signatures-adminSettings');
   data-pades-url="<?php echo $_['pades_url'] ?>"
   data-enable-sandbox="<?php echo $_['enable_sandbox'] ?>"
   data-container-type="<?php echo $_['container_type'] ?>"
+  data-api-language="<?php echo $_['api_language'] ?>"
 ></div>
 

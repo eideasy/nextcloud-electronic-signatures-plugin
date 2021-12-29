@@ -40,6 +40,7 @@ class SettingsApiController extends Controller {
             'enable_local' => $this->config->isSigningLocal(),
             'client_id_provided' => !empty($this->config->getClientId()),
             'secret_provided' => !empty($this->config->getSecret()),
+            'api_language' => !empty($this->config->getApiLanguage()),
         ]);
     }
 
@@ -85,6 +86,11 @@ class SettingsApiController extends Controller {
             $containerType = $this->request->getParam('container_type', null);
             if ($containerType !== null) {
                 $this->iConfig->setAppValue('electronicsignatures', 'container_type', $containerType);
+            }
+
+            $apiLanguage = $this->request->getParam('api_language', null);
+            if ($apiLanguage !== null) {
+                $this->iConfig->setAppValue('electronicsignatures', 'api_language', $apiLanguage);
             }
 
             return new JSONResponse(['message' => 'Settings updated!']);

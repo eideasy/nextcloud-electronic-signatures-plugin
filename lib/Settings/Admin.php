@@ -41,6 +41,7 @@ class Admin implements ISettings {
             'enable_local_signing' => $this->currentConfig->isSigningLocal(),
             'pades_url' => $this->currentConfig->getPadesApiUrl(),
             'container_type' => $this->currentConfig->getContainerType(),
+            'api_language' => $this->currentConfig->getApiLanguage(),
         ], 'blank');
     }
 

@@ -38,6 +38,8 @@ class SigningLinkService
     /** @var Config */
     private $config;
 
+    public const DEFAULT_API_LANGUAGE = 'en';
+
     public function __construct(
         IRootFolder            $storage,
         GetSignLinkRemote      $getSignLinkRemote,
@@ -81,10 +83,11 @@ class SigningLinkService
             return;
         }
 
+        $apiLang = $this->config->getApiLanguage() ?? self::DEFAULT_API_LANGUAGE;
         if ($this->config->isSigningLocal()) {
-            $link = $this->getSignLinkLocalCommand->getSignLink($userId, $path, $signedPath, $containerType, $nextSignerEmails, $email);
+            $link = $this->getSignLinkLocalCommand->getSignLink($userId, $path, $signedPath, $containerType, $nextSignerEmails, $email, $apiLang);
         } else {
-            $link = $this->getSignLinkRemoteCommand->getSignLink($userId, $path, $signedPath, $containerType, $nextSignerEmails, $email);
+            $link = $this->getSignLinkRemoteCommand->getSignLink($userId, $path, $signedPath, $containerType, $nextSignerEmails, $email, $apiLang);
         }
 
         $isAsice = $containerType === Config::CONTAINER_TYPE_ASICE;

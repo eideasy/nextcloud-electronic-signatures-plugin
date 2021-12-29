@@ -6138,6 +6138,11 @@ linkify-string@^3.0.2:
   resolved "https://registry.yarnpkg.com/linkify-string/-/linkify-string-3.0.4.tgz#6abf1a5e436e800c729274ae08f5703484647f84"
   integrity sha512-OnNqqRjlYXaXipIAbBC8sDXsSumI1ftatzFg141Pw9HEXWjTVLFcMZoKbFupshqWRavtNJ6QHLa+u6AlxxgeRw==
 
+linkifyjs@^3.0.4:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/linkifyjs/-/linkifyjs-3.0.4.tgz#469a1b44903d179e3b23317fd3c4e995453765b9"
+  integrity sha512-JWw1HHMx54g8mEsG7JwI8I/xh7qeJbF6L9u1dQOYW91RdRqDYpnTn1UaNXYkmLD967Vk0xGuyHzuRnkSApby3w==
+
 load-json-file@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/load-json-file/-/load-json-file-1.1.0.tgz#956905708d58b4bab4c2261b04f59f31c99374c0"
