@@ -43,7 +43,7 @@ class Config {
     /** @var EidEasyApi */
     private $api;
 
-    /** @var string */
+    /** @var string|null */
     private $apiLanguage;
 
     /** @var Pades */
@@ -82,10 +82,10 @@ class Config {
         return $this->containerType;
     }
 
-    public function getApiLanguage(): string
+    public function getApiLanguage(): ?string
     {
         if (!isset($this->apiLanguage)) {
-            $this->apiLanguage = $this->config->getAppValue('electronicsignatures', 'api_language');
+            $this->apiLanguage = $this->config->getAppValue('electronicsignatures', 'api_language', null);
         }
 
         return $this->apiLanguage;

@@ -60,7 +60,8 @@ class GetSignLinkRemote extends Controller
         string $signedPath,
         string $containerType,
         string $signerEmails,
-        string $email
+        string $email,
+        string $apiLang
     ): string
     {
         list($mimeType, $contents) = $this->getFile($path, $userId);
@@ -68,7 +69,7 @@ class GetSignLinkRemote extends Controller
 
         $token = $this->generateRandomString(30);
 
-        $responseBody = $this->startSigningSession($path, $base64, $mimeType, $email, $containerType, $token);
+        $responseBody = $this->startSigningSession($path, $base64, $mimeType, $email, $containerType, $token, $apiLang);
 
         if (!isset($responseBody['doc_id'])) {
             $this->logger->alert(json_encode($responseBody));
@@ -90,7 +91,8 @@ class GetSignLinkRemote extends Controller
         string $mimeType,
         string $email,
         string $containerType,
-        string $token
+        string $token,
+        string $apiLang
     ): array
     {
         // Send file to eID Easy server.
@@ -106,7 +108,7 @@ class GetSignLinkRemote extends Controller
             'container_type' => $containerType,
             'client_id' => $this->config->getClientId(),
             'secret' => $this->config->getSecret(),
-            'lang' => 'en',
+            'lang' => $apiLang,
             'signature_redirect' => $this->urlGenerator->linkToRouteAbsolute('electronicsignatures.sign.showSuccessPage', ['token' => $token]),
         ];
 
