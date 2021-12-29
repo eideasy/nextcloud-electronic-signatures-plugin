@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "90640061d20062377c1515e18bc71657",
+    "content-hash": "75111c5726e83d7bf360762e660d985b",
     "packages": [
         {
             "name": "eideasy/eideasy-php",
-            "version": "v1.14",
+            "version": "v1.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/eideasy/eideasy-php.git",
-                "reference": "57bd8f22ee845f30f354c0e8073b43fe979d34ee"
+                "reference": "a0925daf265984b24c1340c44a06911692fa0d69"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eideasy/eideasy-php/zipball/57bd8f22ee845f30f354c0e8073b43fe979d34ee",
-                "reference": "57bd8f22ee845f30f354c0e8073b43fe979d34ee",
+                "url": "https://api.github.com/repos/eideasy/eideasy-php/zipball/a0925daf265984b24c1340c44a06911692fa0d69",
+                "reference": "a0925daf265984b24c1340c44a06911692fa0d69",
                 "shasum": ""
             },
             "require": {
@@ -47,9 +47,9 @@
             "description": "Create ASIC-E digital signature containers and add XAdES signatures to the container. Helper SDK for eID Easy API-s.",
             "support": {
                 "issues": "https://github.com/eideasy/eideasy-php/issues",
-                "source": "https://github.com/eideasy/eideasy-php/tree/v1.14"
+                "source": "https://github.com/eideasy/eideasy-php/tree/v1.15"
             },
-            "time": "2021-12-17T13:39:59+00:00"
+            "time": "2021-12-29T17:25:44+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -2064,16 +2064,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v4.4.34",
+            "version": "v4.4.36",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "2c309e258adeb9970229042be39b360d34986fad"
+                "reference": "a19f7c44ba665fa9d9d415cc4493361381b93f9b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/2c309e258adeb9970229042be39b360d34986fad",
-                "reference": "2c309e258adeb9970229042be39b360d34986fad",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/a19f7c44ba665fa9d9d415cc4493361381b93f9b",
+                "reference": "a19f7c44ba665fa9d9d415cc4493361381b93f9b",
                 "shasum": ""
             },
             "require": {
@@ -2115,7 +2115,7 @@
             "description": "Loads and dumps YAML files",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/yaml/tree/v4.4.34"
+                "source": "https://github.com/symfony/yaml/tree/v4.4.36"
             },
             "funding": [
                 {
@@ -2131,7 +2131,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-11-18T18:49:23+00:00"
+            "time": "2021-11-25T16:40:00+00:00"
         },
         {
             "name": "webmozart/assert",
