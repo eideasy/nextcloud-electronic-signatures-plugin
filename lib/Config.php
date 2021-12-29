@@ -43,6 +43,9 @@ class Config {
     /** @var EidEasyApi */
     private $api;
 
+    /** @var string */
+    private $apiLanguage;
+
     /** @var Pades */
     private $padesApi;
 
@@ -77,6 +80,15 @@ class Config {
         }
 
         return $this->containerType;
+    }
+
+    public function getApiLanguage(): string
+    {
+        if (!isset($this->apiLanguage)) {
+            $this->apiLanguage = $this->config->getAppValue('electronicsignatures', 'api_language');
+        }
+
+        return $this->apiLanguage;
     }
 
     public function isSandboxEnabled(): bool
