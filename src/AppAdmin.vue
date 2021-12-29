@@ -145,7 +145,7 @@ export default {
     <SettingsSection v-if="showAdvancedSettings" :title="$t($globalConfig.appId, 'eID Easy service language')">
       <template #settingsHint>
         <p>
-          {{ $t($globalConfig.appId, 'saasfd') }}
+          {{ $t($globalConfig.appId, 'Choose the language for eID Easy signing views and emails that the end users receive.') }}
         </p>
       </template>
 
