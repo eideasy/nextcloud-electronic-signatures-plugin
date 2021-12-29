@@ -40,7 +40,7 @@ Are you not seeing your preferred signature card / signing app / other QES metho
 ]]></description>
     <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-dropdown.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-modal.png</screenshot>
-    <version>1.9.1</version>
+    <version>1.10.0</version>
     <licence>agpl</licence>
     <author mail="support@eideasy.com" homepage="https://eideasy.com">eID Easy</author>
     <namespace>ElectronicSignatures</namespace>
