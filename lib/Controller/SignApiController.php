@@ -50,6 +50,7 @@ class SignApiController extends OCSController
     }
 
     /**
+     * @return JSONResponse
      * @NoAdminRequired
      */
     public function createSigningQueue(): JSONResponse
@@ -78,6 +79,10 @@ class SignApiController extends OCSController
         }
     }
 
+    /**
+     * @return JSONResponse
+     * @NoAdminRequired
+     */
     public function getSigningQueue(): JSONResponse
     {
         try {
@@ -91,6 +96,10 @@ class SignApiController extends OCSController
         }
     }
 
+    /**
+     * @return JSONResponse
+     * @NoAdminRequired
+     */
     public function updateSigningQueue(): JSONResponse
     {
         try {
