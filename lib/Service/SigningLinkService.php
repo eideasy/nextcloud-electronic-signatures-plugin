@@ -11,6 +11,8 @@ use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Db\SessionMapper;
 use OCA\ElectronicSignatures\Exceptions\EidEasyException;
 use OCP\Files\IRootFolder;
+use OCP\Files\NotFoundException;
+use OCP\Files\NotPermittedException;
 use OCP\Mail\IMailer;
 
 class SigningLinkService
@@ -66,7 +68,7 @@ class SigningLinkService
      * @param string $containerType
      * @param string|null $emails
      * @throws EidEasyException
-     * @throws \OCP\Files\NotFoundException
+     * @throws NotFoundException
      * @throws \OCP\DB\Exception
      * @throws \Exception
      */
@@ -146,7 +148,7 @@ class SigningLinkService
      * @param string $userId
      * @param string $path
      * @return array
-     * @throws \OCP\Files\NotFoundException
+     * @throws NotFoundException
      */
     public function createFileCopy(
         string $userId,
@@ -210,6 +212,31 @@ class SigningLinkService
 
         $userFolder->touch($containerPath);
         $userFolder->newFile($containerPath, $contents);
+    }
+
+    public function downloadAuditTrail(
+        string $userId,
+        string $contents,
+        string $containerPath,
+        string $signedFilePath
+    ): void
+    {
+        $userFolder = $this->storage->getUserFolder($userId);
+
+        $signedPathParts = explode('/', $signedFilePath);
+        array_pop($signedPathParts);
+        $signedFileFolder = implode('/', $signedPathParts);
+
+        $path = $signedFileFolder . '/audit_trails/' . $containerPath;
+        try {
+            $userFolder->newFolder($signedFileFolder . '/audit_trails');
+            $userFolder = $this->storage->getUserFolder($userId);
+        } catch (NotPermittedException $exception) {
+            $userFolder = $this->storage->getUserFolder($userId);
+        }
+
+        $userFolder->touch($path);
+        $userFolder->newFile($path, $contents);
     }
 
     public function checkCredentials(): void

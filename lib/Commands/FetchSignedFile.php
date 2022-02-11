@@ -85,7 +85,10 @@ class FetchSignedFile extends Controller
         $isHashBased = (bool)$session->getIsHashBased();
         $containerType = $session->getContainerType();
 
-        $data = $this->eidEasyApi->downloadSignedFile($session->getDocId());
+        $docId = $session->getDocId();
+        $data = $this->eidEasyApi->downloadSignedFile($docId);
+        $auditTrailData = $this->eidEasyApi->downloadAuditTrail($docId);
+        $auditTrailContents = base64_decode($auditTrailData['audit_trail_file']);
 
         $signedFileContents = $data['signed_file_contents'];
 
@@ -124,6 +127,13 @@ class FetchSignedFile extends Controller
             $signedPath,
             $containerType,
             $signedFileContents
+        );
+
+        $this->signingLinkService->downloadAuditTrail(
+            $userId,
+            $auditTrailContents,
+            $auditTrailData['filename'],
+            $signedPath
         );
 
         $this->activityManager->createAndTriggerEvent($session, $data);
