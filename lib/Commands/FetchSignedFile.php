@@ -129,12 +129,14 @@ class FetchSignedFile extends Controller
             $signedFileContents
         );
 
-        $this->signingLinkService->downloadAuditTrail(
-            $userId,
-            $auditTrailContents,
-            $auditTrailData['filename'],
-            $signedPath
-        );
+        if (isset($auditTrailData['filename']) && $auditTrailData['filename'] !== null) {
+            $this->signingLinkService->downloadAuditTrail(
+                $userId,
+                $auditTrailContents,
+                $auditTrailData['filename'],
+                $signedPath
+            );
+        }
 
         $this->activityManager->createAndTriggerEvent($session, $data);
 
