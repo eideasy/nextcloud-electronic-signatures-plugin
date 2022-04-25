@@ -4,6 +4,7 @@ namespace OCA\ElectronicSignatures\Controller;
 
 use JsonSchema\Exception\ValidationException;
 use OCA\ElectronicSignatures\Commands\FetchSignedFile;
+use OCA\ElectronicSignatures\Service\RemoteSigningQueueService;
 use OCA\ElectronicSignatures\Service\SigningQueueService;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
@@ -31,6 +32,9 @@ class SignApiController extends OCSController
     /** @var SigningQueueService */
     private $signingQueueService;
 
+    /** @var RemoteSigningQueueService */
+    private $remoteSigningQueueService;
+
     public function __construct(
         $AppName,
         IRequest $request,
@@ -38,6 +42,7 @@ class SignApiController extends OCSController
         Pades $pades,
         LoggerInterface $logger,
         SigningQueueService $signingQueueService,
+        RemoteSigningQueueService $remoteSigningQueueService,
         $UserId
     )
     {
@@ -47,6 +52,7 @@ class SignApiController extends OCSController
         $this->signingQueueService = $signingQueueService;
         $this->pades = $pades;
         $this->logger = $logger;
+        $this->remoteSigningQueueService = $remoteSigningQueueService;
     }
 
     /**
@@ -77,6 +83,36 @@ class SignApiController extends OCSController
                 'message' => "Failed to send email: {$e->getMessage()}"
             ], Http::STATUS_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    /**
+     * @return JSONResponse
+     * @NoAdminRequired
+     */
+    public function createRemoteSigningQueue(): JSONResponse
+    {
+        $userId = $this->userId;
+        $path = $this->request->getParam('path');
+
+        $response = $this->remoteSigningQueueService->createSigningQueue($userId, $path);
+
+        return new JSONResponse($response);
+    }
+
+    /**
+     * @return JSONResponse
+     * @NoAdminRequired
+     */
+    public function fetchSigningQueueFile(): JSONResponse
+    {
+        $queueId = $this->request->getParam('id');
+        $signers = $this->request->getParam('signers');
+        $signersCount = count($signers);
+        $docId = $signers[$signersCount]['doc_id'];
+
+        $this->remoteSigningQueueService->fetchSignedFile($queueId, $docId);
+
+        return new JSONResponse(['message' => 'Fetched successfully!']);
     }
 
     /**

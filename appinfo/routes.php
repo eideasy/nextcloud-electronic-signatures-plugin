@@ -9,10 +9,12 @@
  */
 return [
 	'routes' => [
-		['name' => 'signApi#createSigningQueue', 'url' => '/create_signing_queue', 'verb' => 'POST'],
+        ['name' => 'signApi#createRemoteSigningQueue', 'url' => '/create_signing_queue', 'verb' => 'POST'],
         ['name' => 'signApi#getSigningQueue', 'url' => '/signing_queue', 'verb' => 'GET'],
         ['name' => 'signApi#updateSigningQueue', 'url' => '/signing_queue', 'verb' => 'POST'],
         ['name' => 'signApi#fetchSignedFile', 'url' => '/fetch_signed_file', 'verb' => 'POST'],
+        //		['name' => 'signApi#createRemoteSigningQueue', 'url' => '/create_signing_queue_remote', 'verb' => 'POST'],
+        ['name' => 'signApi#fetchSigningQueueFile', 'url' => '/fetch_signing_queue_file', 'verb' => 'POST'],
         ['name' => 'settingsApi#getSettings', 'url' => '/settings', 'verb' => 'GET'],
 		// TODO remove (deprecated)
         ['name' => 'settingsApi#updateSettingsDepr', 'url' => '/update_settings', 'verb' => 'POST'],
