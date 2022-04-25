@@ -93,8 +93,13 @@ class SignApiController extends OCSController
     {
         $userId = $this->userId;
         $path = $this->request->getParam('path');
+        $emailsInput = $this->request->getParam('emails');
 
-        $response = $this->remoteSigningQueueService->createSigningQueue($userId, $path);
+        $response = $this->remoteSigningQueueService->createSigningQueue(
+            $userId,
+            $path,
+            $emailsInput
+        );
 
         return new JSONResponse($response);
     }
@@ -102,13 +107,15 @@ class SignApiController extends OCSController
     /**
      * @return JSONResponse
      * @NoAdminRequired
+     * @NoCSRFRequired
+     * @PublicPage
      */
     public function fetchSigningQueueFile(): JSONResponse
     {
-        $queueId = $this->request->getParam('id');
+        $queueId = $this->request->getParam('queue_id');
         $signers = $this->request->getParam('signers');
-        $signersCount = count($signers);
-        $docId = $signers[$signersCount]['doc_id'];
+        $signerIndex = count($signers) - 1;
+        $docId = $signers[$signerIndex]['doc_id'];
 
         $this->remoteSigningQueueService->fetchSignedFile($queueId, $docId);
 

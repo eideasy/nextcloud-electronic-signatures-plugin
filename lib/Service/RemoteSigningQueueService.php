@@ -9,7 +9,6 @@ use OCA\ElectronicSignatures\Db\RemoteSigningQueue;
 use OCA\ElectronicSignatures\Db\RemoteSigningQueueMapper;
 use OCA\ElectronicSignatures\Exceptions\EidEasyException;
 use OCP\Files\IRootFolder;
-use OCP\IURLGenerator;
 use Psr\Log\LoggerInterface;
 
 class RemoteSigningQueueService
@@ -28,8 +27,6 @@ class RemoteSigningQueueService
     private $config;
     /** @var EidEasyApi */
     private $eidEasyApi;
-    /** @var IURLGenerator */
-    private $urlGenerator;
     /** @var LoggerInterface */
     private $logger;
 
@@ -38,7 +35,6 @@ class RemoteSigningQueueService
         SigningLinkService       $signingLinkService,
         RemoteSigningQueueMapper $signingQueueMapper,
         Config                   $config,
-        IURLGenerator            $urlGenerator,
         LoggerInterface          $logger
     )
     {
@@ -47,16 +43,32 @@ class RemoteSigningQueueService
         $this->signingQueueMapper = $signingQueueMapper;
         $this->config = $config;
         $this->eidEasyApi = $config->getApi();
-        $this->urlGenerator = $urlGenerator;
         $this->logger = $logger;
     }
 
     public function createSigningQueue(
         string $userId,
-        string $path
+        string $path,
+        ?array $emails
     ): array
     {
-        $token = 'randomstring123';
+        $signers = [];
+        foreach ($emails as $email) {
+            $signers[] = [
+                'name' => 'test',
+                'email' => $email,
+            ];
+        }
+        $docId = $this->getFileAndPrepare($path, $userId);
+
+        return $this->createAndSaveQueue($docId, $signers, $userId, $path);
+    }
+
+    protected function getFileAndPrepare(
+        $path,
+        $userId
+    )
+    {
         list($mimeType, $contents) = $this->getFile($path, $userId);
 
         $file = [
@@ -69,7 +81,6 @@ class RemoteSigningQueueService
             'client_id' => $this->config->getClientId(),
             'secret' => $this->config->getSecret(),
 //            'lang' => $apiLang,
-            'signature_redirect' => $this->urlGenerator->linkToRouteAbsolute('electronicsignatures.sign.showSuccessPage', ['token' => $token]),
         ];
         $prepareFilesResponse = $this->eidEasyApi->prepareFiles([$file], $params);
         if ($prepareFilesResponse['status'] !== 'OK') {
@@ -79,11 +90,20 @@ class RemoteSigningQueueService
                 : 'eID Easy error';
             throw new EidEasyException($message);
         }
+        return $prepareFilesResponse['doc_id'];
+    }
 
-        $queueResponse = $this->eidEasyApi->createSigningQueue(
-            $prepareFilesResponse['doc_id'],
-            ['has_management_page' => true]
-        );
+    protected function createAndSaveQueue(
+        $docId,
+        $signers,
+        $userId,
+        $path
+    ): array
+    {
+        $queueResponse = $this->eidEasyApi->createSigningQueue($docId, [
+            'has_management_page' => true,
+            'signers' => $signers,
+        ]);
         if (!isset($queueResponse['id'], $queueResponse['signing_queue_secret'])) {
             $this->logger->alert(json_encode($queueResponse));
             throw new EidEasyException('eID Easy error');
@@ -110,7 +130,7 @@ class RemoteSigningQueueService
         }
 
         $userId = $signingQueue->getUserId();
-        $path = $signingQueue->getPath(); // what should it be?
+        $path = $signingQueue->getOriginalFilePath();
 
         $data = $this->eidEasyApi->downloadSignedFile($docId);
         $signedFileContents = base64_decode($data['signed_file_contents']);
@@ -119,7 +139,8 @@ class RemoteSigningQueueService
             $userId,
             $path,
             self::CONTAINER_TYPE,
-            $signedFileContents
+            $signedFileContents,
+            true
         );
 
         $signingQueue->setIsDownloaded(true);
