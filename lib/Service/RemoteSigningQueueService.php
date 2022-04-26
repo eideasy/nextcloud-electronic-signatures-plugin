@@ -16,7 +16,7 @@ class RemoteSigningQueueService
 {
     use GetsFile;
 
-    private const CONTAINER_TYPE = 'pdf';
+    public const DEFAULT_API_LANGUAGE = 'en';
 
     /** @var IRootFolder */
     private $storage;
@@ -78,10 +78,10 @@ class RemoteSigningQueueService
             'mimeType' => $mimeType,
         ];
         $params = [
-            'container_type' => 'pdf',
+            'container_type' => $this->config->getContainerType(),
             'client_id' => $this->config->getClientId(),
             'secret' => $this->config->getSecret(),
-//            'lang' => $apiLang,
+            'lang' => $this->config->getApiLanguage() ?? self::DEFAULT_API_LANGUAGE,
         ];
         $prepareFilesResponse = $this->eidEasyApi->prepareFiles([$file], $params);
         if ($prepareFilesResponse['status'] !== 'OK') {
@@ -141,11 +141,13 @@ class RemoteSigningQueueService
 
         $data = $this->eidEasyApi->downloadSignedFile($docId);
         $signedFileContents = base64_decode($data['signed_file_contents']);
+        $filenameParts = explode('.', $data['filename']);
+        $containerType = $filenameParts[array_key_last($filenameParts)];
 
         $this->signingLinkService->createFile(
             $userId,
             $path,
-            self::CONTAINER_TYPE,
+            $containerType,
             $signedFileContents,
             true
         );
