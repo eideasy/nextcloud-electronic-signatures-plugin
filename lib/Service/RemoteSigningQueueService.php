@@ -9,6 +9,7 @@ use OCA\ElectronicSignatures\Db\RemoteSigningQueue;
 use OCA\ElectronicSignatures\Db\RemoteSigningQueueMapper;
 use OCA\ElectronicSignatures\Exceptions\EidEasyException;
 use OCP\Files\IRootFolder;
+use OCP\IURLGenerator;
 use Psr\Log\LoggerInterface;
 
 class RemoteSigningQueueService
@@ -29,13 +30,16 @@ class RemoteSigningQueueService
     private $eidEasyApi;
     /** @var LoggerInterface */
     private $logger;
+    /** @var IURLGenerator */
+    private $urlGenerator;
 
     public function __construct(
         IRootFolder              $storage,
         SigningLinkService       $signingLinkService,
         RemoteSigningQueueMapper $signingQueueMapper,
         Config                   $config,
-        LoggerInterface          $logger
+        LoggerInterface          $logger,
+        IURLGenerator            $urlGenerator
     )
     {
         $this->storage = $storage;
@@ -44,6 +48,7 @@ class RemoteSigningQueueService
         $this->config = $config;
         $this->eidEasyApi = $config->getApi();
         $this->logger = $logger;
+        $this->urlGenerator = $urlGenerator;
     }
 
     public function createSigningQueue(
@@ -51,6 +56,10 @@ class RemoteSigningQueueService
         string $path
     ): array
     {
+        if (!$this->config->getClientId() || !$this->config->getSecret()) {
+            throw new EidEasyException('Please specify your eID Easy Client ID and secret under Settings -> Electronic Signatures.');
+        }
+
         $docId = $this->getFileAndPrepare($path, $userId);
 
         return $this->createAndSaveQueue($docId, $userId, $path);
@@ -91,8 +100,14 @@ class RemoteSigningQueueService
         string $path
     ): array
     {
+        $configWebhookUrl = $this->config->getRemoteSigningQueueWebhook();
+        $webhookUrl = empty($configWebhookUrl)
+            ? $this->urlGenerator->linkToRouteAbsolute('electronicsignatures.remoteQueueApi.fetchSigningQueueFile')
+            : $configWebhookUrl;
+
         $queueResponse = $this->eidEasyApi->createSigningQueue($docId, [
             'has_management_page' => true,
+            'webhook_url' => $webhookUrl
         ]);
         if (!isset($queueResponse['id'], $queueResponse['signing_queue_secret'])) {
             $this->logger->alert(json_encode($queueResponse));
@@ -106,7 +121,7 @@ class RemoteSigningQueueService
         $signingQueue->setOriginalFilePath($path);
         $this->signingQueueMapper->insert($signingQueue);
 
-        return $queueResponse;
+        return [$webhookUrl];
     }
 
     public function fetchSignedFile(

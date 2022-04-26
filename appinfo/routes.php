@@ -13,8 +13,8 @@ return [
         ['name' => 'signApi#getSigningQueue', 'url' => '/signing_queue', 'verb' => 'GET'],
         ['name' => 'signApi#updateSigningQueue', 'url' => '/signing_queue', 'verb' => 'POST'],
         ['name' => 'signApi#fetchSignedFile', 'url' => '/fetch_signed_file', 'verb' => 'POST'],
-        ['name' => 'RemoteQueueApi#createRemoteSigningQueue', 'url' => '/create_signing_queue_remote', 'verb' => 'POST'],
-        ['name' => 'RemoteQueueApi#fetchSigningQueueFile', 'url' => '/fetch_signing_queue_file', 'verb' => 'POST'],
+        ['name' => 'remoteQueueApi#createRemoteSigningQueue', 'url' => '/create_signing_queue_remote', 'verb' => 'POST'],
+        ['name' => 'remoteQueueApi#fetchSigningQueueFile', 'url' => '/fetch_signing_queue_file', 'verb' => 'POST'],
         ['name' => 'settingsApi#getSettings', 'url' => '/settings', 'verb' => 'GET'],
 		// TODO remove (deprecated)
         ['name' => 'settingsApi#updateSettingsDepr', 'url' => '/update_settings', 'verb' => 'POST'],
