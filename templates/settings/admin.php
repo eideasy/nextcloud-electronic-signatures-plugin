@@ -15,6 +15,6 @@ OCP\Util::addscript($appId, 'electronic-signatures-adminSettings');
   data-container-type="<?php echo $_['container_type'] ?>"
   data-api-language="<?php echo $_['api_language'] ?>"
   data-remote-signing-queue-webhook="<?php echo $_['remote_signing_queue_webhook'] ?>"
-  data-singing-mode="<?php echo $_['singing_mode'] ?>"
+  data-signing-mode="<?php echo $_['signing_mode'] ?>"
 ></div>
 
