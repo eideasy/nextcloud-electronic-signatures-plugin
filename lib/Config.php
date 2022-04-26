@@ -118,6 +118,15 @@ class Config {
         return $this->enableLocalSigning;
     }
 
+    public function getRemoteSigningQueueWebhook(): ?string
+    {
+        if (!isset($this->enableLocalSigning)) {
+            $this->enableLocalSigning = $this->config->getAppValue('electronicsignatures', 'remote_signing_queue_webhook', null);
+        }
+
+        return $this->enableLocalSigning;
+    }
+
     public function getApiUrl(string $path = ''): string
     {
         $path = ltrim($path, '/');
