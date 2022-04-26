@@ -50,6 +50,12 @@ class Config {
     /** @var Pades */
     private $padesApi;
 
+    /** @var string */
+    private $signingMode;
+
+    /** @var string|null */
+    private $remoteSigningQueueWebhook;
+
     public function __construct(IConfig $config, EidEasyApi $api, Pades $padesApi) {
         $this->config = $config;
         $this->initApi($api);
@@ -117,20 +123,20 @@ class Config {
 
     public function getSigningMode(): string
     {
-        if (!isset($this->enableLocalSigning)) {
-            $this->enableLocalSigning = $this->config->getAppValue('electronicsignatures', 'signing_mode', self::SIGNING_MODE_REMOTE_BY_DEFAULT);
+        if (!isset($this->signingMode)) {
+            $this->signingMode = $this->config->getAppValue('electronicsignatures', 'signing_mode', self::SIGNING_MODE_REMOTE_BY_DEFAULT);
         }
 
-        return $this->enableLocalSigning;
+        return $this->signingMode;
     }
 
     public function getRemoteSigningQueueWebhook(): ?string
     {
-        if (!isset($this->enableLocalSigning)) {
-            $this->enableLocalSigning = $this->config->getAppValue('electronicsignatures', 'remote_signing_queue_webhook', null);
+        if (!isset($this->remoteSigningQueueWebhook)) {
+            $this->remoteSigningQueueWebhook = $this->config->getAppValue('electronicsignatures', 'remote_signing_queue_webhook', null);
         }
 
-        return $this->enableLocalSigning;
+        return $this->remoteSigningQueueWebhook;
     }
 
     public function getApiUrl(string $path = ''): string
