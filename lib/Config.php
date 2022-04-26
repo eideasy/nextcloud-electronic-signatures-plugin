@@ -133,7 +133,7 @@ class Config {
     public function getRemoteSigningQueueWebhook(): ?string
     {
         if (!isset($this->remoteSigningQueueWebhook)) {
-            $this->remoteSigningQueueWebhook = $this->config->getAppValue('electronicsignatures', 'remote_signing_queue_webhook', null);
+            $this->remoteSigningQueueWebhook = $this->config->getAppValue('electronicsignatures', 'remote_signing_queue_status_webhook', null);
         }
 
         return $this->remoteSigningQueueWebhook;

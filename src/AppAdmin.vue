@@ -30,6 +30,7 @@ export default {
       showAdvancedSettings: false,
       apiLanguage: isoLanguages.getByCode(this.$parent.apiLanguage),
       apiLanguageOptions: isoLanguages.getAll(),
+      remoteSigningQueueStatusWebhook: this.$parent.remoteSigningQueueStatusWebhook,
     };
   },
   computed: {
@@ -254,6 +255,20 @@ export default {
               $t($globalConfig.appId, 'With remote signing, the files are sent to the eID Easy server. The signer will go to a signing page on the eID Easy site, where they will be guided through the signing process.')
             }}
           </p>
+
+          <div class="subSection">
+            <SettingsTextInput
+                v-model="remoteSigningQueueStatusWebhook"
+                :placeholder="remoteSigningQueueStatusWebhook"
+                :on-button-click="() => slotProps.saveSetting({remote_signing_queue_status_webhook: remoteSigningQueueStatusWebhook || null})">
+              <template #label>
+                {{ $t($globalConfig.appId, 'Queue status webhook url') }}
+              </template>
+            </SettingsTextInput>
+            <p>
+              {{ $t($globalConfig.appId, 'You probably only need to fill this in if your Nextcloud instance is behind a reverse proxy etc. This is the url to where eID Easy will send the signing queue status updates. Keep in mind that this URL has to be accessible over the public internet.') }}
+            </p>
+          </div>
 
           <CheckboxRadioSwitch
               :checked.sync="signingMode"
