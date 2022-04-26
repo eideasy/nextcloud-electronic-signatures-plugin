@@ -48,25 +48,17 @@ class RemoteSigningQueueService
 
     public function createSigningQueue(
         string $userId,
-        string $path,
-        ?array $emails
+        string $path
     ): array
     {
-        $signers = [];
-        foreach ($emails as $email) {
-            $signers[] = [
-                'name' => 'test',
-                'email' => $email,
-            ];
-        }
         $docId = $this->getFileAndPrepare($path, $userId);
 
-        return $this->createAndSaveQueue($docId, $signers, $userId, $path);
+        return $this->createAndSaveQueue($docId, $userId, $path);
     }
 
     protected function getFileAndPrepare(
-        $path,
-        $userId
+        string $path,
+        string $userId
     )
     {
         list($mimeType, $contents) = $this->getFile($path, $userId);
@@ -94,15 +86,13 @@ class RemoteSigningQueueService
     }
 
     protected function createAndSaveQueue(
-        $docId,
-        $signers,
-        $userId,
-        $path
+        string $docId,
+        string $userId,
+        string $path
     ): array
     {
         $queueResponse = $this->eidEasyApi->createSigningQueue($docId, [
             'has_management_page' => true,
-            'signers' => $signers,
         ]);
         if (!isset($queueResponse['id'], $queueResponse['signing_queue_secret'])) {
             $this->logger->alert(json_encode($queueResponse));
@@ -120,8 +110,8 @@ class RemoteSigningQueueService
     }
 
     public function fetchSignedFile(
-        $queueId,
-        $docId
+        string $queueId,
+        string $docId
     ): void
     {
         $signingQueue = $this->signingQueueMapper->findByQueueId($queueId);

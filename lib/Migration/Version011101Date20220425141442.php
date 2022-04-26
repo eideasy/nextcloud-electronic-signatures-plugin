@@ -18,8 +18,7 @@ class Version011101Date20220425141442 extends SimpleMigrationStep {
     public function changeSchema(IOutput $output, Closure $schemaClosure, array $options) {
         /** @var ISchemaWrapper $schema */
         $schema = $schemaClosure();
-        $schema->dropTable('signing_queues');
-        $schema->dropTable('remote_signing_queues');
+
         if ($schema->hasTable('remote_signing_queues')) {
             $table = $schema->createTable('remote_signing_queues');
             $table->addColumn('id', 'integer', [

@@ -36,13 +36,8 @@ class RemoteQueueApiController extends OCSController
     {
         $userId = $this->userId;
         $path = $this->request->getParam('path');
-        $emailsInput = $this->request->getParam('emails');
 
-        $response = $this->remoteSigningQueueService->createSigningQueue(
-            $userId,
-            $path,
-            $emailsInput
-        );
+        $response = $this->remoteSigningQueueService->createSigningQueue($userId, $path);
 
         return new JSONResponse($response);
     }
