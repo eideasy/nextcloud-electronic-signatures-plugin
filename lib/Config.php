@@ -14,7 +14,8 @@ class Config {
     public const CONTAINER_TYPE_ASICE = 'asice';
     public const CONTAINER_TYPE_PDF = 'pdf';
     public const ENABLE_OTP_BY_DEFAULT = true;
-    public const ENABLE_LOCAL_SIGNING_BY_DEFAULT = false;
+    public const SIGNING_MODE_REMOTE_BY_DEFAULT = 'remote';
+    public const SIGNING_MODE_LOCAL = 'local';
 
     /** @var IConfig */
     private $config;
@@ -111,8 +112,13 @@ class Config {
 
     public function isSigningLocal(): bool
     {
+        return $this->getSigningMode() === self::SIGNING_MODE_LOCAL;
+    }
+
+    public function getSigningMode(): string
+    {
         if (!isset($this->enableLocalSigning)) {
-            $this->enableLocalSigning = (bool) $this->config->getAppValue('electronicsignatures', 'enable_local_signing', self::ENABLE_LOCAL_SIGNING_BY_DEFAULT);
+            $this->enableLocalSigning = $this->config->getAppValue('electronicsignatures', 'signing_mode', self::SIGNING_MODE_REMOTE_BY_DEFAULT);
         }
 
         return $this->enableLocalSigning;

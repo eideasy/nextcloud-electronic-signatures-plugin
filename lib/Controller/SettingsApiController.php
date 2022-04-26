@@ -94,9 +94,14 @@ class SettingsApiController extends Controller {
                 $this->iConfig->setAppValue('electronicsignatures', 'api_language', $apiLanguage);
             }
 
-            $remoteSigningQueueWebhook = $this->request->getParam('remote_signing_queue_webhook', null);
+            $remoteSigningQueueWebhook = $this->request->getParam('remote_signing_queue_webhook');
             if ($remoteSigningQueueWebhook !== null) {
                 $this->iConfig->setAppValue('electronicsignatures', 'remote_signing_queue_webhook', $remoteSigningQueueWebhook);
+            }
+
+            $signMode = $this->request->getParam('sign_mode');
+            if ($signMode !== null) {
+                $this->iConfig->setAppValue('electronicsignatures', 'sign_mode', $signMode);
             }
 
             return new JSONResponse(['message' => 'Settings updated!']);

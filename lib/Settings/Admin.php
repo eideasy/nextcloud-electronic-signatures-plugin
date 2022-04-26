@@ -38,7 +38,7 @@ class Admin implements ISettings {
             'secret_placeholder' => $this->anonymize($this->currentConfig->getSecret()),
             'enable_otp' => $this->currentConfig->isOtpEnabled(),
             'enable_sandbox' => $this->currentConfig->isSandboxEnabled(),
-            'enable_local_signing' => $this->currentConfig->isSigningLocal(),
+            'signing_mode' => $this->currentConfig->getSigningMode(),
             'pades_url' => $this->currentConfig->getPadesApiUrl(),
             'container_type' => $this->currentConfig->getContainerType(),
             'api_language' => $this->currentConfig->getApiLanguage(),
