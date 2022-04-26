@@ -19,7 +19,7 @@ class Version011101Date20220425141442 extends SimpleMigrationStep {
         /** @var ISchemaWrapper $schema */
         $schema = $schemaClosure();
 
-        if ($schema->hasTable('remote_signing_queues')) {
+        if (!$schema->hasTable('remote_signing_queues')) {
             $table = $schema->createTable('remote_signing_queues');
             $table->addColumn('id', 'integer', [
                 'autoincrement' => true,
