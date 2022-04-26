@@ -10,7 +10,7 @@ OCP\Util::addscript($appId, 'electronic-signatures-adminSettings');
   data-client-id="<?php echo $_['client_id_placeholder'] ?>"
   data-secret="<?php echo $_['secret_placeholder'] ?>"
   data-enable-otp="<?php echo $_['enable_otp'] ?>"
-  data-enable-local-signing="<?php echo $_['enable_local_signing'] ?>"
+  data-signing-mode="<?php echo $_['signing_mode'] ?>"
   data-pades-url="<?php echo $_['pades_url'] ?>"
   data-enable-sandbox="<?php echo $_['enable_sandbox'] ?>"
   data-container-type="<?php echo $_['container_type'] ?>"

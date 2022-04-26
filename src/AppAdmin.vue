@@ -23,7 +23,7 @@ export default {
       clientIdPlaceholder: this.$parent.clientId,
       secretPlaceholder: this.$parent.secret,
       allowSimpleSignatures: this.$parent.enableOtp,
-      fileHandling: this.$parent.enableLocalSigning ? 'local' : 'remote',
+      signingMode: this.$parent.signingMode || 'remote',
       padesUrl: this.$parent.padesUrl,
       enableSandbox: !!this.$parent.enableSandbox,
       containerType: this.$parent.containerType,
@@ -40,7 +40,7 @@ export default {
       return window.location.origin;
     },
     simpleSignaturesSettingIsDisabled() {
-      return this.fileHandling === 'local' || this.containerType === 'asice';
+      return this.signingMode === 'local' || this.containerType === 'asice';
     },
     buttonTextShowAdvanced() {
       if (this.showAdvancedSettings) {
@@ -55,9 +55,9 @@ export default {
       return generateUrl(url);
     },
     onFileHandlingToggle(saveSetting) {
-      const enableLocalSigning = this.fileHandling === 'local';
+      const enableLocalSigning = this.signingMode === 'local';
 
-      const settings = { enable_local_signing: enableLocalSigning };
+      const settings = { signing_mode: this.signingMode };
       if (enableLocalSigning) {
         this.allowSimpleSignatures = '0';
         settings.enable_otp = false;
@@ -241,12 +241,26 @@ export default {
       <SettingsGroup>
         <template v-slot:default="slotProps">
           <CheckboxRadioSwitch
-              :checked.sync="fileHandling"
+              :checked.sync="signingMode"
               value="remote"
               name="signing_mode_radio"
               type="radio"
               @update:checked="onFileHandlingToggle(slotProps.saveSetting)">
             {{ $t($globalConfig.appId, 'Remote with eID Easy') }}
+          </CheckboxRadioSwitch>
+          <p>
+            {{
+              $t($globalConfig.appId, 'With remote signing, the files are sent to the eID Easy server. The signer will go to a signing page on the eID Easy site, where they will be guided through the signing process.')
+            }}
+          </p>
+
+          <CheckboxRadioSwitch
+              :checked.sync="signingMode"
+              value="remote_legacy"
+              name="signing_mode_radio"
+              type="radio"
+              @update:checked="onFileHandlingToggle(slotProps.saveSetting)">
+            {{ $t($globalConfig.appId, 'Old version of remote with eID Easy') }}
           </CheckboxRadioSwitch>
           <p>
             {{
@@ -294,7 +308,7 @@ export default {
           </div>
 
           <CheckboxRadioSwitch
-              :checked.sync="fileHandling"
+              :checked.sync="signingMode"
               value="local"
               name="signing_mode_radio"
               type="radio"
