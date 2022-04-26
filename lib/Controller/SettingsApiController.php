@@ -42,7 +42,6 @@ class SettingsApiController extends Controller {
             'client_id_provided' => !empty($this->config->getClientId()),
             'secret_provided' => !empty($this->config->getSecret()),
             'api_language' => !empty($this->config->getApiLanguage()),
-            'signing_mode' => $this->config->getSigningMode(),
             'remote_signing_queue_status_webhook' => $this->config->getRemoteSigningQueueWebhook(),
         ]);
     }
