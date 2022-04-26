@@ -260,7 +260,7 @@ export default {
             <SettingsTextInput
                 v-model="remoteSigningQueueStatusWebhook"
                 :placeholder="remoteSigningQueueStatusWebhook"
-                :on-button-click="() => slotProps.saveSetting({remote_signing_queue_status_webhook: remoteSigningQueueStatusWebhook || null})">
+                :on-button-click="() => slotProps.saveSetting({remote_signing_queue_status_webhook: remoteSigningQueueStatusWebhook || 'reset'})">
               <template #label>
                 {{ $t($globalConfig.appId, 'Queue status webhook url') }}
               </template>
