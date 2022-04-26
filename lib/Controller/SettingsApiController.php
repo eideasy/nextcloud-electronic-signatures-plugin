@@ -38,6 +38,7 @@ class SettingsApiController extends Controller {
             'container_type' => $this->config->getContainerType(),
             'enable_otp' => $this->config->isOtpEnabled(),
             'enable_local' => $this->config->isSigningLocal(),
+            'signing_mode' => $this->config->getSigningMode(),
             'client_id_provided' => !empty($this->config->getClientId()),
             'secret_provided' => !empty($this->config->getSecret()),
             'api_language' => !empty($this->config->getApiLanguage()),

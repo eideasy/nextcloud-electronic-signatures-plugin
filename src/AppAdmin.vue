@@ -40,7 +40,8 @@ export default {
       return window.location.origin;
     },
     simpleSignaturesSettingIsDisabled() {
-      return this.signingMode === 'local' || this.containerType === 'asice';
+      // simple sigs are only supported for remote_legacy
+      return this.signingMode === 'local' || this.signingMode === 'remote' || this.containerType === 'asice';
     },
     buttonTextShowAdvanced() {
       if (this.showAdvancedSettings) {
