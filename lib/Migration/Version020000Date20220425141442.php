@@ -3,11 +3,12 @@
 namespace OCA\ElectronicSignatures\Migration;
 
 use Closure;
+use Doctrine\DBAL\Types\Types;
 use OCP\DB\ISchemaWrapper;
 use OCP\Migration\SimpleMigrationStep;
 use OCP\Migration\IOutput;
 
-class Version011200Date20220425141442 extends SimpleMigrationStep {
+class Version020000Date20220425141442 extends SimpleMigrationStep {
 
     /**
      * @param IOutput $output
@@ -40,6 +41,10 @@ class Version011200Date20220425141442 extends SimpleMigrationStep {
             $table->addColumn('original_file_path', 'string', [
                 'notnull' => true,
                 'length' => 200,
+            ]);
+            $table->addColumn('is_downloaded', Types::BOOLEAN, [
+                'default' => false,
+                'notnull' => false,
             ]);
 
             $table->setPrimaryKey(['id']);
