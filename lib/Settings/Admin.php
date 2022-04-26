@@ -39,6 +39,7 @@ class Admin implements ISettings {
             'enable_otp' => $this->currentConfig->isOtpEnabled(),
             'enable_sandbox' => $this->currentConfig->isSandboxEnabled(),
             'signing_mode' => $this->currentConfig->getSigningMode(),
+            'remote_signing_queue_webhook' => $this->currentConfig->getRemoteSigningQueueWebhook(),
             'pades_url' => $this->currentConfig->getPadesApiUrl(),
             'container_type' => $this->currentConfig->getContainerType(),
             'api_language' => $this->currentConfig->getApiLanguage(),
