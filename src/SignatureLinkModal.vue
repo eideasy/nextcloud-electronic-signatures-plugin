@@ -9,6 +9,7 @@ import fetchAdminSettings from './fetchAdminSettings';
 import SigningQueue from './SigningQueue';
 import SignatureQueue from './SignatureQueue';
 import SigningStatus from './SigningStatus';
+import RemoteSigningQueue from './RemoteSigningQueue';
 
 const EMAIL_FIELD_TEMPLATE = {
   type: 'email',
@@ -28,6 +29,7 @@ export default {
   data() {
     return {
       SigningQueue: new SigningQueue(),
+      RemoteSigningQueue: new RemoteSigningQueue(),
       modal: false,
       errorMessage: null,
       successMessage: null,
@@ -148,6 +150,25 @@ export default {
             _self.isLoadingSettings = false;
           });
     },
+    startRemoteMultisigning() {
+      const _self = this;
+      this.isLoading = true;
+      this.RemoteSigningQueue.create(this.getFilePath())
+          .then(function(response) {
+            if (response.data && response.data.management_page_url) {
+              window.location.href = response.data.management_page_url;
+            } else {
+              _self.setErrorMessage(_self.$t(_self.$globalConfig.appId, 'Response data does not contain management_page_url'));
+            }
+          })
+          .catch(function(error) {
+            console.error(error);
+            _self.setErrorMessage(_self.$t(_self.$globalConfig.appId, 'Failed to start remote multisigning'));
+          })
+          .then(function() {
+            _self.isLoading = false;
+          });
+    },
     getSigningQueue() {
       const _self = this;
       _self.isLoadingQueue = true;
@@ -246,8 +267,16 @@ export default {
           <div class="icon-loading spinner" />
         </div>
         <div v-if="!isLoadingSettings" class="contentWrap">
+          <div v-if="adminSettings.signing_mode === 'remote'">
+            <h3>
+              {{ $t($globalConfig.appId, 'Request signatures via eID Easy') }}
+            </h3>
+            <button @click.prevent="startRemoteMultisigning">
+              {{ $t($globalConfig.appId, 'Request signatures') }}
+            </button>
+          </div>
           <div
-              v-if="signatureQueue.length"
+              v-else-if="signatureQueue.length"
               class="siqQueue">
             <h3>
               {{ $t($globalConfig.appId, 'Signature queue') }}
@@ -282,7 +311,7 @@ export default {
               }}
             </div>
           </div>
-          <div v-else>
+          <div v-else-if="adminSettings.signing_mode !== 'remote'">
             <form
                 action=""
                 @submit.prevent="onSubmit">

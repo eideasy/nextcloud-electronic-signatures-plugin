@@ -121,7 +121,9 @@ class RemoteSigningQueueService
         $signingQueue->setOriginalFilePath($path);
         $this->signingQueueMapper->insert($signingQueue);
 
-        return [$webhookUrl];
+        return [
+            'management_page_url' => $queueResponse['management_page_url']
+        ];
     }
 
     public function fetchSignedFile(
