@@ -38,9 +38,11 @@ class SettingsApiController extends Controller {
             'container_type' => $this->config->getContainerType(),
             'enable_otp' => $this->config->isOtpEnabled(),
             'enable_local' => $this->config->isSigningLocal(),
+            'signing_mode' => $this->config->getSigningMode(),
             'client_id_provided' => !empty($this->config->getClientId()),
             'secret_provided' => !empty($this->config->getSecret()),
             'api_language' => !empty($this->config->getApiLanguage()),
+            'remote_signing_queue_status_webhook' => $this->config->getRemoteSigningQueueWebhook(),
         ]);
     }
 
@@ -91,6 +93,17 @@ class SettingsApiController extends Controller {
             $apiLanguage = $this->request->getParam('api_language', null);
             if ($apiLanguage !== null) {
                 $this->iConfig->setAppValue('electronicsignatures', 'api_language', $apiLanguage);
+            }
+
+            $remoteSigningQueueWebhook = $this->request->getParam('remote_signing_queue_status_webhook');
+            if ($remoteSigningQueueWebhook !== null) {
+                $configValue = $remoteSigningQueueWebhook === 'reset' ? null : $remoteSigningQueueWebhook;
+                $this->iConfig->setAppValue('electronicsignatures', 'remote_signing_queue_status_webhook', $configValue);
+            }
+
+            $signingMode = $this->request->getParam('signing_mode');
+            if ($signingMode !== null) {
+                $this->iConfig->setAppValue('electronicsignatures', 'signing_mode', $signingMode);
             }
 
             return new JSONResponse(['message' => 'Settings updated!']);

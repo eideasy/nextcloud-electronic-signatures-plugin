@@ -1006,20 +1006,21 @@
   dependencies:
     chalk "^4.0.0"
 
-"@eid-easy/eideasy-browser-client@2.12.0":
-  version "2.12.0"
-  resolved "https://registry.yarnpkg.com/@eid-easy/eideasy-browser-client/-/eideasy-browser-client-2.12.0.tgz#f7d84c82d1ea5e105675f8647a115d585a7b6b88"
-  integrity sha512-zc24oBCo9MQOb4yQ4apSHYLJs3oU3+5Wr3nHIw32YDObmxcAPmI5dWdPR9tMqFhn6z8s9bb4GBXrRotcORtSZA==
+"@eid-easy/eideasy-browser-client@2.19.0":
+  version "2.19.0"
+  resolved "https://registry.yarnpkg.com/@eid-easy/eideasy-browser-client/-/eideasy-browser-client-2.19.0.tgz#3e87ade21cb8df42db1442107dddaf3f78920d61"
+  integrity sha512-5VF/BpVFrWDKJBlBzC10TM/VQoHzbFxs9Yv41+FEqVNzrQkEN7HVSXcnYUQnn1fATtgm2mg+MG4FtvF1Fge85g==
   dependencies:
     axios "^0.21.1"
     lodash "^4.17.21"
+    serialize-error "^9.1.1"
 
-"@eid-easy/eideasy-widget@2.8.0":
-  version "2.8.0"
-  resolved "https://registry.yarnpkg.com/@eid-easy/eideasy-widget/-/eideasy-widget-2.8.0.tgz#d753b0b13ec201234a33a22379aa792f3d3bc966"
-  integrity sha512-duVgTeNhCBMHkVs2Jo1/pthEShm5UsV4ZOVeXYyiNfc08NWTH98aT7KckLf8z2kxnVYouZoaIDJY1VnjH42C7w==
+"@eid-easy/eideasy-widget@2.17.0":
+  version "2.17.0"
+  resolved "https://registry.yarnpkg.com/@eid-easy/eideasy-widget/-/eideasy-widget-2.17.0.tgz#d862abbd141b2d1fb6a055f24a444f826f7c04c2"
+  integrity sha512-HN4vYxHgZjckXACx+3jn56hkkZsNDfIdefOR0d1Rd9zr/Iedywfgc4o1T6FZmc8dtrPDnwXm1ytEPLBLx+Mdvg==
   dependencies:
-    "@eid-easy/eideasy-browser-client" "2.12.0"
+    "@eid-easy/eideasy-browser-client" "2.19.0"
     core-js "^3.6.5"
     i18n-iso-countries "^6.7.0"
     lodash.defaultsdeep "^4.6.1"
@@ -8172,6 +8173,13 @@ semver@~5.3.0:
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.3.0.tgz#9b2ce5d3de02d17c6012ad326aa6b4d0cf54f94f"
   integrity sha1-myzl094C0XxgEq0yaqa00M9U+U8=
 
+serialize-error@^9.1.1:
+  version "9.1.1"
+  resolved "https://registry.yarnpkg.com/serialize-error/-/serialize-error-9.1.1.tgz#b66744b6287b538996a153103e67af7179d0831a"
+  integrity sha512-6uZQLGyUkNA4N+Zii9fYukmNu9PEA1F5rqcwXzN/3LtBjwl2dFBbVZ1Zyn08/CGkB4H440PIemdOQBt1Wvjbrg==
+  dependencies:
+    type-fest "^2.5.3"
+
 serialize-javascript@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/serialize-javascript/-/serialize-javascript-4.0.0.tgz#b525e1238489a5ecfc42afacc3fe99e666f4b1aa"
@@ -9151,6 +9159,11 @@ type-fest@^0.8.1:
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.8.1.tgz#09e249ebde851d3b1e48d27c105444667f17b83d"
   integrity sha512-4dbzIzqvjtgiM5rw1k5rEHtBANKmdudhGyBEajN01fEyhaAIhsoKNy6y7+IN93IfpFtwY9iqi7kD+xwKhQsNJA==
+
+type-fest@^2.5.3:
+  version "2.12.2"
+  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-2.12.2.tgz#80a53614e6b9b475eb9077472fb7498dc7aa51d0"
+  integrity sha512-qt6ylCGpLjZ7AaODxbpyBZSs9fCI9SkL3Z9q2oxMBQhs/uyY+VD8jHA8ULCGmWQJlBgqvO3EJeAngOHD8zQCrQ==
 
 typedarray-to-buffer@^3.1.5:
   version "3.1.5"

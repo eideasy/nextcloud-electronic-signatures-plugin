@@ -37,10 +37,13 @@ With Simple Electronic Signatures, the contents of your file need to be sent to 
 # Feedback is welcome
 Are you not seeing your preferred signature card / signing app / other QES method? Are we not quite covering your use case? Let us know at support@eideasy.com
 
+# Documentation
+[CHANGELOG](https://github.com/eideasy/nextcloud-electronic-signatures-plugin/blob/master/CHANGELOG.md)
+
 ]]></description>
     <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-dropdown.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-modal.png</screenshot>
-    <version>1.10.1</version>
+    <version>2.0.0</version>
     <licence>agpl</licence>
     <author mail="support@eideasy.com" homepage="https://eideasy.com">eID Easy</author>
     <namespace>ElectronicSignatures</namespace>

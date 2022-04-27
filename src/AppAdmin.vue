@@ -23,13 +23,14 @@ export default {
       clientIdPlaceholder: this.$parent.clientId,
       secretPlaceholder: this.$parent.secret,
       allowSimpleSignatures: this.$parent.enableOtp,
-      fileHandling: this.$parent.enableLocalSigning ? 'local' : 'remote',
+      signingMode: this.$parent.signingMode || 'remote',
       padesUrl: this.$parent.padesUrl,
       enableSandbox: !!this.$parent.enableSandbox,
       containerType: this.$parent.containerType,
       showAdvancedSettings: false,
       apiLanguage: isoLanguages.getByCode(this.$parent.apiLanguage),
       apiLanguageOptions: isoLanguages.getAll(),
+      remoteSigningQueueStatusWebhook: this.$parent.remoteSigningQueueStatusWebhook,
     };
   },
   computed: {
@@ -40,7 +41,8 @@ export default {
       return window.location.origin;
     },
     simpleSignaturesSettingIsDisabled() {
-      return this.fileHandling === 'local' || this.containerType === 'asice';
+      // simple sigs are only supported for remote_legacy
+      return this.signingMode === 'local' || this.signingMode === 'remote' || this.containerType === 'asice';
     },
     buttonTextShowAdvanced() {
       if (this.showAdvancedSettings) {
@@ -55,9 +57,9 @@ export default {
       return generateUrl(url);
     },
     onFileHandlingToggle(saveSetting) {
-      const enableLocalSigning = this.fileHandling === 'local';
+      const enableLocalSigning = this.signingMode === 'local';
 
-      const settings = { enable_local_signing: enableLocalSigning };
+      const settings = { signing_mode: this.signingMode };
       if (enableLocalSigning) {
         this.allowSimpleSignatures = '0';
         settings.enable_otp = false;
@@ -241,12 +243,40 @@ export default {
       <SettingsGroup>
         <template v-slot:default="slotProps">
           <CheckboxRadioSwitch
-              :checked.sync="fileHandling"
+              :checked.sync="signingMode"
               value="remote"
               name="signing_mode_radio"
               type="radio"
               @update:checked="onFileHandlingToggle(slotProps.saveSetting)">
             {{ $t($globalConfig.appId, 'Remote with eID Easy') }}
+          </CheckboxRadioSwitch>
+          <p>
+            {{
+              $t($globalConfig.appId, 'With remote signing, the files are sent to the eID Easy server. The signer will go to a signing page on the eID Easy site, where they will be guided through the signing process.')
+            }}
+          </p>
+
+          <div class="subSection">
+            <SettingsTextInput
+                v-model="remoteSigningQueueStatusWebhook"
+                :placeholder="remoteSigningQueueStatusWebhook"
+                :on-button-click="() => slotProps.saveSetting({remote_signing_queue_status_webhook: remoteSigningQueueStatusWebhook || 'reset'})">
+              <template #label>
+                {{ $t($globalConfig.appId, 'Queue status webhook url') }}
+              </template>
+            </SettingsTextInput>
+            <p>
+              {{ $t($globalConfig.appId, 'You probably only need to fill this in if your Nextcloud instance is behind a reverse proxy etc. This is the url to where eID Easy will send the signing queue status updates. Keep in mind that this URL has to be accessible over the public internet.') }}
+            </p>
+          </div>
+
+          <CheckboxRadioSwitch
+              :checked.sync="signingMode"
+              value="remote_legacy"
+              name="signing_mode_radio"
+              type="radio"
+              @update:checked="onFileHandlingToggle(slotProps.saveSetting)">
+            {{ $t($globalConfig.appId, 'Old version of remote with eID Easy') }}
           </CheckboxRadioSwitch>
           <p>
             {{
@@ -294,7 +324,7 @@ export default {
           </div>
 
           <CheckboxRadioSwitch
-              :checked.sync="fileHandling"
+              :checked.sync="signingMode"
               value="local"
               name="signing_mode_radio"
               type="radio"
