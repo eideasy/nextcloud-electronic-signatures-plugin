@@ -7,15 +7,14 @@
     <description><![CDATA[# Features
 - 🔒🔒 Accept Qualified Electronic Signatures (QES - strongest legal value) in PDF or ASICE formats
 - 🔒 Accept Simple Electronic Signatures (email based signature - simple to sign)
-- 🥷 Own your data. Accept QES while never exposing your file to a remote service
 
 Currently, this app enables the user to gather a single signature onto an existing file:
 1. Pick a file which you want signed by another person
-1. Select "Signing" in the file's dropdown menu
-1. Enter the signer's email address
-1. The signer receives a link on their e-mail
-1. They sign the document
-1. The signed document appears in your Nextcloud instance, next to the original file
+2. Select "Signing" in the file's dropdown menu
+3. Enter the signer's email address
+4. The signer receives a link on their e-mail
+5. They sign the document
+6. The signed document appears in your Nextcloud instance, next to the original file
 
 # Built on top of eID Easy
 The app uses [eID Easy](https://eideasy.com) as its signing back-end. eID Easy handles the signing process. Refer to [eID Easy's pricing](https://eideasy.com/pricing/) to see the cost of each signing method.
@@ -38,12 +37,20 @@ With Simple Electronic Signatures, the contents of your file need to be sent to 
 Are you not seeing your preferred signature card / signing app / other QES method? Are we not quite covering your use case? Let us know at support@eideasy.com
 
 # Documentation
+
+## Set up
+1. Install and enable the "Electronic Signatures" app.
+2. In Nextcloud, on the blue top-bar, click on your profile picture.
+3. A dropdown menu opens, click on "Settings".
+4. On the left sidebar, click on "Electronic Signatures".
+5. Follow the instructions there to configure your eID Easy credentials.
+
 [CHANGELOG](https://github.com/eideasy/nextcloud-electronic-signatures-plugin/blob/master/CHANGELOG.md)
 
 ]]></description>
     <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-dropdown.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-modal.png</screenshot>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
     <licence>agpl</licence>
     <author mail="support@eideasy.com" homepage="https://eideasy.com">eID Easy</author>
     <namespace>ElectronicSignatures</namespace>
@@ -53,7 +60,7 @@ Are you not seeing your preferred signature card / signing app / other QES metho
     <bugs>https://github.com/eideasy/nextcloud-electronic-signatures-plugin/issues</bugs>
     <dependencies>
         <php min-version="7.3"/>
-        <nextcloud min-version="21" max-version="23"/>
+        <nextcloud min-version="21" max-version="24"/>
     </dependencies>
     <settings>
         <admin-section>OCA\ElectronicSignatures\Settings\AdminSection</admin-section>
