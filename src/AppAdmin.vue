@@ -91,20 +91,68 @@ export default {
       <template #settingsHint>
         <p>
           {{
-            $t($globalConfig.appId, 'You can find your credentials under the "My Webpages" section on your dashboard at: ')
+            "1. " + $t($globalConfig.appId, 'Head over to eID Easy sign-up page and authenticate yourself: ')
           }}
           <a
               class="link"
               target="_blank"
-              href="https://id.eideasy.com/">
-            id.eideasy.com
+              href="https://id.eideasy.com">
+            https://id.eideasy.com
           </a>
         </p>
         <p>
-          {{ $t($globalConfig.appId, 'Your application url is: ') }} <b>{{ instanceUrl }}</b><br>
           {{
-            $t($globalConfig.appId, 'Ensure that in your eID Easy panel under "My Websites", you have added the following notification hook to your website: ')
-          }} <b>{{ fetchSignedFileUrl }}</b>
+            "2. " + $t($globalConfig.appId, 'Navigate to: ')
+          }}
+          <a
+              class="link"
+              target="_blank"
+              href="https://id.eideasy.com/admin/clientlist">
+            My Webpages
+          </a>
+        </p>
+        <p>
+          {{
+            "3. " + $t($globalConfig.appId, 'Click on the "Add webpage" button (on the right)')
+          }}
+        </p>
+        <p>
+          {{
+            "4. " + $t($globalConfig.appId, 'For the "Website landing page address" field enter: ')
+          }}
+          <b>{{ instanceUrl }}</b>
+        </p>
+        <p>
+          {{
+            "5. " + $t($globalConfig.appId, 'Click the "Register" button')
+          }}
+        </p>
+        <p>
+          {{
+            "6. " + $t($globalConfig.appId, 'Scroll to the "Notification hooks" section and for the "Signature notification URL" field enter: ')
+          }}
+          <b>{{ fetchSignedFileUrl }}</b>
+        </p>
+        <p>
+          {{
+            "7. " + $t($globalConfig.appId, 'Click the "Save hooks data" button')
+          }}
+        </p>
+        <p>
+          {{
+            "8. " + $t($globalConfig.appId, 'On the left sidebar, click again on ')
+          }}
+          <a
+              class="link"
+              target="_blank"
+              href="https://id.eideasy.com/admin/clientlist">
+            My Webpages
+          </a>
+        </p>
+        <p>
+          {{
+            "9. " + $t($globalConfig.appId, 'You can now find your Client ID and Secret in the "client_id/secret" column. Use these to fill in the fields below:')
+          }}
         </p>
       </template>
       <SettingsGroup>
