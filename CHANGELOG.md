@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.0.2 – 2023-01-17
+### Added
+- Compatibility with Nextcloud 25
+
 ## 2.0.1 – 2022-06-20
 ### Added
 - Compatibility with Nextcloud 24
