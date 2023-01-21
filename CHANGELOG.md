@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.0.3 – 2023-01-21
+### Fix
+- Support php >= 7.4
+
 ## 2.0.2 – 2023-01-17
 ### Added
 - Compatibility with Nextcloud 25
