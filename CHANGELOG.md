@@ -1,5 +1,12 @@
 # Change Log
 
+## 2.0.5 – 2023-06-14
+### Added
+- Compatibility with Nextcloud 27
+
+### Changed
+- Moving forward, this app will only support Nextcloud 25 and above.
+
 ## 2.0.4 – 2023-04-04
 ### Added
 - Compatibility with Nextcloud 26
