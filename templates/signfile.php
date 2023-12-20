@@ -1,6 +1,6 @@
 <?php
 $appId = OCA\ElectronicSignatures\AppInfo\Application::APP_ID;
-OCP\Util::addscript($appId, 'electronic-signatures-signFile');
+OCP\Util::addInitScript($appId, 'electronic-signatures-signFile');
 OCP\Util::addStyle($appId, 'icons');
 /** @var array $_ */
 /** @var \OCP\IL10N $l */

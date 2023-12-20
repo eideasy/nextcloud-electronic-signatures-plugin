@@ -22,7 +22,7 @@ class Application extends App implements IBootstrap {
         $container = $this->getContainer();
         $eventDispatcher = $container->get(IEventDispatcher::class);
         $eventDispatcher->addListener(LoadAdditionalScriptsEvent::class, function() {
-            Util::addScript(self::APP_ID, 'electronic-signatures-fileActions');
+            Util::addInitScript(self::APP_ID, 'electronic-signatures-fileActions');
             Util::addStyle(self::APP_ID, 'icons');
         });
     }

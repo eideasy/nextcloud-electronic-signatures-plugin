@@ -39,6 +39,7 @@ function addCustomFileActions() {
       });
     },
   };
+  console.log('222222222222 registering fileActionsPlugin');
   OC.Plugins.register('OCA.Files.FileList', fileActionsPlugin);
 }
 
