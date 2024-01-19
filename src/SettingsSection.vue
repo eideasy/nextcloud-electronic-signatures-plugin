@@ -1,9 +1,9 @@
 <script>
-import SettingsSectionNC from '@nextcloud/vue/dist/Components/SettingsSection';
+import NcSettingsSection from '@nextcloud/vue/dist/Components/NcSettingsSection.js'
 export default {
   name: 'SettingsSection',
   components: {
-    SettingsSectionNC,
+    NcSettingsSection,
   },
   props: {
     title: {
@@ -15,13 +15,13 @@ export default {
 </script>
 
 <template>
-  <SettingsSectionNC
+  <NcSettingsSection
       :title="title">
     <div class="settings-hint settingsHint">
       <slot name="settingsHint" />
     </div>
     <slot />
-  </SettingsSectionNC>
+  </NcSettingsSection>
 </template>
 
 <style scoped>

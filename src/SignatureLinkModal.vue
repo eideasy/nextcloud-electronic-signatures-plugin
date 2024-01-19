@@ -1,6 +1,6 @@
 <script>
 import axios from 'axios';
-import Modal from '@nextcloud/vue/dist/Components/Modal';
+import NcModal from '@nextcloud/vue/dist/Components/NcModal.js'
 import EventBus from './EventBus';
 import { generateUrl } from '@nextcloud/router';
 import queryString from 'query-string';
@@ -23,7 +23,7 @@ const getFileExtension = function getFileExtension(filename) {
 export default {
   name: 'SignatureLinkModal',
   components: {
-    Modal,
+    NcModal,
     SignatureQueue,
   },
   data() {
@@ -256,7 +256,7 @@ export default {
 
 <template>
   <div>
-    <modal
+    <nc-modal
         v-if="modal"
         @close="closeModal">
       <div
@@ -377,7 +377,7 @@ export default {
           </div>
         </div>
       </div>
-    </modal>
+    </nc-modal>
   </div>
 </template>
 

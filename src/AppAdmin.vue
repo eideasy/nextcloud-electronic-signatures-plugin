@@ -1,10 +1,10 @@
 <script>
 import { generateUrl } from '@nextcloud/router';
-import SettingsSection from './SettingsSection';
-import SettingsGroup from './SettingsGroup';
-import SettingsTextInput from './SettingsTextInput';
-import Multiselect from '@nextcloud/vue/dist/Components/Multiselect';
-import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch';
+import SettingsSection from './SettingsSection.vue';
+import SettingsGroup from './SettingsGroup.vue';
+import SettingsTextInput from './SettingsTextInput.vue';
+import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js';
 import isoLanguages from './isoLanguages';
 
 export default {
@@ -13,8 +13,8 @@ export default {
     SettingsSection,
     SettingsGroup,
     SettingsTextInput,
-    CheckboxRadioSwitch,
-    Multiselect,
+    NcCheckboxRadioSwitch,
+    NcSelect,
   },
   data() {
     return {
@@ -201,7 +201,7 @@ export default {
 
       <SettingsGroup>
         <template v-slot:default="slotProps">
-          <Multiselect
+          <NcSelect
               v-model="apiLanguage"
               :options="apiLanguageOptions"
               track-by="code"
@@ -225,24 +225,24 @@ export default {
       <SettingsGroup>
         <template v-slot:default="slotProps">
           <div class="radioRow">
-            <CheckboxRadioSwitch
+            <NcCheckboxRadioSwitch
                 :checked.sync="containerType"
                 value="pdf"
                 name="container_type_radio"
                 type="radio"
                 @update:checked="onFileTypeToggle(slotProps.saveSetting)">
               {{ $t($globalConfig.appId, '.pdf') }}
-            </CheckboxRadioSwitch>
+            </NcCheckboxRadioSwitch>
           </div>
           <div class="radioRow">
-            <CheckboxRadioSwitch
+            <NcCheckboxRadioSwitch
                 :checked.sync="containerType"
                 value="asice"
                 name="container_type_radio"
                 type="radio"
                 @update:checked="onFileTypeToggle(slotProps.saveSetting)">
               {{ $t($globalConfig.appId, '.asice') }}
-            </CheckboxRadioSwitch>
+            </NcCheckboxRadioSwitch>
             <a href="#" class="infoTip">
               <span class="icon icon-details" />
             </a>
@@ -290,14 +290,14 @@ export default {
       </template>
       <SettingsGroup>
         <template v-slot:default="slotProps">
-          <CheckboxRadioSwitch
+          <NcCheckboxRadioSwitch
               :checked.sync="signingMode"
               value="remote"
               name="signing_mode_radio"
               type="radio"
               @update:checked="onFileHandlingToggle(slotProps.saveSetting)">
             {{ $t($globalConfig.appId, 'Remote with eID Easy') }}
-          </CheckboxRadioSwitch>
+          </NcCheckboxRadioSwitch>
           <p>
             {{
               $t($globalConfig.appId, 'With remote signing, the files are sent to the eID Easy server. The signer will go to a signing page on the eID Easy site, where they will be guided through the signing process.')
@@ -318,14 +318,14 @@ export default {
             </p>
           </div>
 
-          <CheckboxRadioSwitch
+          <NcCheckboxRadioSwitch
               :checked.sync="signingMode"
               value="remote_legacy"
               name="signing_mode_radio"
               type="radio"
               @update:checked="onFileHandlingToggle(slotProps.saveSetting)">
             {{ $t($globalConfig.appId, 'Old version of remote with eID Easy') }}
-          </CheckboxRadioSwitch>
+          </NcCheckboxRadioSwitch>
           <p>
             {{
               $t($globalConfig.appId, 'With remote signing, the files are sent to the eID Easy server. The signer will go to a signing page on the eID Easy site, where they will be guided through the signing process.')
@@ -371,14 +371,14 @@ export default {
             </ul>
           </div>
 
-          <CheckboxRadioSwitch
+          <NcCheckboxRadioSwitch
               :checked.sync="signingMode"
               value="local"
               name="signing_mode_radio"
               type="radio"
               @update:checked="onFileHandlingToggle(slotProps.saveSetting)">
             {{ $t($globalConfig.appId, 'Local') }}
-          </CheckboxRadioSwitch>
+          </NcCheckboxRadioSwitch>
           <p>
             {{
               $t($globalConfig.appId, 'With local signing, the signer is directed to your Nextcloud instance for the signing process. They will not need an account in your Nextcloud instance. The file contents are not sent to the eID Easy server, however the file names and signatory names will pass through eID Easy server, to enable electronic signature creation.')
@@ -440,12 +440,12 @@ export default {
       </template>
       <SettingsGroup>
         <template v-slot:default="slotProps">
-          <CheckboxRadioSwitch
+          <NcCheckboxRadioSwitch
               :checked.sync="enableSandbox"
               type="switch"
               @update:checked="onSandboxToggle(slotProps.saveSetting)">
             {{ $t($globalConfig.appId, 'Enable sandbox mode') }}
-          </CheckboxRadioSwitch>
+          </NcCheckboxRadioSwitch>
         </template>
       </SettingsGroup>
       <p>

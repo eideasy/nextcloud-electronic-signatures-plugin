@@ -1,14 +1,14 @@
 <template>
-	<Content :class="{'icon-loading': loading}" app-name="vueexample" />
+	<NcContent :class="{'icon-loading': loading}" app-name="vueexample" />
 </template>
 
 <script>
-import Content from '@nextcloud/vue/dist/Components/Content';
+import NcContent from '@nextcloud/vue/dist/Components/NcContent.js'
 
 export default {
 	name: 'App',
 	components: {
-		Content,
+    NcContent,
 	},
 	data() {
 		return {
