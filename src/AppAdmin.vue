@@ -6,6 +6,7 @@ import SettingsTextInput from './SettingsTextInput.vue';
 import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js';
 import isoLanguages from './isoLanguages';
+import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js';
 
 export default {
   name: 'AppAdmin',
@@ -15,6 +16,7 @@ export default {
     SettingsTextInput,
     NcCheckboxRadioSwitch,
     NcSelect,
+    NcNoteCard,
   },
   data() {
     return {
@@ -87,6 +89,26 @@ export default {
 
 <template>
   <div>
+    <SettingsSection v-if="signingMode === 'remote_legacy'">
+      <NcNoteCard type="error">
+        <p>
+          {{
+            $t($globalConfig.appId, 'Your are using a deprecated signing mode.')
+          }}
+        </p>
+        <p>
+          {{
+            $t($globalConfig.appId, 'Please scroll down and click on "Show advanced settings."')
+          }}
+        </p>
+        <p>
+          {{
+            $t($globalConfig.appId, 'Under advanced settings, enable the "Remote with eID Easy" option.')
+          }}
+        </p>
+      </NcNoteCard>
+    </SettingsSection>
+
     <SettingsSection :title="$t($globalConfig.appId, 'eID Easy credentials')">
       <template #settingsHint>
         <p>
@@ -324,8 +346,15 @@ export default {
               name="signing_mode_radio"
               type="radio"
               @update:checked="onFileHandlingToggle(slotProps.saveSetting)">
-            {{ $t($globalConfig.appId, 'Old version of remote with eID Easy') }}
+            {{ $t($globalConfig.appId, '[Deprecated!] Old version of remote with eID Easy') }}
           </NcCheckboxRadioSwitch>
+          <NcNoteCard v-if="signingMode === 'remote_legacy'" type="warning">
+            <p>
+              {{
+                $t($globalConfig.appId, 'This signing mode is deprecated. Please enable "Remote with eID Easy"')
+              }}
+            </p>
+          </NcNoteCard>
           <p>
             {{
               $t($globalConfig.appId, 'With remote signing, the files are sent to the eID Easy server. The signer will go to a signing page on the eID Easy site, where they will be guided through the signing process.')
