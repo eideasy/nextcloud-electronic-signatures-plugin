@@ -59,9 +59,7 @@ export default {
   },
   methods: {
     showModal() {
-      if (!this.adminSettings) {
-        this.getAdminSettings();
-      }
+      this.getAdminSettings();
       this.setError(null);
       this.modal = true;
     },
@@ -131,7 +129,7 @@ export default {
             }}
           </p>
         </NcNoteCard>
-
+        <RemoteQueue v-else />
       </div>
     </nc-modal>
   </div>
@@ -154,12 +152,6 @@ export default {
 
 .modal__content * {
   box-sizing: border-box;
-}
-
-h3 {
-  font-size: 20px;
-  margin-bottom: 20px;
-  font-weight: bold;
 }
 
 a {

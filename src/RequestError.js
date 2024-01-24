@@ -9,7 +9,7 @@ class RequestError extends Error {
       this.debugInfo.request = {
         url: cause.config.url,
         method: cause.config.method,
-        data: cause.config.data,
+        data: JSON.parse(cause.config.data),
       }
     }
 
@@ -17,10 +17,12 @@ class RequestError extends Error {
       this.debugInfo.response = {
         status: cause.response.status,
         statusText: cause.response.statusText,
-        data: cause.response.data,
+        data: JSON.parse(cause.response.data),
       }
     }
+
   }
+
 
   get debugInfoPrettyString() {
     return JSON.stringify(this.debugInfo, null, 4);

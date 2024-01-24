@@ -4,6 +4,8 @@ import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
 import queryString from 'query-string';
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js';
 import RemoteSigningQueue from './RemoteSigningQueue';
+import Error from './Error.vue';
+import RequestError from './RequestError';
 
 export default {
   name: 'RemoteQueue',
@@ -11,12 +13,13 @@ export default {
     NcModal,
     NcNoteCard,
     NcLoadingIcon,
+    Error,
   },
   data() {
     return {
       RemoteSigningQueue: new RemoteSigningQueue(),
       isLoading: false,
-      errorMessage: null,
+      error: null,
     };
   },
   methods: {
@@ -36,25 +39,21 @@ export default {
             if (response.data && response.data.management_page_url) {
               window.location.href = response.data.management_page_url;
             } else {
-              _self.setErrorMessage(_self.$t(_self.$globalConfig.appId, 'Response data does not contain management_page_url'));
+              _self.setError(new RequestError(_self.$t(_self.$globalConfig.appId, 'Response data does not contain management_page_url'), {}));
             }
           })
           .catch(function (error) {
             console.error(error);
-            _self.setErrorMessage(_self.$t(_self.$globalConfig.appId, 'Failed to start remote multisigning'));
+            console.log(error.response);
+            console.log(error.config);
+            _self.setError(new RequestError(_self.$t(_self.$globalConfig.appId, 'Failed to start remote multisigning'), error));
           })
           .then(function () {
             _self.isLoading = false;
           });
     },
-    setErrorMessage(message) {
-      if (message === null) {
-        this.errorMessage = null;
-      } else if (!message) {
-        this.errorMessage = this.$t(this.$globalConfig.appId, 'Something went wrong. Make sure that the electronic signatures app settings are correct.');
-      } else {
-        this.errorMessage = message;
-      }
+    setError(error) {
+      this.error = error;
     },
   },
 };
@@ -70,9 +69,11 @@ export default {
         v-if="isLoading"
         :size="64"
         appearance="dark"
-        name="Loading modal content"
+        name="Loading"
     />
     <div v-else>
+      <Error v-if="error" :error="error" />
+
       <button @click.prevent="startRemoteMultisigning">
         {{ $t($globalConfig.appId, 'Request signatures') }}
       </button>
@@ -80,15 +81,17 @@ export default {
       <NcNoteCard v-if="errorMessage" type="error" heading="Error">
         <p>{{ errorMessage }}<</p>
       </NcNoteCard>
-
-      <NcNoteCard v-if="successMessage" type="success">
-        <p>{{ successMessage }}<</p>
-      </NcNoteCard>
     </div>
   </div>
 </template>
 
 <style scoped>
+h3 {
+  font-size: 20px;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
 .contentWrap {
   position: relative;
   padding-bottom: 30px;
