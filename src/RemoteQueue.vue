@@ -15,6 +15,9 @@ export default {
     NcLoadingIcon,
     Error,
   },
+  props: {
+    filePath: String,
+  },
   data() {
     return {
       RemoteSigningQueue: new RemoteSigningQueue(),
@@ -23,18 +26,10 @@ export default {
     };
   },
   methods: {
-    getFilePath() {
-      const parsed = queryString.parse(window.location.search);
-      if (parsed.dir === '/') {
-        return this.filename;
-      } else {
-        return parsed.dir + '/' + this.filename;
-      }
-    },
     startRemoteMultisigning() {
       const _self = this;
       this.isLoading = true;
-      this.RemoteSigningQueue.create(this.getFilePath())
+      this.RemoteSigningQueue.create(this.filePath)
           .then(function (response) {
             if (response.data && response.data.management_page_url) {
               window.location.href = response.data.management_page_url;
@@ -77,10 +72,6 @@ export default {
       <button @click.prevent="startRemoteMultisigning">
         {{ $t($globalConfig.appId, 'Request signatures') }}
       </button>
-
-      <NcNoteCard v-if="errorMessage" type="error" heading="Error">
-        <p>{{ errorMessage }}<</p>
-      </NcNoteCard>
     </div>
   </div>
 </template>

@@ -27,7 +27,7 @@ export default {
       error: null,
       isLoading: false,
       adminSettings: null,
-      filename: '',
+      filePath: '',
     };
   },
   computed: {
@@ -53,7 +53,7 @@ export default {
   mounted() {
     const _self = this;
     EventBus.$on('SIGNATURES_CLICK', function (payload) {
-      _self.filename = payload.filename;
+      _self.filePath = payload.path;
       _self.showModal();
     });
   },
@@ -129,7 +129,7 @@ export default {
             }}
           </p>
         </NcNoteCard>
-        <RemoteQueue v-else />
+        <RemoteQueue v-else :file-path="filePath" />
       </div>
     </nc-modal>
   </div>

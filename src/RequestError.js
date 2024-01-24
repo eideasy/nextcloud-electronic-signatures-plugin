@@ -23,7 +23,6 @@ class RequestError extends Error {
 
   }
 
-
   get debugInfoPrettyString() {
     return JSON.stringify(this.debugInfo, null, 4);
   }
