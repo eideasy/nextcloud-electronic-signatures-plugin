@@ -16,7 +16,7 @@ export default {
 
 <template>
   <NcSettingsSection
-      :title="title">
+      :name="title">
     <div class="settings-hint settingsHint">
       <slot name="settingsHint" />
     </div>

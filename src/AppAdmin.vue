@@ -89,7 +89,7 @@ export default {
 
 <template>
   <div>
-    <SettingsSection v-if="signingMode === 'remote_legacy'">
+    <SettingsSection v-if="signingMode !== 'remote'">
       <NcNoteCard type="error">
         <p>
           {{
@@ -272,32 +272,11 @@ export default {
               {{
                 $t($globalConfig.appId, '.asice files can be opened and verified with the DigiDoc4 application that is available at:')
               }}
-              <ul>
-                <li>
-                  {{ $t($globalConfig.appId, 'Windows - ') }}
-                  <a
-                      href="https://www.microsoft.com/en-us/p/digidoc4-client/9pfpfk4dj1s6"
-                      target="_blank">
-                    https://www.microsoft.com/en-us/p/digidoc4-client/9pfpfk4dj1s6
-                  </a>
-                </li>
-                <li>
-                  {{ $t($globalConfig.appId, 'macOS - ') }}
-                  <a
-                      href="https://apps.apple.com/us/app/digidoc4-client/id1370791134"
-                      target="_blank">
-                    https://apps.apple.com/us/app/digidoc4-client/id1370791134
-                  </a>
-                </li>
-                <li>
-                  {{ $t($globalConfig.appId, 'or alternatively - ') }}
-                  <a
-                      href="https://www.id.ee/en/article/install-id-software/"
-                      target="_blank">
-                    https://www.id.ee/en/article/install-id-software
-                  </a>
-                </li>
-              </ul>
+              <a
+                  href="https://www.id.ee/en/article/install-id-software/"
+                  target="_blank">
+                https://www.id.ee/en/article/install-id-software
+              </a>
             </div>
           </div>
         </template>
@@ -408,6 +387,13 @@ export default {
               @update:checked="onFileHandlingToggle(slotProps.saveSetting)">
             {{ $t($globalConfig.appId, 'Local') }}
           </NcCheckboxRadioSwitch>
+          <NcNoteCard v-if="signingMode === 'local'" type="warning">
+            <p>
+              {{
+                $t($globalConfig.appId, 'This signing mode is deprecated. Please enable "Remote with eID Easy"')
+              }}
+            </p>
+          </NcNoteCard>
           <p>
             {{
               $t($globalConfig.appId, 'With local signing, the signer is directed to your Nextcloud instance for the signing process. They will not need an account in your Nextcloud instance. The file contents are not sent to the eID Easy server, however the file names and signatory names will pass through eID Easy server, to enable electronic signature creation.')
@@ -478,53 +464,14 @@ export default {
         </template>
       </SettingsGroup>
       <p>
-        {{ $t($globalConfig.appId, 'While in sandbox mode, you can authenticate and sign with:') }}
+        {{ $t($globalConfig.appId, 'While in sandbox mode, you can use the following test users: ') }}
       </p>
-      <ul>
-        <li>
-          {{ $t($globalConfig.appId, 'Mobile ID') }}
-          <a
-              class="link"
-              href="https://github.com/SK-EID/MID/wiki/Test-number-for-automated-testing-in-DEMO"
-              target="_blank">
-            {{ $t($globalConfig.appId, 'test numbers') }}
-          </a>
-        </li>
-        <li>
-          {{ $t($globalConfig.appId, 'Your own Mobile ID, if you whitelist it beforehand at ') }}
-          <a
-              class="link"
-              href="https://demo.sk.ee/MIDCertsReg/"
-              target="_blank">
-            {{ $t($globalConfig.appId, 'https://demo.sk.ee/') }}
-          </a>
-        </li>
-        <li>
-          {{ $t($globalConfig.appId, 'Smart ID') }}
-          <a
-              class="link"
-              href="https://github.com/SK-EID/smart-id-documentation/wiki/Environment-technical-parameters#accounts"
-              target="_blank">
-            {{ $t($globalConfig.appId, 'test numbers') }}
-          </a>
-        </li>
-        <li>
-          {{
-            $t($globalConfig.appId, 'Production ID card from any of our supported countries (does not work for signing asice/bdoc containers),')
-          }}
-        </li>
-        <li>
-          {{
-            $t($globalConfig.appId, 'Estonian test ID-card (or any other supported country). More info regarding Estonian test ID-cards can be found on')
-          }}
-          <a
-              class="link"
-              href="https://www.id.ee/en/article/service-testing-general-information-2/"
-              target="_blank">
-            {{ $t($globalConfig.appId, 'SK’s site.') }}
-          </a>
-        </li>
-      </ul>
+      <a
+          class="link"
+          href="https://docs.eideasy.com/guide/test-environment.html#electronic-identities-in-test-environment"
+          target="_blank">
+        {{'https://docs.eideasy.com/guide/test-environment.html#electronic-identities-in-test-environment' }}
+      </a>
     </SettingsSection>
   </div>
 </template>
