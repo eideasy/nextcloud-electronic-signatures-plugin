@@ -233,14 +233,11 @@ export default {
       </SettingsGroup>
     </SettingsSection>
 
-    <SettingsSection v-if="showAdvancedSettings" :title="$t($globalConfig.appId, 'Output file type for pdf')">
+    <SettingsSection v-if="showAdvancedSettings" :title="$t($globalConfig.appId, 'Output file type')">
       <template #settingsHint>
         <p>
-          {{ $t($globalConfig.appId, 'These settings only apply to pdf files.') }}
-        </p>
-        <p>
           {{ $t($globalConfig.appId, 'If you choose .pdf as the output file type, then your final signed file will be a pdf.') }}
-          {{ $t($globalConfig.appId, 'If you choose .asice, then your final signed file will be an .asice file that contains the original pdf file.') }}
+          {{ $t($globalConfig.appId, 'If you choose .asice, then your final signed file will be an .asice file that contains the original file.') }}
         </p>
       </template>
 
@@ -385,7 +382,7 @@ export default {
               name="signing_mode_radio"
               type="radio"
               @update:checked="onFileHandlingToggle(slotProps.saveSetting)">
-            {{ $t($globalConfig.appId, 'Local') }}
+            {{ $t($globalConfig.appId, '[Deprecated!] Local') }}
           </NcCheckboxRadioSwitch>
           <NcNoteCard v-if="signingMode === 'local'" type="warning">
             <p>

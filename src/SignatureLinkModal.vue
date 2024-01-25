@@ -28,6 +28,7 @@ export default {
       isLoading: false,
       adminSettings: null,
       filePath: '',
+      fileMime: '',
     };
   },
   computed: {
@@ -54,6 +55,7 @@ export default {
     const _self = this;
     EventBus.$on('SIGNATURES_CLICK', function (payload) {
       _self.filePath = payload.path;
+      _self.fileMime = payload.mime;
       _self.showModal();
     });
   },
@@ -126,6 +128,19 @@ export default {
           <p>
             {{
               $t($globalConfig.appId, 'Please make sure that you have filled in the eID Easy credential fields on the "Electronic Signatures" app settings page.')
+            }}
+          </p>
+        </NcNoteCard>
+        <NcNoteCard v-else-if="fileMime !== 'application/pdf' && adminSettings.container_type !== 'asice'" type="warning">
+          <p>
+            {{
+              $t($globalConfig.appId, 'You are trying to sign a file that is not a PDF.')
+            }}
+            {{
+              $t($globalConfig.appId, 'For this you first need to change the output file type to .asice in the Electronic Sigantures admin settings.')
+            }}
+            {{
+              $t($globalConfig.appId, 'See the following guide for more information:')
             }}
           </p>
         </NcNoteCard>
