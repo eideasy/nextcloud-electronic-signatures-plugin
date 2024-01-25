@@ -228,7 +228,7 @@ export default {
               :options="apiLanguageOptions"
               track-by="code"
               label="name"
-              @change="(option) => slotProps.saveSetting({api_language: option.code})" />
+              @input="(option) => slotProps.saveSetting({api_language: option.code})" />
         </template>
       </SettingsGroup>
     </SettingsSection>
