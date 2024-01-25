@@ -12,6 +12,16 @@ export default {
       default: null,
     },
   },
+  data() {
+    return {
+      showDebugInfo: false,
+    };
+  },
+  methods: {
+    toggleDebugInfo() {
+      this.showDebugInfo = !this.showDebugInfo;
+    }
+  }
 };
 </script>
 
@@ -24,12 +34,22 @@ export default {
       {{ error.cause.message }}
     </p>
 
-    <pre v-if="error.debugInfoPrettyString" class="debugInfo">{{ error.debugInfoPrettyString }}</pre>
+    <div v-if="error.debugInfoPrettyString" class="debugInfoSection">
+      <button @click.prevent="toggleDebugInfo">
+        {{ $t($globalConfig.appId, 'Debug info') }}
+      </button>
+
+      <pre v-if="showDebugInfo" class="debugInfo">{{ error.debugInfoPrettyString }}</pre>
+    </div>
   </NcNoteCard>
 </template>
 
 <style scoped>
 p + p {
+  margin-top: 20px;
+}
+
+.debugInfoSection {
   margin-top: 20px;
 }
 
