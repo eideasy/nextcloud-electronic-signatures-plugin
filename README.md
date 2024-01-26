@@ -1,4 +1,4 @@
-# Electronic Signatures
+# Electronic Signatures Nextcloud app by eID Easy
 Place this app in **nextcloud/apps/**
 IMPORTANT! the folder name must match the id in the appinfo/info.xml
 

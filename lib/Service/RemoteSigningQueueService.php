@@ -106,7 +106,7 @@ class RemoteSigningQueueService
             $webhookUrl= $this->config->getDefaultRemoteSigningQueueWebhook();
         }
 
-        $this->logger->alert("Remote queue status webhook url: $webhookUrl");
+        $this->logger->info("Remote queue status webhook url: $webhookUrl");
 
         $queueResponse = $this->eidEasyApi->createSigningQueue($docId, [
             'has_management_page' => true,
