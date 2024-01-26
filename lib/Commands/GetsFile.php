@@ -12,7 +12,7 @@ trait GetsFile {
             $file = $userFolder->get($path);
 
             if ($file instanceof \OCP\Files\File) {
-                return [$file->getMimeType(), $file->getContent(), $file->getName()];
+                return [$file->getMimeType(), $file->getContent(), $file->getName(), $file->getExtension()];
             } else {
                 throw new NotFoundException('Can not read from folder');
             }

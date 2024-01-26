@@ -70,10 +70,10 @@ class RemoteSigningQueueService
         string $userId
     )
     {
-        list($mimeType, $contents) = $this->getFile($path, $userId);
+        list($mimeType, $contents, $fileName, $extension) = $this->getFile($path, $userId);
 
         $file = [
-            'fileName' => basename($path),
+            'fileName' => $fileName,
             'fileContent' => base64_encode($contents),
             'mimeType' => $mimeType,
         ];
@@ -83,7 +83,12 @@ class RemoteSigningQueueService
             'secret' => $this->config->getSecret(),
             'lang' => $this->config->getApiLanguage() ?? self::DEFAULT_API_LANGUAGE,
         ];
-        $prepareFilesResponse = $this->eidEasyApi->prepareFiles([$file], $params);
+
+        if ($extension === 'asice') {
+            $prepareFilesResponse = $this->eidEasyApi->prepareAsiceForSigning($file['fileContent'], $file);
+        } else {
+            $prepareFilesResponse = $this->eidEasyApi->prepareFiles([$file], $params);
+        }
         if ($prepareFilesResponse['status'] !== 'OK') {
             $this->logger->alert(json_encode($prepareFilesResponse));
             $message = 'File preparation failed.';
