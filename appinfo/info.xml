@@ -6,7 +6,7 @@
     <summary>Accept electronic signatures on your documents.</summary>
     <description><![CDATA[# Features
 - 🔒🔒 Accept Qualified Electronic Signatures (QES - strongest legal value) in PDF or ASICE formats
-- 🔒 Accept Simple Electronic Signatures (email based signature - simple to sign)
+- 🔒 Accept Simple Electronic Signatures (sms based signature - simple to sign)
 
 Currently, this app enables the user to gather a single signature onto an existing file:
 1. Pick a file which you want signed by another person

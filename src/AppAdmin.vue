@@ -1,5 +1,5 @@
 <script>
-import { generateUrl } from '@nextcloud/router';
+import {generateUrl} from '@nextcloud/router';
 import SettingsSection from './SettingsSection.vue';
 import SettingsGroup from './SettingsGroup.vue';
 import SettingsTextInput from './SettingsTextInput.vue';
@@ -33,12 +33,10 @@ export default {
       apiLanguage: isoLanguages.getByCode(this.$parent.apiLanguage),
       apiLanguageOptions: isoLanguages.getAll(),
       remoteSigningQueueStatusWebhook: this.$parent.remoteSigningQueueStatusWebhook,
+      defaultRemoteSigningQueueStatusWebhook: this.$parent.defaultRemoteSigningQueueStatusWebhook,
     };
   },
   computed: {
-    fetchSignedFileUrl() {
-      return window.location.origin + this.generateNextcloudUrl('/apps/electronicsignatures/fetch_signed_file');
-    },
     instanceUrl() {
       return window.location.origin;
     },
@@ -55,13 +53,10 @@ export default {
     },
   },
   methods: {
-    generateNextcloudUrl(url) {
-      return generateUrl(url);
-    },
     onFileHandlingToggle(saveSetting) {
       const enableLocalSigning = this.signingMode === 'local';
 
-      const settings = { signing_mode: this.signingMode };
+      const settings = {signing_mode: this.signingMode};
       if (enableLocalSigning) {
         this.allowSimpleSignatures = '0';
         settings.enable_otp = false;
@@ -151,18 +146,7 @@ export default {
         </p>
         <p>
           {{
-            "6. " + $t($globalConfig.appId, 'Scroll to the "Notification hooks" section and for the "Signature notification URL" field enter: ')
-          }}
-          <b>{{ fetchSignedFileUrl }}</b>
-        </p>
-        <p>
-          {{
-            "7. " + $t($globalConfig.appId, 'Click the "Save hooks data" button')
-          }}
-        </p>
-        <p>
-          {{
-            "8. " + $t($globalConfig.appId, 'On the left sidebar, click again on ')
+            "6. " + $t($globalConfig.appId, 'On the left sidebar, click again on ')
           }}
           <a
               class="link"
@@ -173,7 +157,7 @@ export default {
         </p>
         <p>
           {{
-            "9. " + $t($globalConfig.appId, 'You can now find your Client ID and Secret in the "client_id/secret" column. Use these to fill in the fields below:')
+            "7. " + $t($globalConfig.appId, 'You can now find your Client ID and Secret in the "client_id/secret" column. Use these to fill in the fields below:')
           }}
         </p>
       </template>
@@ -217,7 +201,9 @@ export default {
     <SettingsSection v-if="showAdvancedSettings" :title="$t($globalConfig.appId, 'eID Easy service language')">
       <template #settingsHint>
         <p>
-          {{ $t($globalConfig.appId, 'Choose the language for eID Easy signing views and emails that the end users receive.') }}
+          {{
+            $t($globalConfig.appId, 'Choose the language for eID Easy signing views and emails that the end users receive.')
+          }}
         </p>
       </template>
 
@@ -228,7 +214,7 @@ export default {
               :options="apiLanguageOptions"
               track-by="code"
               label="name"
-              @input="(option) => slotProps.saveSetting({api_language: option.code})" />
+              @input="(option) => slotProps.saveSetting({api_language: option.code})"/>
         </template>
       </SettingsGroup>
     </SettingsSection>
@@ -236,8 +222,12 @@ export default {
     <SettingsSection v-if="showAdvancedSettings" :title="$t($globalConfig.appId, 'Output file type')">
       <template #settingsHint>
         <p>
-          {{ $t($globalConfig.appId, 'If you choose .pdf as the output file type, then your final signed file will be a pdf.') }}
-          {{ $t($globalConfig.appId, 'If you choose .asice, then your final signed file will be an .asice file that contains the original file.') }}
+          {{
+            $t($globalConfig.appId, 'If you choose .pdf as the output file type, then your final signed file will be a pdf.')
+          }}
+          {{
+            $t($globalConfig.appId, 'If you choose .asice, then your final signed file will be an .asice file that contains the original file.')
+          }}
         </p>
       </template>
 
@@ -263,7 +253,7 @@ export default {
               {{ $t($globalConfig.appId, '.asice') }}
             </NcCheckboxRadioSwitch>
             <a href="#" class="infoTip">
-              <span class="icon icon-details" />
+              <span class="icon icon-details"/>
             </a>
             <div>
               {{
@@ -286,7 +276,7 @@ export default {
           {{ $t($globalConfig.appId, 'These settings determine how and where the files are signed.') }}
         </p>
       </template>
-      <SettingsGroup>
+      <SettingsGroup :allow-saving-empty-settings="true">
         <template v-slot:default="slotProps">
           <NcCheckboxRadioSwitch
               :checked.sync="signingMode"
@@ -312,7 +302,13 @@ export default {
               </template>
             </SettingsTextInput>
             <p>
-              {{ $t($globalConfig.appId, 'You probably only need to fill this in if your Nextcloud instance is behind a reverse proxy etc. This is the url to where eID Easy will send the signing queue status updates. Keep in mind that this URL has to be accessible over the public internet.') }}
+              {{
+                $t($globalConfig.appId, 'You probably only need to fill this in if your Nextcloud instance is behind a reverse proxy etc. This is the url to where eID Easy will send the signing queue status updates. Keep in mind that this URL has to be accessible over the public internet.')
+              }}
+            </p>
+            <p>
+              If left empty, the following default url is used: <br>
+              <b>{{ defaultRemoteSigningQueueStatusWebhook }}</b>
             </p>
           </div>
 
@@ -338,7 +334,8 @@ export default {
           </p>
 
           <p v-if="simpleSignaturesSettingIsDisabled">
-            "Allow simple signatures" setting is only available if ".pdf" is selected in "Output file type for pdf" setting.
+            "Allow simple signatures" setting is only available if ".pdf" is selected in "Output file type for pdf"
+            setting.
           </p>
 
           <div :class="`subSection ${simpleSignaturesSettingIsDisabled ? 'disabled' : ''}`">
@@ -366,7 +363,7 @@ export default {
             </p>
             <ul>
               <li>
-{{
+                {{
                   $t($globalConfig.appId, 'Simple Electronic Signatures are always collected remotely, in order to increase the legal value of the signature.')
                 }}
               </li>
@@ -409,16 +406,16 @@ export default {
           <ol>
             <li>{{ $t($globalConfig.appId, 'Install docker') }}</li>
             <li>
-{{
+              {{
                 $t($globalConfig.appId, 'Pull the service container into the directory of your choice: docker pull eideasy/pades-external-digital-signatures')
               }}
             </li>
             <li>cd eideasy-external-pades-digital-signatures/</li>
             <li>
-{{ $t($globalConfig.appId, 'Start the container: ') }}<span v-pre>sudo docker run -p 8080:8084 --name=eideasy_detached_pades --restart always --log-driver syslog --log-opt tag="{{ .Name }}/{{ .ID }}" eideasy/pades-external-digital-signatures</span>
+              {{ $t($globalConfig.appId, 'Start the container: ') }}<span v-pre>sudo docker run -p 8080:8084 --name=eideasy_detached_pades --restart always --log-driver syslog --log-opt tag="{{ .Name }}/{{ .ID }}" eideasy/pades-external-digital-signatures</span>
             </li>
             <li>
-{{
+              {{
                 $t($globalConfig.appId, 'Provide the container\'s url for the PADES URL setting below. If you didn\'t change the above "docker run" command, the url is 0.0.0.0:8080.')
               }}
             </li>
@@ -467,7 +464,7 @@ export default {
           class="link"
           href="https://docs.eideasy.com/guide/test-environment.html#electronic-identities-in-test-environment"
           target="_blank">
-        {{'https://docs.eideasy.com/guide/test-environment.html#electronic-identities-in-test-environment' }}
+        {{ 'https://docs.eideasy.com/guide/test-environment.html#electronic-identities-in-test-environment' }}
       </a>
     </SettingsSection>
   </div>

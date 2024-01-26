@@ -5,6 +5,7 @@ namespace OCA\ElectronicSignatures;
 use OCP\IConfig;
 use EidEasy\Api\EidEasyApi;
 use EidEasy\Signatures\Pades;
+use OCP\IURLGenerator;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -19,6 +20,9 @@ class Config {
 
     /** @var IConfig */
     private $config;
+
+    /** @var IURLGenerator */
+    private $urlGenerator;
 
     /** @var string */
     private $clientId;
@@ -56,8 +60,12 @@ class Config {
     /** @var string|null */
     private $remoteSigningQueueWebhook;
 
-    public function __construct(IConfig $config, EidEasyApi $api, Pades $padesApi) {
+    /** @var string|null */
+    private $defaultRemoteSigningQueueWebhook;
+
+    public function __construct(IConfig $config, IURLGenerator $urlGenerator, EidEasyApi $api, Pades $padesApi) {
         $this->config = $config;
+        $this->urlGenerator = $urlGenerator;
         $this->initApi($api);
         $this->initPadesApi($padesApi);
     }
@@ -128,6 +136,15 @@ class Config {
         }
 
         return $this->signingMode;
+    }
+
+    public function getDefaultRemoteSigningQueueWebhook(): ?string
+    {
+        if (!isset($this->defaultRemoteSigningQueueWebhook)) {
+            $this->defaultRemoteSigningQueueWebhook = $this->urlGenerator->linkToRouteAbsolute('electronicsignatures.remoteQueueApi.fetchSigningQueueFile');
+        }
+
+        return $this->defaultRemoteSigningQueueWebhook;
     }
 
     public function getRemoteSigningQueueWebhook(): ?string
