@@ -147,12 +147,22 @@ appstore:
 	mkdir -p $(appstore_sign_dir)/$(app_name)/js
 	cp js/* $(appstore_sign_dir)/$(app_name)/js/
 
-	echo "Signing app files…"; \
-	php ../../occ integrity:sign-app \
-		--privateKey=$(cert_dir)/$(app_name).key\
-		--certificate=$(cert_dir)/$(app_name).crt\
-		--path=$(appstore_sign_dir)/$(app_name); \
-	echo "Signing app files ... done"; \
+	# export the key and cert to a file
+	@if [ ! -f $(cert_dir)/$(app_name).key ] || [ ! -f $(cert_dir)/$(app_name).crt ]; then \
+		echo "Key and cert do not exist"; \
+		mkdir -p $(cert_dir); \
+		php ./bin/tools/file_from_env.php "app_private_key" "$(cert_dir)/$(app_name).key"; \
+		php ./bin/tools/file_from_env.php "app_public_crt" "$(cert_dir)/$(app_name).crt"; \
+	fi
+
+	@if [ -f $(cert_dir)/$(app_name).key ]; then \
+		echo "Signing app files…"; \
+		php ../../occ integrity:sign-app \
+			--privateKey=$(cert_dir)/$(app_name).key\
+			--certificate=$(cert_dir)/$(app_name).crt\
+			--path=$(appstore_sign_dir)/$(app_name); \
+		echo "Signing app files ... done"; \
+	fi
 	mkdir -p $(appstore_artifact_directory)
 	tar -czf $(appstore_package_name).tar.gz -C $(appstore_sign_dir) $(app_name)
 
