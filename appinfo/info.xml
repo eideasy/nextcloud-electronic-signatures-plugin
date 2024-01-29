@@ -49,7 +49,7 @@ See the following guides:
     <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-1.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-2.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-3.png</screenshot>
-    <version>2.0.6</version>
+    <version>3.0.0</version>
     <licence>agpl</licence>
     <author mail="info@eideasy.com" homepage="https://eideasy.com">eID Easy</author>
     <namespace>ElectronicSignatures</namespace>
