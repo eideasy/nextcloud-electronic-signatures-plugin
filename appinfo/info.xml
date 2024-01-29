@@ -8,6 +8,7 @@
 - 🔒🔒 Accept Qualified Electronic Signatures (QES - strongest legal value) in PDF or .asice formats
 - 🔒 Accept Simple Electronic Signatures (sms based signature - simple to sign)
 
+### How it works:
 1. Pick a file
 2. Select "Signing" in the file's dropdown menu
 3. Add signers
@@ -24,9 +25,9 @@ For limited time only, we're offering €10 of credit that you can spend to try 
 Write to info@eideasy.com to claim this offer.
 
 # Two levels of electronic signatures
-*Qualified Electronic Signature* - the strongest kind of electronic signature. The signer's identity and approval is linked to the file contents and a timestamp by cryptographic means. The signing time and the document's integrity can be verified to ensure that the document has not been tampered with after signing.
+**Qualified Electronic Signature** - the strongest kind of electronic signature. The signer's identity and approval is linked to the file contents and a timestamp by cryptographic means. The signing time and the document's integrity can be verified to ensure that the document has not been tampered with after signing.
 
-*Simple Electronic Signature* - the simplest kind of electronic signature. eID Easy sends a unique link to the signer's e-mail. The signer opens the link, reviews the file and confirms their approval. A visual signature is added to the file. eId Easy adds a cryptographic e-seal to the file, to ensure that it cannot be modified after signing.
+**Simple Electronic Signature** - the simplest kind of electronic signature. eID Easy sends a unique link to the signer's e-mail. The signer opens the link, reviews the file and confirms their approval. A visual signature is added to the file. eId Easy adds a cryptographic e-seal to the file, to ensure that it cannot be modified after signing.
 
 # Pricing
 See [https://eideasy.com/pricing](https://eideasy.com/pricing) for pricing information.
@@ -37,17 +38,17 @@ Are you not seeing your preferred signature card / signing app / other QES metho
 # Documentation
 
 ## Set up
-1. Install and enable the "Electronic Signatures" app.
-2. In Nextcloud, on the blue top-bar, click on your profile picture.
-3. A dropdown menu opens, click on "Settings".
-4. On the left sidebar, click on "Electronic Signatures".
-5. Follow the instructions there to configure your eID Easy credentials.
+See the following guides:
+[1. Installation](https://docs.eideasy.com/nextcloud/nextcloud-app-installation.html#_1-installation)
+[2. Set up](https://docs.eideasy.com/nextcloud/nextcloud-app-setup.html#_2-set-up)
+[3. Signing a document](https://docs.eideasy.com/nextcloud/nextcloud-app-signing.html#_3-signing-a-document)
 
 [CHANGELOG](https://github.com/eideasy/nextcloud-electronic-signatures-plugin/blob/master/CHANGELOG.md)
 
 ]]></description>
-    <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-dropdown.png</screenshot>
-    <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-modal.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-1.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-2.png</screenshot>
+    <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-3.png</screenshot>
     <version>2.0.6</version>
     <licence>agpl</licence>
     <author mail="info@eideasy.com" homepage="https://eideasy.com">eID Easy</author>
