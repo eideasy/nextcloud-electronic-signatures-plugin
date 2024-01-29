@@ -35,8 +35,11 @@ app_name=$(notdir $(CURDIR))
 build_tools_directory=$(CURDIR)/build/tools
 source_build_directory=$(CURDIR)/build/artifacts/source
 source_package_name=$(source_build_directory)/$(app_name)
-appstore_build_directory=$(CURDIR)/build/artifacts/appstore
-appstore_package_name=$(appstore_build_directory)/$(app_name)
+appstore_build_directory:=$(CURDIR)/build/appstore/$(app_name)
+appstore_artifact_directory:=$(CURDIR)/build/artifacts/appstore
+appstore_package_name:=$(appstore_artifact_directory)/$(app_name)
+appstore_sign_dir=$(appstore_build_directory)/sign
+cert_dir=$(HOME)/.nextcloud/certificates
 npm=$(shell which npm 2> /dev/null)
 composer=$(shell which composer 2> /dev/null)
 
@@ -117,31 +120,41 @@ source:
 # Builds the source package for the app store, ignores php and js tests
 .PHONY: appstore
 appstore:
-	rm -rf $(appstore_build_directory)
-	mkdir -p $(appstore_build_directory)
-	tar cvzf $(appstore_package_name).tar.gz \
-	--exclude-vcs \
-	--exclude="../$(app_name)/build" \
-	--exclude="../$(app_name)/tests" \
-	--exclude="../$(app_name)/Makefile" \
-	--exclude="../$(app_name)/*.log" \
-	--exclude="../$(app_name)/phpunit*xml" \
-	--exclude="../$(app_name)/composer.*" \
-	--exclude="../$(app_name)/js/node_modules" \
-	--exclude="../$(app_name)/js/tests" \
-	--exclude="../$(app_name)/js/test" \
-	--exclude="../$(app_name)/js/*.log" \
-	--exclude="../$(app_name)/js/package.json" \
-	--exclude="../$(app_name)/js/bower.json" \
-	--exclude="../$(app_name)/js/karma.*" \
-	--exclude="../$(app_name)/js/protractor.*" \
-	--exclude="../$(app_name)/package.json" \
-	--exclude="../$(app_name)/bower.json" \
-	--exclude="../$(app_name)/karma.*" \
-	--exclude="../$(app_name)/protractor\.*" \
-	--exclude="../$(app_name)/.*" \
-	--exclude="../$(app_name)/js/.*" \
-	../$(app_name)
+	rm -rf $(appstore_build_directory) $(appstore_sign_dir) $(appstore_artifact_directory)
+	install -d $(appstore_sign_dir)/$(app_name)
+	cp -r \
+	"appinfo" \
+	"css" \
+	"img" \
+	"lib" \
+	"templates" \
+	"vendor" \
+	$(appstore_sign_dir)/$(app_name)
+
+	# remove composer binaries, those aren't needed
+	rm -rf $(appstore_sign_dir)/$(app_name)/vendor/bin
+	# the App Store doesn't like .git
+	rm -rf $(appstore_sign_dir)/$(app_name)/vendor/arthurhoaro/favicon/.git
+	# remove large test files
+	rm -rf $(appstore_sign_dir)/$(app_name)/vendor/fivefilters/readability.php/test
+
+	install "CHANGELOG.md" $(appstore_sign_dir)/$(app_name)
+
+	#remove stray .htaccess files since they are filtered by nextcloud
+	find $(appstore_sign_dir) -name .htaccess -exec rm {} \;
+
+	# on macOS there is no option "--parents" for the "cp" command
+	mkdir -p $(appstore_sign_dir)/$(app_name)/js
+	cp js/* $(appstore_sign_dir)/$(app_name)/js/
+
+	echo "Signing app files…"; \
+	php ../../occ integrity:sign-app \
+		--privateKey=$(cert_dir)/$(app_name).key\
+		--certificate=$(cert_dir)/$(app_name).crt\
+		--path=$(appstore_sign_dir)/$(app_name); \
+	echo "Signing app files ... done"; \
+	mkdir -p $(appstore_artifact_directory)
+	tar -czf $(appstore_package_name).tar.gz -C $(appstore_sign_dir) $(app_name)
 
 .PHONY: test
 test: composer
