@@ -107,6 +107,21 @@ export default {
     <SettingsSection :title="$t($globalConfig.appId, 'eID Easy credentials')">
       <template #settingsHint>
         <p>
+          If you do not yet have an account at https://id.eideasy.com follow
+          <a
+              class="link"
+              target="_blank"
+              href="https://docs.eideasy.com/nextcloud/nextcloud-app-setup.html#_2-set-up">
+
+            {{
+              $t($globalConfig.appId, 'this guide') + ", "
+            }}
+          </a>
+          {{
+            t($globalConfig.appId, 'otherwise see the instructions below:')
+          }}
+        </p>
+        <p>
           {{
             "1. " + $t($globalConfig.appId, 'Head over to eID Easy sign-up page and authenticate yourself: ')
           }}
@@ -303,11 +318,15 @@ export default {
             </SettingsTextInput>
             <p>
               {{
-                $t($globalConfig.appId, 'You probably only need to fill this in if your Nextcloud instance is behind a reverse proxy etc. This is the url to where eID Easy will send the signing queue status updates. Keep in mind that this URL has to be accessible over the public internet.')
+                $t($globalConfig.appId, 'This is the url to where eID Easy will send the signing queue status updates.' + ' ' +
+                    'In most cases you do not need to fill this in.' + ' ' +
+                    'You only need to provide this url if your Nextcloud instance is not reachable from the public internet.' + ' ' +
+                    'For example when your running it on a localhost without a public url.' + ' ' +
+                    '(Keep in mind that the URL you provide has to be accessible over the public internet.)')
               }}
             </p>
             <p>
-              If left empty, the following default url is used: <br>
+              {{ $t($globalConfig.appId, 'If left empty, the following default url is used:') }} <br>
               <b>{{ defaultRemoteSigningQueueStatusWebhook }}</b>
             </p>
           </div>

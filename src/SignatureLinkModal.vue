@@ -114,6 +114,11 @@ export default {
             {{
               $t($globalConfig.appId, 'The currently configured signing mode is deprecated in Nextcloud v28+. See the following guide on how to enable the new and recommended mode: ')
             }}
+            <a
+                href="https://docs.eideasy.com/nextcloud/nextcloud-app-configuration.html#_4-1-changing-the-signing-mode"
+                target="_blank">
+              Changing the signing mode
+            </a>
           </p>
         </NcNoteCard>
         <NcNoteCard v-else-if="missingAdminSettings.length" type="error" heading="Error">
@@ -142,6 +147,11 @@ export default {
             {{
               $t($globalConfig.appId, 'See the following guide for more information:')
             }}
+            <a
+                href="https://docs.eideasy.com/nextcloud/nextcloud-app-configuration.html#_4-2-changing-the-output-file-type"
+                target="_blank">
+              Changing the output file type
+            </a>
           </p>
         </NcNoteCard>
         <RemoteQueue v-else :file-path="filePath" />
