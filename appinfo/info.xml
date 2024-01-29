@@ -2,7 +2,7 @@
 <info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
     <id>electronicsignatures</id>
-    <name>Electronic Signatures by eID Easy</name>
+    <name>Electronic Signatures</name>
     <summary>Accept electronic signatures on your documents.</summary>
     <description><![CDATA[# Features
 - 🔒🔒 Accept Qualified Electronic Signatures (QES - strongest legal value) in PDF or .asice formats
