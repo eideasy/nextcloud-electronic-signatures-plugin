@@ -1,20 +1,12 @@
 <script>
-import axios from 'axios';
-import Modal from '@nextcloud/vue/dist/Components/Modal';
+import NcModal from '@nextcloud/vue/dist/Components/NcModal.js'
+import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
 import EventBus from './EventBus';
-import { generateUrl } from '@nextcloud/router';
-import queryString from 'query-string';
-import OC from './OC';
+import RemoteQueue from './RemoteQueue.vue';
 import fetchAdminSettings from './fetchAdminSettings';
-import SigningQueue from './SigningQueue';
-import SignatureQueue from './SignatureQueue';
-import SigningStatus from './SigningStatus';
-import RemoteSigningQueue from './RemoteSigningQueue';
-
-const EMAIL_FIELD_TEMPLATE = {
-  type: 'email',
-  value: '',
-};
+import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js';
+import RequestError from './RequestError.js';
+import Error from './Error.vue';
 
 const getFileExtension = function getFileExtension(filename) {
   return filename.split('.').pop();
@@ -23,28 +15,20 @@ const getFileExtension = function getFileExtension(filename) {
 export default {
   name: 'SignatureLinkModal',
   components: {
-    Modal,
-    SignatureQueue,
+    Error,
+    NcLoadingIcon,
+    NcModal,
+    RemoteQueue,
+    NcNoteCard,
   },
   data() {
     return {
-      SigningQueue: new SigningQueue(),
-      RemoteSigningQueue: new RemoteSigningQueue(),
       modal: false,
-      errorMessage: null,
-      successMessage: null,
+      error: null,
       isLoading: false,
-      isLoadingSettings: false,
       adminSettings: null,
-      signeeFormSchema: [
-        {
-          ...EMAIL_FIELD_TEMPLATE,
-        },
-      ],
-      email: '',
-      filename: '',
-      isLoadingQueue: false,
-      signatureQueue: [],
+      filePath: '',
+      fileMime: '',
     };
   },
   computed: {
@@ -55,7 +39,7 @@ export default {
       const missingSettings = [];
       /* eslint-disable camelcase */
       if (this.adminSettings) {
-        const { client_id_provided, secret_provided } = this.adminSettings;
+        const {client_id_provided, secret_provided} = this.adminSettings;
         if (!client_id_provided) {
           missingSettings.push('client_id');
         }
@@ -69,186 +53,43 @@ export default {
   },
   mounted() {
     const _self = this;
-    EventBus.$on('SIGNATURES_CLICK', function(payload) {
-      _self.filename = payload.filename;
+    EventBus.$on('SIGNATURES_CLICK', function (payload) {
+      _self.filePath = payload.path;
+      _self.fileMime = payload.mime;
       _self.showModal();
     });
   },
   methods: {
-    removeSignerFromQueue(index) {
-      const emails = this.signatureQueue.reduce((acc, item, itemIndex) => {
-        if (itemIndex !== index
-            && item.status !== SigningStatus.EMAIL_SENT
-            && item.status !== SigningStatus.DOCUMENT_SIGNED) {
-          acc.push(item.email);
-        }
-        return acc;
-      }, []);
-      this.setSigningQueue(emails);
-    },
-    addEmailRow() {
-      this.signeeFormSchema.push({
-        ...EMAIL_FIELD_TEMPLATE,
-      });
-    },
-    removeEmailRow(index) {
-      if (this.signeeFormSchema.length <= 1) {
-        return;
-      }
-      this.signeeFormSchema.splice(index, 1);
-    },
-    generateNextcloudUrl(url) {
-      return generateUrl(url);
-    },
     showModal() {
-      if (!this.adminSettings) {
-        this.getAdminSettings();
-      }
-      this.getSigningQueue();
-      this.setErrorMessage(null);
-      this.setSuccessMessage(null);
+      this.getAdminSettings();
+      this.setError(null);
       this.modal = true;
     },
     closeModal() {
       this.modal = false;
-    },
-    setErrorMessage(message) {
-      if (message === null) {
-        this.errorMessage = null;
-      } else if (!message) {
-        this.errorMessage = this.$t(this.$globalConfig.appId, 'Something went wrong. Make sure that the electronic signatures app settings are correct.');
-      } else {
-        this.errorMessage = message;
-      }
-    },
-    setSuccessMessage(message) {
-      this.successMessage = message;
-    },
-    getFilePath() {
-      const parsed = queryString.parse(window.location.search);
-      if (parsed.dir === '/') {
-        return this.filename;
-      } else {
-        return parsed.dir + '/' + this.filename;
-      }
     },
     setAdminSettings(settings) {
       this.adminSettings = settings;
     },
     getAdminSettings() {
       const _self = this;
-      _self.isLoadingSettings = true;
+      _self.isLoading = true;
       fetchAdminSettings()
-          .then(function(response) {
+          .then(function (response) {
             _self.setAdminSettings(response.data);
           })
-          .catch(function(error) {
+          .catch(function (error) {
             console.error(error);
-            _self.setErrorMessage(_self.$t(_self.$globalConfig.appId, 'Failed to fetch electronicsignatures settings'));
+            console.log(error.response);
+            console.log(error.config);
+            _self.setError(new RequestError(_self.$t(_self.$globalConfig.appId, 'Failed to fetch the eID Easy electronic signatures app settings'), error));
           })
-          .then(function() {
-            _self.isLoadingSettings = false;
-          });
-    },
-    startRemoteMultisigning() {
-      const _self = this;
-      this.isLoading = true;
-      this.RemoteSigningQueue.create(this.getFilePath())
-          .then(function(response) {
-            if (response.data && response.data.management_page_url) {
-              window.location.href = response.data.management_page_url;
-            } else {
-              _self.setErrorMessage(_self.$t(_self.$globalConfig.appId, 'Response data does not contain management_page_url'));
-            }
-          })
-          .catch(function(error) {
-            console.error(error);
-            _self.setErrorMessage(_self.$t(_self.$globalConfig.appId, 'Failed to start remote multisigning'));
-          })
-          .then(function() {
+          .then(function () {
             _self.isLoading = false;
           });
     },
-    getSigningQueue() {
-      const _self = this;
-      _self.isLoadingQueue = true;
-      this.SigningQueue.getQueue(this.getFilePath())
-          .then(function(response) {
-            _self.signatureQueue = response.data.signersQueue || [];
-          })
-          .catch(function(error) {
-            console.error(error);
-            _self.setErrorMessage(_self.$t(_self.$globalConfig.appId, 'Failed to fetch the signing queue'));
-          })
-          .then(function() {
-            _self.isLoadingQueue = false;
-          });
-    },
-    setSigningQueue(emails) {
-      const _self = this;
-      _self.isLoading = true;
-      this.SigningQueue.setQueue(this.getFilePath(), emails)
-          .then(function(response) {
-            _self.signatureQueue = response.data.signersQueue || [];
-          })
-          .catch(function(error) {
-            console.error(error);
-            _self.setErrorMessage(_self.$t(_self.$globalConfig.appId, 'Failed to modify the signing queue'));
-          })
-          .then(function() {
-            _self.isLoading = false;
-          });
-    },
-    getModifiableSigners() {
-      return this.signatureQueue.filter(item => item.status === SigningStatus.EMAIL_PENDING);
-    },
-    addToSigningQueue(emails) {
-      const queueEmails = this.getModifiableSigners().map(item => item.email);
-      this.setSigningQueue([...queueEmails, ...emails]);
-    },
-    clearSigneeForm() {
-      this.signeeFormSchema = [
-        {
-          ...EMAIL_FIELD_TEMPLATE,
-        },
-      ];
-    },
-    onSubmit() {
-      const _self = this;
-      this.isLoading = true;
-      this.setErrorMessage(null);
-      this.setSuccessMessage(null);
-      const emails = this.signeeFormSchema.map(field => field.value);
-
-      if (this.signatureQueue.length) {
-        this.addToSigningQueue(emails);
-        this.clearSigneeForm();
-        return;
-      }
-
-      axios({
-        method: 'post',
-        url: generateUrl('/apps/electronicsignatures/create_signing_queue'),
-        responseType: 'json',
-        headers: {
-          requesttoken: OC.requestToken,
-        },
-        data: {
-          path: this.getFilePath(),
-          emails,
-        },
-      })
-          .then(function() {
-            _self.setSuccessMessage(_self.$t(_self.$globalConfig.appId, 'Email successfully sent!'));
-            // reset the email fields after successful submit
-            _self.clearSigneeForm();
-          })
-          .catch(function(error) {
-            _self.setErrorMessage(error.response && error.response.data && error.response.data.message);
-          })
-          .then(function() {
-            _self.isLoading = false;
-          });
+    setError(error) {
+      this.error = error;
     },
   },
 };
@@ -256,128 +97,66 @@ export default {
 
 <template>
   <div>
-    <modal
+    <nc-modal
         v-if="modal"
-        @close="closeModal">
-      <div
-          class="modal__content">
-        <div
-            v-if="isLoading || isLoadingSettings || isLoadingQueue"
-            class="loader">
-          <div class="icon-loading spinner" />
-        </div>
-        <div v-if="!isLoadingSettings" class="contentWrap">
-          <div v-if="adminSettings.signing_mode === 'remote'">
-            <h3>
-              {{ $t($globalConfig.appId, 'Request signatures via eID Easy') }}
-            </h3>
-            <button @click.prevent="startRemoteMultisigning">
-              {{ $t($globalConfig.appId, 'Request signatures') }}
-            </button>
-          </div>
-          <div
-              v-else-if="signatureQueue.length"
-              class="siqQueue">
-            <h3>
-              {{ $t($globalConfig.appId, 'Signature queue') }}
-            </h3>
-            <SignatureQueue
-                :signature-queue="signatureQueue"
-                :on-remove-item-click="removeSignerFromQueue" />
-          </div>
-          <h3 v-else>
-            {{ $t($globalConfig.appId, 'Request a signature via email') }}
-          </h3>
-
-          <div v-if="errorMessage">
-            <span class="alert alert-danger">{{ errorMessage }}</span>
-          </div>
-
-          <div v-if="successMessage">
-            <span class="alert alert-success">{{ successMessage }}</span>
-          </div>
-
-          <div
-              v-if="missingAdminSettings.length">
-            <div class="alert alert-danger">
-              {{ $t($globalConfig.appId, 'The following credentials are missing: ') }}
-              <ul>
-                <li v-for="credential in missingAdminSettings" :key="credential">
-                  <b>{{ credential }}</b>
-                </li>
-              </ul>
-              {{
-                $t($globalConfig.appId, 'Please make sure that you have filled in the eID Easy credential fields on the "Electronic Signatures" app settings page.')
-              }}
-            </div>
-          </div>
-          <div v-else-if="adminSettings.signing_mode !== 'remote'">
-            <form
-                action=""
-                @submit.prevent="onSubmit">
-              <label
-                  class="label"
-                  for="signingLinkEmail">
-                {{ $t($globalConfig.appId, 'Add signers') }}
-              </label>
-
-              <div
-                  v-for="(field, index) in signeeFormSchema"
-                  :key="index"
-                  class="fieldRow">
-                <input
-                    id="signingLinkEmail"
-                    v-model="field.value"
-                    type="email"
-                    class="input"
-                    placeholder="Email"
-                    required
-                    aria-label="email">
-                <button
-                    v-if="index > 0"
-                    @click.prevent="removeEmailRow(index)">
-                  {{ $t($globalConfig.appId, 'Remove') }}
-                </button>
-              </div>
-              <button
-                  v-if="!signatureQueue.length"
-                  @click.prevent="addEmailRow">
-                + {{ $t($globalConfig.appId, 'Add') }}
-              </button>
-              <div
-                  v-if="!signatureQueue.length"
-                  style="margin-bottom: 20px; margin-top: 20px">
-                {{
-                  $t($globalConfig.appId, 'After you click "Request signature" a copy of this document will be created. An email with an invitation to sign this newly created copy will be sent to the first signer. After the first signer has signed the document, next signer in the list will get the invitation email and so on until everyone has signed.')
-                }}
-              </div>
-              <div
-                  v-if="adminSettings && adminSettings.enable_otp && currentFileExtension !== 'pdf'"
-                  class="basicNote">
-                {{
-                  $t($globalConfig.appId, 'Note: You have enabled simple signatures in the settings. Simple signatures can only be added to pdf files, but this file is not a pdf file. This means that the signer can not sign this file using simple signatures. However, they can still use all the other available signing methods.')
-                }}
-              </div>
-
-              <div />
-
-              <button
-                  v-if="signatureQueue.length"
-                  type="submit"
-                  class="submitButton">
-                {{ $t($globalConfig.appId, 'Add to queue') }}
-              </button>
-              <button
-                  v-else
-                  type="submit"
-                  class="submitButton">
-                {{ $t($globalConfig.appId, 'Request signature') }}
-              </button>
-            </form>
-          </div>
-        </div>
+        @close="closeModal"
+    >
+      <div class="modal__content">
+        <NcLoadingIcon
+            v-if="isLoading"
+            :size="64"
+            appearance="dark"
+            name="Loading modal content"
+        />
+        <Error v-else-if="error" :error="error" />
+        <NcNoteCard v-else-if="adminSettings.signing_mode !== 'remote'" type="error">
+          <p>
+            {{
+              $t($globalConfig.appId, 'The currently configured signing mode is deprecated in Nextcloud v28+. See the following guide on how to enable the new and recommended mode: ')
+            }}
+            <a
+                href="https://docs.eideasy.com/nextcloud/nextcloud-app-configuration.html#_4-1-changing-the-signing-mode"
+                target="_blank">
+              Changing the signing mode
+            </a>
+          </p>
+        </NcNoteCard>
+        <NcNoteCard v-else-if="missingAdminSettings.length" type="error" heading="Error">
+          <p>
+            {{ $t($globalConfig.appId, 'The following credentials are missing: ') }}
+          </p>
+          <ul>
+            <li v-for="credential in missingAdminSettings" :key="credential">
+              <b>{{ credential }}</b>
+            </li>
+          </ul>
+          <p>
+            {{
+              $t($globalConfig.appId, 'Please make sure that you have filled in the eID Easy credential fields on the "Electronic Signatures" app settings page.')
+            }}
+          </p>
+        </NcNoteCard>
+        <NcNoteCard v-else-if="fileMime !== 'application/pdf' && adminSettings.container_type !== 'asice'" type="warning">
+          <p>
+            {{
+              $t($globalConfig.appId, 'You are trying to sign a file that is not a PDF.')
+            }}
+            {{
+              $t($globalConfig.appId, 'For this you first need to change the output file type to .asice in the Electronic Sigantures admin settings.')
+            }}
+            {{
+              $t($globalConfig.appId, 'See the following guide for more information:')
+            }}
+            <a
+                href="https://docs.eideasy.com/nextcloud/nextcloud-app-configuration.html#_4-2-changing-the-output-file-type"
+                target="_blank">
+              Changing the output file type
+            </a>
+          </p>
+        </NcNoteCard>
+        <RemoteQueue v-else :file-path="filePath" />
       </div>
-    </modal>
+    </nc-modal>
   </div>
 </template>
 
@@ -400,108 +179,13 @@ export default {
   box-sizing: border-box;
 }
 
-.loader {
-  margin: 0 auto;
-  position: absolute;
-  z-index: 500;
-  width: 100%;
-  height: 100%;
-  left: 0;
-  top: 0;
-  background-color: rgba(255, 255, 255, 0.9);
-}
-
-.contentWrap {
-  position: relative;
-  padding-bottom: 30px;
-}
-
-.error {
-  color: #842029;
-}
-
-h3 {
-  font-size: 20px;
-  margin-bottom: 20px;
-  font-weight: bold;
-}
-
 a {
   color: var(--color-primary-element);
-}
-
-.fieldRow {
-  display: flex;
-  margin-bottom: 1rem;
-}
-
-.radioRow + .radioRow {
-  margin-top: 2px;
-}
-
-.label {
-  display: block;
-  margin-bottom: 10px;
-}
-
-.input {
-  width: 100%;
-  max-width: 300px;
-}
-
-.spinner {
-  top: 50%;
-}
-
-.alert {
-  display: block;
-  position: relative;
-  padding: .75rem 1.25rem;
-  margin-bottom: 1rem;
-  border: 1px solid transparent;
-  border-radius: .25rem;
-}
-
-.alert-success {
-  color: #155724;
-  background-color: #d4edda;
-  border-color: #c3e6cb;
-}
-
-.alert-danger {
-  color: #721c24;
-  background-color: #f8d7da;
-  border-color: #f5c6cb;
-}
-
-.alert-warning {
-  color: #856404;
-  background-color: #fff3cd;
-  border-color: #ffeeba;
-}
-
-.basicNote {
-  margin-bottom: 16px;
-  font-style: italic;
-}
-
-.submitButton {
-  background-color: #0082c9;
-  color: #fff;
 }
 
 @media (min-width: 600px) {
   .modal__content {
     padding: 2rem;
   }
-}
-
-.queueTitle {
-  font-size: 18px;
-  margin-bottom: 10px;
-}
-
-.siqQueue {
-  margin-bottom: 20px;
 }
 </style>

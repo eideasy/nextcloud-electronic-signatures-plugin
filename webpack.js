@@ -9,12 +9,14 @@ webpackConfig.module.rules = [
     test: /\.scss$/,
     use: ['style-loader', 'css-loader', 'sass-loader'],
   },
+  /*
   {
     test: /\.(js|vue)$/,
     use: 'eslint-loader',
     exclude: /node_modules/,
     enforce: 'pre',
   },
+  */
   {
     test: /\.vue$/,
     loader: 'vue-loader',

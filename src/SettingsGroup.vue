@@ -15,6 +15,9 @@ export default {
       errorMessage: null,
     };
   },
+  props: {
+    allowSavingEmptySettings: false,
+  },
   created() {
     this.debouncedSaveSetting = debounce(this.saveSetting, 300);
   },
@@ -35,11 +38,15 @@ export default {
       const _self = this;
       // do not save empty values
       let shouldSave = true;
-      Object.keys(setting).forEach(key => {
-        if (setting[key] === undefined || setting[key] === '') {
-          shouldSave = false;
-        }
-      });
+
+      if (!this.allowSavingEmptySettings) {
+        Object.keys(setting).forEach(key => {
+          if (setting[key] === undefined || setting[key] === '') {
+            shouldSave = false;
+          }
+        });
+      }
+
       if (!shouldSave) {
         return;
       }

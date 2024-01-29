@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.0.0 – 2024-01-29
+### Added
+- Compatibility with Nextcloud 28
+
+### Changed
+- Moving forward, this app will only support Nextcloud 28 and above.
+- Moving forward, this app requires php 8.1 and above.
+- Deprecated old remote signing mode and local signing mode.
+
 ## 2.0.5 – 2023-06-14
 ### Added
 - Compatibility with Nextcloud 27

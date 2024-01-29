@@ -1,11 +1,12 @@
 <script>
-import { generateUrl } from '@nextcloud/router';
-import SettingsSection from './SettingsSection';
-import SettingsGroup from './SettingsGroup';
-import SettingsTextInput from './SettingsTextInput';
-import Multiselect from '@nextcloud/vue/dist/Components/Multiselect';
-import CheckboxRadioSwitch from '@nextcloud/vue/dist/Components/CheckboxRadioSwitch';
+import {generateUrl} from '@nextcloud/router';
+import SettingsSection from './SettingsSection.vue';
+import SettingsGroup from './SettingsGroup.vue';
+import SettingsTextInput from './SettingsTextInput.vue';
+import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js';
 import isoLanguages from './isoLanguages';
+import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js';
 
 export default {
   name: 'AppAdmin',
@@ -13,8 +14,9 @@ export default {
     SettingsSection,
     SettingsGroup,
     SettingsTextInput,
-    CheckboxRadioSwitch,
-    Multiselect,
+    NcCheckboxRadioSwitch,
+    NcSelect,
+    NcNoteCard,
   },
   data() {
     return {
@@ -31,12 +33,10 @@ export default {
       apiLanguage: isoLanguages.getByCode(this.$parent.apiLanguage),
       apiLanguageOptions: isoLanguages.getAll(),
       remoteSigningQueueStatusWebhook: this.$parent.remoteSigningQueueStatusWebhook,
+      defaultRemoteSigningQueueStatusWebhook: this.$parent.defaultRemoteSigningQueueStatusWebhook,
     };
   },
   computed: {
-    fetchSignedFileUrl() {
-      return window.location.origin + this.generateNextcloudUrl('/apps/electronicsignatures/fetch_signed_file');
-    },
     instanceUrl() {
       return window.location.origin;
     },
@@ -53,13 +53,10 @@ export default {
     },
   },
   methods: {
-    generateNextcloudUrl(url) {
-      return generateUrl(url);
-    },
     onFileHandlingToggle(saveSetting) {
       const enableLocalSigning = this.signingMode === 'local';
 
-      const settings = { signing_mode: this.signingMode };
+      const settings = {signing_mode: this.signingMode};
       if (enableLocalSigning) {
         this.allowSimpleSignatures = '0';
         settings.enable_otp = false;
@@ -87,8 +84,43 @@ export default {
 
 <template>
   <div>
+    <SettingsSection v-if="signingMode !== 'remote'">
+      <NcNoteCard type="error">
+        <p>
+          {{
+            $t($globalConfig.appId, 'Your are using a deprecated signing mode.')
+          }}
+        </p>
+        <p>
+          {{
+            $t($globalConfig.appId, 'Please scroll down and click on "Show advanced settings."')
+          }}
+        </p>
+        <p>
+          {{
+            $t($globalConfig.appId, 'Under advanced settings, enable the "Remote with eID Easy" option.')
+          }}
+        </p>
+      </NcNoteCard>
+    </SettingsSection>
+
     <SettingsSection :title="$t($globalConfig.appId, 'eID Easy credentials')">
       <template #settingsHint>
+        <p>
+          If you do not yet have an account at https://id.eideasy.com follow
+          <a
+              class="link"
+              target="_blank"
+              href="https://docs.eideasy.com/nextcloud/nextcloud-app-setup.html#_2-set-up">
+
+            {{
+              $t($globalConfig.appId, 'this guide') + ", "
+            }}
+          </a>
+          {{
+            t($globalConfig.appId, 'otherwise see the instructions below:')
+          }}
+        </p>
         <p>
           {{
             "1. " + $t($globalConfig.appId, 'Head over to eID Easy sign-up page and authenticate yourself: ')
@@ -129,18 +161,7 @@ export default {
         </p>
         <p>
           {{
-            "6. " + $t($globalConfig.appId, 'Scroll to the "Notification hooks" section and for the "Signature notification URL" field enter: ')
-          }}
-          <b>{{ fetchSignedFileUrl }}</b>
-        </p>
-        <p>
-          {{
-            "7. " + $t($globalConfig.appId, 'Click the "Save hooks data" button')
-          }}
-        </p>
-        <p>
-          {{
-            "8. " + $t($globalConfig.appId, 'On the left sidebar, click again on ')
+            "6. " + $t($globalConfig.appId, 'On the left sidebar, click again on ')
           }}
           <a
               class="link"
@@ -151,7 +172,7 @@ export default {
         </p>
         <p>
           {{
-            "9. " + $t($globalConfig.appId, 'You can now find your Client ID and Secret in the "client_id/secret" column. Use these to fill in the fields below:')
+            "7. " + $t($globalConfig.appId, 'You can now find your Client ID and Secret in the "client_id/secret" column. Use these to fill in the fields below:')
           }}
         </p>
       </template>
@@ -195,87 +216,69 @@ export default {
     <SettingsSection v-if="showAdvancedSettings" :title="$t($globalConfig.appId, 'eID Easy service language')">
       <template #settingsHint>
         <p>
-          {{ $t($globalConfig.appId, 'Choose the language for eID Easy signing views and emails that the end users receive.') }}
+          {{
+            $t($globalConfig.appId, 'Choose the language for eID Easy signing views and emails that the end users receive.')
+          }}
         </p>
       </template>
 
       <SettingsGroup>
         <template v-slot:default="slotProps">
-          <Multiselect
+          <NcSelect
               v-model="apiLanguage"
               :options="apiLanguageOptions"
               track-by="code"
               label="name"
-              @change="(option) => slotProps.saveSetting({api_language: option.code})" />
+              @input="(option) => slotProps.saveSetting({api_language: option.code})"/>
         </template>
       </SettingsGroup>
     </SettingsSection>
 
-    <SettingsSection v-if="showAdvancedSettings" :title="$t($globalConfig.appId, 'Output file type for pdf')">
+    <SettingsSection v-if="showAdvancedSettings" :title="$t($globalConfig.appId, 'Output file type')">
       <template #settingsHint>
         <p>
-          {{ $t($globalConfig.appId, 'These settings only apply to pdf files.') }}
-        </p>
-        <p>
-          {{ $t($globalConfig.appId, 'If you choose .pdf as the output file type, then your final signed file will be a pdf.') }}
-          {{ $t($globalConfig.appId, 'If you choose .asice, then your final signed file will be an .asice file that contains the original pdf file.') }}
+          {{
+            $t($globalConfig.appId, 'If you choose .pdf as the output file type, then your final signed file will be a pdf.')
+          }}
+          {{
+            $t($globalConfig.appId, 'If you choose .asice, then your final signed file will be an .asice file that contains the original file.')
+          }}
         </p>
       </template>
 
       <SettingsGroup>
         <template v-slot:default="slotProps">
           <div class="radioRow">
-            <CheckboxRadioSwitch
+            <NcCheckboxRadioSwitch
                 :checked.sync="containerType"
                 value="pdf"
                 name="container_type_radio"
                 type="radio"
                 @update:checked="onFileTypeToggle(slotProps.saveSetting)">
               {{ $t($globalConfig.appId, '.pdf') }}
-            </CheckboxRadioSwitch>
+            </NcCheckboxRadioSwitch>
           </div>
           <div class="radioRow">
-            <CheckboxRadioSwitch
+            <NcCheckboxRadioSwitch
                 :checked.sync="containerType"
                 value="asice"
                 name="container_type_radio"
                 type="radio"
                 @update:checked="onFileTypeToggle(slotProps.saveSetting)">
               {{ $t($globalConfig.appId, '.asice') }}
-            </CheckboxRadioSwitch>
+            </NcCheckboxRadioSwitch>
             <a href="#" class="infoTip">
-              <span class="icon icon-details" />
+              <span class="icon icon-details"/>
             </a>
             <div>
               {{
                 $t($globalConfig.appId, '.asice files can be opened and verified with the DigiDoc4 application that is available at:')
               }}
-              <ul>
-                <li>
-                  {{ $t($globalConfig.appId, 'Windows - ') }}
-                  <a
-                      href="https://www.microsoft.com/en-us/p/digidoc4-client/9pfpfk4dj1s6"
-                      target="_blank">
-                    https://www.microsoft.com/en-us/p/digidoc4-client/9pfpfk4dj1s6
-                  </a>
-                </li>
-                <li>
-                  {{ $t($globalConfig.appId, 'macOS - ') }}
-                  <a
-                      href="https://apps.apple.com/us/app/digidoc4-client/id1370791134"
-                      target="_blank">
-                    https://apps.apple.com/us/app/digidoc4-client/id1370791134
-                  </a>
-                </li>
-                <li>
-                  {{ $t($globalConfig.appId, 'or alternatively - ') }}
-                  <a
-                      href="https://www.id.ee/en/article/install-id-software/"
-                      target="_blank">
-                    https://www.id.ee/en/article/install-id-software
-                  </a>
-                </li>
-              </ul>
+              <a
+                  href="https://www.id.ee/en/article/install-id-software/"
+                  target="_blank">
+                https://www.id.ee/en/article/install-id-software
+              </a>
             </div>
           </div>
         </template>
@@ -288,16 +291,16 @@ export default {
           {{ $t($globalConfig.appId, 'These settings determine how and where the files are signed.') }}
         </p>
       </template>
-      <SettingsGroup>
+      <SettingsGroup :allow-saving-empty-settings="true">
         <template v-slot:default="slotProps">
-          <CheckboxRadioSwitch
+          <NcCheckboxRadioSwitch
               :checked.sync="signingMode"
               value="remote"
               name="signing_mode_radio"
               type="radio"
               @update:checked="onFileHandlingToggle(slotProps.saveSetting)">
             {{ $t($globalConfig.appId, 'Remote with eID Easy') }}
-          </CheckboxRadioSwitch>
+          </NcCheckboxRadioSwitch>
           <p>
             {{
               $t($globalConfig.appId, 'With remote signing, the files are sent to the eID Easy server. The signer will go to a signing page on the eID Easy site, where they will be guided through the signing process.')
@@ -314,18 +317,35 @@ export default {
               </template>
             </SettingsTextInput>
             <p>
-              {{ $t($globalConfig.appId, 'You probably only need to fill this in if your Nextcloud instance is behind a reverse proxy etc. This is the url to where eID Easy will send the signing queue status updates. Keep in mind that this URL has to be accessible over the public internet.') }}
+              {{
+                $t($globalConfig.appId, 'This is the url to where eID Easy will send the signing queue status updates.' + ' ' +
+                    'In most cases you do not need to fill this in.' + ' ' +
+                    'You only need to provide this url if your Nextcloud instance is not reachable from the public internet.' + ' ' +
+                    'For example when your running it on a localhost without a public url.' + ' ' +
+                    '(Keep in mind that the URL you provide has to be accessible over the public internet.)')
+              }}
+            </p>
+            <p>
+              {{ $t($globalConfig.appId, 'If left empty, the following default url is used:') }} <br>
+              <b>{{ defaultRemoteSigningQueueStatusWebhook }}</b>
             </p>
           </div>
 
-          <CheckboxRadioSwitch
+          <NcCheckboxRadioSwitch
               :checked.sync="signingMode"
               value="remote_legacy"
               name="signing_mode_radio"
               type="radio"
               @update:checked="onFileHandlingToggle(slotProps.saveSetting)">
-            {{ $t($globalConfig.appId, 'Old version of remote with eID Easy') }}
-          </CheckboxRadioSwitch>
+            {{ $t($globalConfig.appId, '[Deprecated!] Old version of remote with eID Easy') }}
+          </NcCheckboxRadioSwitch>
+          <NcNoteCard v-if="signingMode === 'remote_legacy'" type="warning">
+            <p>
+              {{
+                $t($globalConfig.appId, 'This signing mode is deprecated. Please enable "Remote with eID Easy"')
+              }}
+            </p>
+          </NcNoteCard>
           <p>
             {{
               $t($globalConfig.appId, 'With remote signing, the files are sent to the eID Easy server. The signer will go to a signing page on the eID Easy site, where they will be guided through the signing process.')
@@ -333,7 +353,8 @@ export default {
           </p>
 
           <p v-if="simpleSignaturesSettingIsDisabled">
-            "Allow simple signatures" setting is only available if ".pdf" is selected in "Output file type for pdf" setting.
+            "Allow simple signatures" setting is only available if ".pdf" is selected in "Output file type for pdf"
+            setting.
           </p>
 
           <div :class="`subSection ${simpleSignaturesSettingIsDisabled ? 'disabled' : ''}`">
@@ -361,7 +382,7 @@ export default {
             </p>
             <ul>
               <li>
-{{
+                {{
                   $t($globalConfig.appId, 'Simple Electronic Signatures are always collected remotely, in order to increase the legal value of the signature.')
                 }}
               </li>
@@ -371,14 +392,21 @@ export default {
             </ul>
           </div>
 
-          <CheckboxRadioSwitch
+          <NcCheckboxRadioSwitch
               :checked.sync="signingMode"
               value="local"
               name="signing_mode_radio"
               type="radio"
               @update:checked="onFileHandlingToggle(slotProps.saveSetting)">
-            {{ $t($globalConfig.appId, 'Local') }}
-          </CheckboxRadioSwitch>
+            {{ $t($globalConfig.appId, '[Deprecated!] Local') }}
+          </NcCheckboxRadioSwitch>
+          <NcNoteCard v-if="signingMode === 'local'" type="warning">
+            <p>
+              {{
+                $t($globalConfig.appId, 'This signing mode is deprecated. Please enable "Remote with eID Easy"')
+              }}
+            </p>
+          </NcNoteCard>
           <p>
             {{
               $t($globalConfig.appId, 'With local signing, the signer is directed to your Nextcloud instance for the signing process. They will not need an account in your Nextcloud instance. The file contents are not sent to the eID Easy server, however the file names and signatory names will pass through eID Easy server, to enable electronic signature creation.')
@@ -397,16 +425,16 @@ export default {
           <ol>
             <li>{{ $t($globalConfig.appId, 'Install docker') }}</li>
             <li>
-{{
+              {{
                 $t($globalConfig.appId, 'Pull the service container into the directory of your choice: docker pull eideasy/pades-external-digital-signatures')
               }}
             </li>
             <li>cd eideasy-external-pades-digital-signatures/</li>
             <li>
-{{ $t($globalConfig.appId, 'Start the container: ') }}<span v-pre>sudo docker run -p 8080:8084 --name=eideasy_detached_pades --restart always --log-driver syslog --log-opt tag="{{ .Name }}/{{ .ID }}" eideasy/pades-external-digital-signatures</span>
+              {{ $t($globalConfig.appId, 'Start the container: ') }}<span v-pre>sudo docker run -p 8080:8084 --name=eideasy_detached_pades --restart always --log-driver syslog --log-opt tag="{{ .Name }}/{{ .ID }}" eideasy/pades-external-digital-signatures</span>
             </li>
             <li>
-{{
+              {{
                 $t($globalConfig.appId, 'Provide the container\'s url for the PADES URL setting below. If you didn\'t change the above "docker run" command, the url is 0.0.0.0:8080.')
               }}
             </li>
@@ -440,62 +468,23 @@ export default {
       </template>
       <SettingsGroup>
         <template v-slot:default="slotProps">
-          <CheckboxRadioSwitch
+          <NcCheckboxRadioSwitch
               :checked.sync="enableSandbox"
               type="switch"
               @update:checked="onSandboxToggle(slotProps.saveSetting)">
             {{ $t($globalConfig.appId, 'Enable sandbox mode') }}
-          </CheckboxRadioSwitch>
+          </NcCheckboxRadioSwitch>
         </template>
       </SettingsGroup>
       <p>
-        {{ $t($globalConfig.appId, 'While in sandbox mode, you can authenticate and sign with:') }}
+        {{ $t($globalConfig.appId, 'While in sandbox mode, you can use the following test users: ') }}
       </p>
-      <ul>
-        <li>
-          {{ $t($globalConfig.appId, 'Mobile ID') }}
-          <a
-              class="link"
-              href="https://github.com/SK-EID/MID/wiki/Test-number-for-automated-testing-in-DEMO"
-              target="_blank">
-            {{ $t($globalConfig.appId, 'test numbers') }}
-          </a>
-        </li>
-        <li>
-          {{ $t($globalConfig.appId, 'Your own Mobile ID, if you whitelist it beforehand at ') }}
-          <a
-              class="link"
-              href="https://demo.sk.ee/MIDCertsReg/"
-              target="_blank">
-            {{ $t($globalConfig.appId, 'https://demo.sk.ee/') }}
-          </a>
-        </li>
-        <li>
-          {{ $t($globalConfig.appId, 'Smart ID') }}
-          <a
-              class="link"
-              href="https://github.com/SK-EID/smart-id-documentation/wiki/Environment-technical-parameters#accounts"
-              target="_blank">
-            {{ $t($globalConfig.appId, 'test numbers') }}
-          </a>
-        </li>
-        <li>
-          {{
-            $t($globalConfig.appId, 'Production ID card from any of our supported countries (does not work for signing asice/bdoc containers),')
-          }}
-        </li>
-        <li>
-          {{
-            $t($globalConfig.appId, 'Estonian test ID-card (or any other supported country). More info regarding Estonian test ID-cards can be found on')
-          }}
-          <a
-              class="link"
-              href="https://www.id.ee/en/article/service-testing-general-information-2/"
-              target="_blank">
-            {{ $t($globalConfig.appId, 'SK’s site.') }}
-          </a>
-        </li>
-      </ul>
+      <a
+          class="link"
+          href="https://docs.eideasy.com/guide/test-environment.html#electronic-identities-in-test-environment"
+          target="_blank">
+        {{ 'https://docs.eideasy.com/guide/test-environment.html#electronic-identities-in-test-environment' }}
+      </a>
     </SettingsSection>
   </div>
 </template>

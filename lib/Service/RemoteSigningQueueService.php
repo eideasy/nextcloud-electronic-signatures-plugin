@@ -70,10 +70,10 @@ class RemoteSigningQueueService
         string $userId
     )
     {
-        list($mimeType, $contents) = $this->getFile($path, $userId);
+        list($mimeType, $contents, $fileName, $extension) = $this->getFile($path, $userId);
 
         $file = [
-            'fileName' => basename($path),
+            'fileName' => $fileName,
             'fileContent' => base64_encode($contents),
             'mimeType' => $mimeType,
         ];
@@ -83,12 +83,18 @@ class RemoteSigningQueueService
             'secret' => $this->config->getSecret(),
             'lang' => $this->config->getApiLanguage() ?? self::DEFAULT_API_LANGUAGE,
         ];
-        $prepareFilesResponse = $this->eidEasyApi->prepareFiles([$file], $params);
+
+        if ($extension === 'asice') {
+            $prepareFilesResponse = $this->eidEasyApi->prepareAsiceForSigning($file['fileContent'], $file);
+        } else {
+            $prepareFilesResponse = $this->eidEasyApi->prepareFiles([$file], $params);
+        }
         if ($prepareFilesResponse['status'] !== 'OK') {
             $this->logger->alert(json_encode($prepareFilesResponse));
-            $message = $prepareFilesResponse['message']
-                ? "eID Easy error: {$prepareFilesResponse['message']}"
-                : 'eID Easy error';
+            $message = 'File preparation failed.';
+            if ($prepareFilesResponse['message']) {
+                $message = $message . ' Cause: ' . $prepareFilesResponse['message'];
+            }
             throw new EidEasyException($message);
         }
         return $prepareFilesResponse['doc_id'];
@@ -100,10 +106,12 @@ class RemoteSigningQueueService
         string $path
     ): array
     {
-        $configWebhookUrl = $this->config->getRemoteSigningQueueWebhook();
-        $webhookUrl = empty($configWebhookUrl)
-            ? $this->urlGenerator->linkToRouteAbsolute('electronicsignatures.remoteQueueApi.fetchSigningQueueFile')
-            : $configWebhookUrl;
+        $webhookUrl = $this->config->getRemoteSigningQueueWebhook();
+        if (empty($webhookUrl)) {
+            $webhookUrl= $this->config->getDefaultRemoteSigningQueueWebhook();
+        }
+
+        $this->logger->info("Remote queue status webhook url: $webhookUrl");
 
         $queueResponse = $this->eidEasyApi->createSigningQueue($docId, [
             'has_management_page' => true,
@@ -111,7 +119,7 @@ class RemoteSigningQueueService
         ]);
         if (!isset($queueResponse['id'], $queueResponse['signing_queue_secret'])) {
             $this->logger->alert(json_encode($queueResponse));
-            throw new EidEasyException('eID Easy error');
+            throw new EidEasyException('Failed to create remote signing queue');
         }
 
         $signingQueue = new RemoteSigningQueue();
