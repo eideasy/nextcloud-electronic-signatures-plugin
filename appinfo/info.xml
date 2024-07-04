@@ -59,7 +59,7 @@ See the following guides:
     <bugs>https://github.com/eideasy/nextcloud-electronic-signatures-plugin/issues</bugs>
     <dependencies>
         <php min-version="8.1"/>
-        <nextcloud min-version="29" max-version="29"/>
+        <nextcloud min-version="28" max-version="29"/>
     </dependencies>
     <settings>
         <admin-section>OCA\ElectronicSignatures\Settings\AdminSection</admin-section>
