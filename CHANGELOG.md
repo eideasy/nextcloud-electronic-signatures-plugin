@@ -1,5 +1,10 @@
 # Change Log
 
+## 3.0.2 – 2024-07-23
+### Changed
+- Updated the pricing info on the App Store listing page.
+- Removed the deprecated API credentials instructions from the settings page.
+
 ## 3.0.1 – 2024-07-04
 ### Added
 - Compatibility with Nextcloud 29
