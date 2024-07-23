@@ -107,72 +107,18 @@ export default {
     <SettingsSection :title="$t($globalConfig.appId, 'eID Easy credentials')">
       <template #settingsHint>
         <p>
-          If you do not yet have an account at https://id.eideasy.com follow
+          Follow
           <a
               class="link"
               target="_blank"
               href="https://docs.eideasy.com/nextcloud/nextcloud-app-setup.html#_2-set-up">
 
             {{
-              $t($globalConfig.appId, 'this guide') + ", "
+              $t($globalConfig.appId, 'this guide') + " "
             }}
           </a>
           {{
-            t($globalConfig.appId, 'otherwise see the instructions below:')
-          }}
-        </p>
-        <p>
-          {{
-            "1. " + $t($globalConfig.appId, 'Head over to eID Easy sign-up page and authenticate yourself: ')
-          }}
-          <a
-              class="link"
-              target="_blank"
-              href="https://id.eideasy.com">
-            https://id.eideasy.com
-          </a>
-        </p>
-        <p>
-          {{
-            "2. " + $t($globalConfig.appId, 'Navigate to: ')
-          }}
-          <a
-              class="link"
-              target="_blank"
-              href="https://id.eideasy.com/admin/clientlist">
-            My Webpages
-          </a>
-        </p>
-        <p>
-          {{
-            "3. " + $t($globalConfig.appId, 'Click on the "Add webpage" button (on the right)')
-          }}
-        </p>
-        <p>
-          {{
-            "4. " + $t($globalConfig.appId, 'For the "Website landing page address" field enter: ')
-          }}
-          <b>{{ instanceUrl }}</b>
-        </p>
-        <p>
-          {{
-            "5. " + $t($globalConfig.appId, 'Click the "Register" button')
-          }}
-        </p>
-        <p>
-          {{
-            "6. " + $t($globalConfig.appId, 'On the left sidebar, click again on ')
-          }}
-          <a
-              class="link"
-              target="_blank"
-              href="https://id.eideasy.com/admin/clientlist">
-            My Webpages
-          </a>
-        </p>
-        <p>
-          {{
-            "7. " + $t($globalConfig.appId, 'You can now find your Client ID and Secret in the "client_id/secret" column. Use these to fill in the fields below:')
+            t($globalConfig.appId, 'on how to register for the eID Easy services and get the API credentials.')
           }}
         </p>
       </template>

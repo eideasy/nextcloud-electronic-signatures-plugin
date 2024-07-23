@@ -30,7 +30,8 @@ Write to info@eideasy.com to claim this offer.
 **Simple Electronic Signature** - the simplest kind of electronic signature. eID Easy sends a unique link to the signer's e-mail. The signer opens the link, reviews the file and confirms their approval. A visual signature is added to the file. eId Easy adds a cryptographic e-seal to the file, to ensure that it cannot be modified after signing.
 
 # Pricing
-See [https://eideasy.com/pricing](https://eideasy.com/pricing) for pricing information.
+The minimum fee is 20 EUR per month +VAT, which includes signatures up to that amount.
+See [https://eideasy.com/pricing](https://eideasy.com/pricing) for detailed pricing information.
 
 # Feedback is welcome
 Are you not seeing your preferred signature card / signing app / other QES method? Are we not quite covering your use case? Let us know at info@eideasy.com
@@ -39,9 +40,13 @@ Are you not seeing your preferred signature card / signing app / other QES metho
 
 ## Set up
 See the following guides:
-[1. Installation](https://docs.eideasy.com/nextcloud/nextcloud-app-installation.html#_1-installation)
-[2. Set up](https://docs.eideasy.com/nextcloud/nextcloud-app-setup.html#_2-set-up)
-[3. Signing a document](https://docs.eideasy.com/nextcloud/nextcloud-app-signing.html#_3-signing-a-document)
+
+1. [Installation](https://docs.eideasy.com/nextcloud/nextcloud-app-installation.html#_1-installation)
+
+2. [Set up](https://docs.eideasy.com/nextcloud/nextcloud-app-setup.html#_2-set-up)
+
+3. [Signing a document](https://docs.eideasy.com/nextcloud/nextcloud-app-signing.html#_3-signing-a-document)
+
 
 [CHANGELOG](https://github.com/eideasy/nextcloud-electronic-signatures-plugin/blob/master/CHANGELOG.md)
 
