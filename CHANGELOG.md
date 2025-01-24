@@ -1,5 +1,9 @@
 # Change Log
 
+## 3.0.3 – 2025-01-24
+### Added
+- Compatibility with Nextcloud 30
+
 ## 3.0.2 – 2024-07-23
 ### Changed
 - Updated the pricing info on the App Store listing page.
