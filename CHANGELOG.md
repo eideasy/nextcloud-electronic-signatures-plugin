@@ -1,5 +1,9 @@
 # Change Log
 
+## 3.0.4 – 2025-01-24
+### Fixed
+- Build and deployment process
+
 ## 3.0.3 – 2025-01-24
 ### Added
 - Compatibility with Nextcloud 30
