@@ -27,6 +27,9 @@ function addCustomFileActions() {
         mime: file.mime,
       });
     },
+    enabled() {
+      return true;
+    },
     order: 1,
   });
   registerFileAction(fileAction);
