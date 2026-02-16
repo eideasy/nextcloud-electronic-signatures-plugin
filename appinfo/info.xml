@@ -5,7 +5,7 @@
     <name>Electronic Signatures</name>
     <summary>Accept electronic signatures on your documents.</summary>
     <description><![CDATA[# Features
-- 🔒🔒 Accept Qualified Electronic Signatures (QES - strongest legal value) in PDF or .asice formats
+- 🔒🔒 Accept Qualified Electronic Signatures (QES - strongest legal value) and Advanced Electronic Signatures (AdES) in PDF or .asice formats
 - 🔒 Accept Simple Electronic Signatures (sms based signature - simple to sign)
 
 ### How it works:
@@ -19,19 +19,19 @@
 # Built on top of eID Easy
 Electronic signatures app uses [eID Easy](https://eideasy.com) as its signing back-end. eID Easy handles the signing process. Refer to [eID Easy's pricing](https://eideasy.com/pricing/) for pricing information.
 
-### Get €10 to try out eID Easy
-For limited time only, we're offering €10 of credit that you can spend to try out all the eID Easy signing services.
+# Three levels of electronic signatures
+**Qualified Electronic Signature** - A Qualified Electronic Signature (QES) is the most secure and legally recognized form of digital signature. It’s equivalent to a handwritten signature in the European Union and can replace paper-based signatures in most legal contexts.
+QES ensures the highest level of security with strict identity verification, multi-factor authentication, and compliance with international standards, making it the ideal choice for businesses needing legally binding, tamper-proof digital signatures.
 
-Write to info@eideasy.com to claim this offer.
+**Advanced Electronic Signature** – An Advanced Electronic Signature (AdES) offers higher security and legal validity than a Simple Electronic Signature (SES), without the complexity of a Qualified Electronic Signature (QES). It uniquely identifies the signer, ensures they control the signing process, and guarantees the signed data hasn’t been tampered with.
 
-# Two levels of electronic signatures
-**Qualified Electronic Signature** - the strongest kind of electronic signature. The signer's identity and approval is linked to the file contents and a timestamp by cryptographic means. The signing time and the document's integrity can be verified to ensure that the document has not been tampered with after signing.
+**Simple Electronic Signature** - A Simple Electronic Signature is any form of digital consent or agreement that links a person to a document or message. It is the most accessible and widely used type of eSignature.
 
-**Simple Electronic Signature** - the simplest kind of electronic signature. eID Easy sends a unique link to the signer's e-mail. The signer opens the link, reviews the file and confirms their approval. A visual signature is added to the file. eId Easy adds a cryptographic e-seal to the file, to ensure that it cannot be modified after signing.
 
 # Pricing
-The minimum fee is 20 EUR per month +VAT, which includes signatures up to that amount.
-See [https://eideasy.com/pricing](https://eideasy.com/pricing) for detailed pricing information.
+
+Every business is different — [talk to our experts](https://www.eideasy.com/book-a-call) to get a custom quote based on your location, use case, and volume.
+Whether you're serving one country or many, we offer flexible pricing that aligns with your compliance needs, usage volume, and geographic coverage.
 
 # Feedback is welcome
 Are you not seeing your preferred signature card / signing app / other QES method? Are we not quite covering your use case? Let us know at info@eideasy.com
@@ -54,7 +54,7 @@ See the following guides:
     <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-1.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-2.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-3.png</screenshot>
-    <version>3.0.5</version>
+    <version>3.0.6</version>
     <licence>agpl</licence>
     <author mail="info@eideasy.com" homepage="https://eideasy.com">eID Easy</author>
     <namespace>ElectronicSignatures</namespace>
@@ -64,7 +64,7 @@ See the following guides:
     <bugs>https://github.com/eideasy/nextcloud-electronic-signatures-plugin/issues</bugs>
     <dependencies>
         <php min-version="8.1"/>
-        <nextcloud min-version="29" max-version="31"/>
+        <nextcloud min-version="31" max-version="32"/>
     </dependencies>
     <settings>
         <admin-section>OCA\ElectronicSignatures\Settings\AdminSection</admin-section>
