@@ -1,5 +1,9 @@
 # Change Log
 
+## 3.0.7 – 2026-07-13
+### Added
+- Compatibility with Nextcloud 33
+
 ## 3.0.6 – 2026-02-16
 ### Added
 - Compatibility with Nextcloud 32
