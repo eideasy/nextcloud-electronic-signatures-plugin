@@ -55,7 +55,7 @@ See the following guides:
     <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-1.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-2.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/eideasy/nextcloud-electronic-signatures-plugin/master/img/screenshots/screenshot-3.png</screenshot>
-    <version>3.0.7</version>
+    <version>3.0.8</version>
     <licence>agpl</licence>
     <author mail="info@eideasy.com" homepage="https://eideasy.com">eID Easy</author>
     <namespace>ElectronicSignatures</namespace>
@@ -64,7 +64,7 @@ See the following guides:
     <category>office</category>
     <bugs>https://github.com/eideasy/nextcloud-electronic-signatures-plugin/issues</bugs>
     <dependencies>
-        <php min-version="8.1"/>
+        <php min-version="8.2"/>
         <nextcloud min-version="33" max-version="33"/>
     </dependencies>
     <settings>
