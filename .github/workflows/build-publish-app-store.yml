@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         php-versions: ['8.2']
-        nextcloud: ['stable33']
+        nextcloud: ['stable34']
         database: ['sqlite']
     steps:
       - uses: actions/checkout@v4
