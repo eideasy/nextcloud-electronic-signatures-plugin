@@ -11,10 +11,6 @@ use OCP\AppFramework\OCSController;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
-require_once __DIR__ . '/../../vendor/autoload.php';
-
-use EidEasy\Signatures\Pades;
-
 class SignApiController extends OCSController
 {
     private $userId;
@@ -22,8 +18,6 @@ class SignApiController extends OCSController
     /** @var FetchSignedFile */
     private $fetchFileCommand;
 
-    /** @var Pades */
-    private $pades;
 
     /** @var LoggerInterface */
     private $logger;
@@ -35,7 +29,6 @@ class SignApiController extends OCSController
         $AppName,
         IRequest $request,
         FetchSignedFile $fetchSignedFile,
-        Pades $pades,
         LoggerInterface $logger,
         SigningQueueService $signingQueueService,
         $UserId
@@ -45,7 +38,6 @@ class SignApiController extends OCSController
         $this->userId = $UserId;
         $this->fetchFileCommand = $fetchSignedFile;
         $this->signingQueueService = $signingQueueService;
-        $this->pades = $pades;
         $this->logger = $logger;
     }
 

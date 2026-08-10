@@ -8,11 +8,8 @@ use OCA\ElectronicSignatures\Exceptions\EidEasyException;
 use OCP\Files\IRootFolder;
 use OCP\AppFramework\Controller;
 use OCP\IURLGenerator;
+use OCA\ElectronicSignatures\Service\EidEasyApiClient;
 use Psr\Log\LoggerInterface;
-
-require_once __DIR__ . '/../../vendor/autoload.php';
-
-use EidEasy\Api\EidEasyApi;
 
 class GetSignLinkRemote extends Controller
 {
@@ -33,7 +30,7 @@ class GetSignLinkRemote extends Controller
     /** @var Config */
     private $config;
 
-    /** @var EidEasyApi */
+    /** @var EidEasyApiClient */
     private $eidEasyApi;
 
     /** @var IURLGenerator */

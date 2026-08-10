@@ -2,12 +2,10 @@
 
 namespace OCA\ElectronicSignatures;
 
+use OCA\ElectronicSignatures\Service\EidEasyApiClient;
+use OCA\ElectronicSignatures\Service\PadesClient;
 use OCP\IConfig;
-use EidEasy\Api\EidEasyApi;
-use EidEasy\Signatures\Pades;
 use OCP\IURLGenerator;
-
-require_once __DIR__ . '/../vendor/autoload.php';
 
 class Config {
     public const PROD_URL = 'https://id.eideasy.com';
@@ -45,13 +43,13 @@ class Config {
     /** @var string */
     private $baseUrl;
 
-    /** @var EidEasyApi */
+    /** @var EidEasyApiClient */
     private $api;
 
     /** @var string|null */
     private $apiLanguage;
 
-    /** @var Pades */
+    /** @var PadesClient */
     private $padesApi;
 
     /** @var string */
@@ -63,7 +61,7 @@ class Config {
     /** @var string|null */
     private $defaultRemoteSigningQueueWebhook;
 
-    public function __construct(IConfig $config, IURLGenerator $urlGenerator, EidEasyApi $api, Pades $padesApi) {
+    public function __construct(IConfig $config, IURLGenerator $urlGenerator, EidEasyApiClient $api, PadesClient $padesApi) {
         $this->config = $config;
         $this->urlGenerator = $urlGenerator;
         $this->initApi($api);
@@ -186,12 +184,12 @@ class Config {
         return $this->padesBaseUrl;
 	}
 
-    public function getApi(): EidEasyApi
+    public function getApi(): EidEasyApiClient
     {
         return $this->api;
     }
 
-	public function getPadesApi(): Pades
+	public function getPadesApi(): PadesClient
 	{
 		return $this->padesApi;
 	}
@@ -201,7 +199,7 @@ class Config {
         return !!$this->getPadesApiUrl();
     }
 
-    private function initApi(EidEasyApi $api): void
+    private function initApi(EidEasyApiClient $api): void
     {
         $this->api = $api;
         $this->api->setApiUrl($this->getApiUrl());
@@ -209,7 +207,7 @@ class Config {
         $this->api->setSecret($this->getSecret());
     }
 
-	private function initPadesApi(Pades $padesApi): void
+	private function initPadesApi(PadesClient $padesApi): void
 	{
 		$this->padesApi = $padesApi;
 		$this->padesApi->setApiUrl($this->getPadesApiUrl());

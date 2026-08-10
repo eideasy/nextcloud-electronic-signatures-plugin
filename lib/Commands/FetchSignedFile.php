@@ -7,14 +7,11 @@ use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Db\Session;
 use OCA\ElectronicSignatures\Db\SessionMapper;
 use OCA\ElectronicSignatures\Service\SigningLinkService;
+use OCA\ElectronicSignatures\Service\EidEasyApiClient;
+use OCA\ElectronicSignatures\Service\PadesClient;
+use OCA\ElectronicSignatures\Signature\Asice;
 use OCP\Files\IRootFolder;
 use OCP\AppFramework\Controller;
-
-require_once __DIR__ . '/../../vendor/autoload.php';
-
-use EidEasy\Api\EidEasyApi;
-use EidEasy\Signatures\Asice;
-use EidEasy\Signatures\Pades;
 
 class FetchSignedFile extends Controller
 {
@@ -32,10 +29,10 @@ class FetchSignedFile extends Controller
     /** @var SessionMapper */
     private $mapper;
 
-    /** @var EidEasyApi */
+    /** @var EidEasyApiClient */
     private $eidEasyApi;
 
-    /** @var Pades */
+    /** @var PadesClient */
     private $padesApi;
 
     public function __construct(

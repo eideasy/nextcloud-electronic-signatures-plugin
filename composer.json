@@ -1,8 +1,14 @@
 {
-    "require": {
-        "eideasy/eideasy-php": "^1.20.1"
-    },
+    "name": "eideasy/nextcloud-electronic-signatures-plugin",
+    "description": "Nextcloud app for electronic signatures through eID Easy.",
+    "license": "AGPL-3.0-or-later",
+    "require": {},
     "require-dev": {
         "phpunit/phpunit": "^9.5"
+    },
+    "config": {
+        "platform": {
+            "php": "8.2.0"
+        }
     }
 }

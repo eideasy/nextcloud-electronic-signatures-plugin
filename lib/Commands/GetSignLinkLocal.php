@@ -8,17 +8,12 @@ use Exception;
 use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Db\SessionMapper;
 use OCA\ElectronicSignatures\Exceptions\EidEasyException;
+use OCA\ElectronicSignatures\Service\EidEasyApiClient;
+use OCA\ElectronicSignatures\Service\PadesClient;
 use OCP\Files\IRootFolder;
 use OCP\AppFramework\Controller;
 use OCP\IURLGenerator;
 use Psr\Log\LoggerInterface;
-
-require_once __DIR__ . '/../../vendor/autoload.php';
-
-use EidEasy\Api\EidEasyApi;
-use EidEasy\Signatures\Pades;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Session;
 
 class GetSignLinkLocal extends Controller
 {
@@ -42,10 +37,10 @@ class GetSignLinkLocal extends Controller
     /** @var LoggerInterface */
     private $logger;
 
-    /** @var EidEasyApi */
+    /** @var EidEasyApiClient */
     private $eidEasyApi;
 
-    /** @var Pades */
+    /** @var PadesClient */
     private $padesApi;
 
     public function __construct(
