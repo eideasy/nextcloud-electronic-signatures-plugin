@@ -147,6 +147,15 @@ class RemoteSigningQueueService
         $path = $signingQueue->getOriginalFilePath();
 
         $data = $this->eidEasyApi->downloadSignedFile($docId);
+        if (!isset($data['signed_file_contents'], $data['filename'])) {
+            $this->logger->alert(json_encode($data));
+            $message = 'Failed to download signed file.';
+            if (!empty($data['message'])) {
+                $message = $message . ' Cause: ' . $data['message'];
+            }
+            throw new EidEasyException($message);
+        }
+
         $signedFileContents = base64_decode($data['signed_file_contents']);
         $filenameParts = explode('.', $data['filename']);
         $containerType = $filenameParts[array_key_last($filenameParts)];
