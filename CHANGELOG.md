@@ -1,5 +1,9 @@
 # Change Log
 
+## 3.0.12 – 2026-08-10
+### Fix
+- fix the Guzzle autoload/class-shadowing issue by removing direct use of Guzzle from the app
+
 ## 3.0.11 – 2026-08-10
 ### Added
 - Backwards compatibility with Nextcloud 32
