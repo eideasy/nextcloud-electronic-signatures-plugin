@@ -21,6 +21,23 @@ function addCustomFileActions() {
     return actionArgument ? [actionArgument] : [];
   };
 
+  const isBeforeFilesV4 = () => {
+    const majorVersion = Number.parseInt(window.OC?.config?.version?.split('.')[0], 10);
+    return Number.isFinite(majorVersion) && majorVersion < 33;
+  };
+
+  const registerLegacyFileAction = action => {
+    if (!isBeforeFilesV4()) {
+      return;
+    }
+
+    window._nc_fileactions = window._nc_fileactions || [];
+    const isAlreadyRegistered = window._nc_fileactions.some(({ id }) => id === action.id);
+    if (!isAlreadyRegistered) {
+      window._nc_fileactions.push(action);
+    }
+  };
+
   const fileAction = {
     id: 'eideasy-sign-file-action',
     displayName,
@@ -42,6 +59,7 @@ function addCustomFileActions() {
     order: 1,
   };
   registerFileAction(fileAction);
+  registerLegacyFileAction(fileAction);
 
   const modalHolderId = 'esigModalHolder';
   const modalHolder = document.createElement('div');
