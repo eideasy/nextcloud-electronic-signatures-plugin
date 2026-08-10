@@ -2,7 +2,6 @@
 
 namespace OCA\ElectronicSignatures\Service;
 
-use EidEasy\Api\EidEasyApi;
 use OCA\ElectronicSignatures\Commands\GetsFile;
 use OCA\ElectronicSignatures\Config;
 use OCA\ElectronicSignatures\Db\RemoteSigningQueue;
@@ -26,7 +25,7 @@ class RemoteSigningQueueService
     private $signingQueueMapper;
     /** @var Config */
     private $config;
-    /** @var EidEasyApi */
+    /** @var EidEasyApiClient */
     private $eidEasyApi;
     /** @var LoggerInterface */
     private $logger;

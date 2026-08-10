@@ -127,7 +127,6 @@ appstore:
 	"img" \
 	"lib" \
 	"templates" \
-	"vendor" \
 	$(appstore_sign_dir)/$(app_name)
 
 	# remove composer binaries, those aren't needed

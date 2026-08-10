@@ -7,8 +7,6 @@ use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\OCSController;
 use OCP\IRequest;
 
-require_once __DIR__ . '/../../vendor/autoload.php';
-
 class RemoteQueueApiController extends OCSController
 {
     private $userId;
