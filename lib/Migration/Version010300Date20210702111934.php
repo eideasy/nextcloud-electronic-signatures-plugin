@@ -54,7 +54,7 @@ class Version010300Date20210702111934 extends SimpleMigrationStep {
             $query = $this->dbConnection->getQueryBuilder();
             $query->update('esignature_sessions')
                 ->set('is_downloaded', 'used');
-            $query->execute();
+            $query->executeStatement();
         }
     }
 }
